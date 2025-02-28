@@ -1,6 +1,8 @@
 package com.example.outsourcing.domain.order.entity;
 
 import com.example.outsourcing.domain.order.enums.OrderStatus;
+import com.example.outsourcing.domain.store.entity.Store;
+import com.example.outsourcing.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
