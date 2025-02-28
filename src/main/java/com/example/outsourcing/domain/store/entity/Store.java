@@ -36,7 +36,7 @@ public class Store extends BaseEntity {
     @Column(nullable = false)
     private String storeName;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private StoreStatus storeStatus;
 
     private String storeNotice;

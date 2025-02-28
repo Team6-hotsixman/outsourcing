@@ -13,13 +13,14 @@ import java.time.LocalDateTime;
 @Entity
 @Getter
 @NoArgsConstructor
-public class Order {
+public class Orders {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private int totalPriceAmount;
     private int usedPoints;
     private LocalDateTime orderAt;
+    @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -31,7 +32,7 @@ public class Order {
     private User user;
 
     @Builder
-    public Order(
+    public Orders(
             int totalPriceAmount,
             int usedPoints,
             LocalDateTime orderAt,

@@ -1,7 +1,7 @@
 package com.example.outsourcing.domain.review.entity;
 
 import com.example.outsourcing.domain.common.entity.BaseEntity;
-import com.example.outsourcing.domain.order.entity.Order;
+import com.example.outsourcing.domain.order.entity.Orders;
 import com.example.outsourcing.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -30,11 +30,11 @@ public class Review extends BaseEntity {
 
     @ManyToOne
     @JoinColumn(name = "order_id")
-    private Order order;
+    private Orders order;
 
 
     @Builder
-    private Review(String content, int rate, User user, Order order) {
+    private Review(String content, int rate, User user, Orders order) {
         this.content = content;
         this.rate = rate;
         this.user = user;

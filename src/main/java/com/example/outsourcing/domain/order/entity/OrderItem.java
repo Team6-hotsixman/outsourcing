@@ -16,14 +16,14 @@ public class OrderItem {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
-    private Order order;
+    private Orders order;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "menu_id", nullable = false)
     private Menu menu;
 
     @Builder
-    public OrderItem(Order order, Menu menu) {
+    public OrderItem(Orders order, Menu menu) {
         this.order = order;
         this.menu = menu;
     }
