@@ -1,4 +1,4 @@
-package com.example.outsourcing.global.entity;
+package com.example.outsourcing.domain.common.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
