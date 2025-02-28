@@ -12,10 +12,10 @@ import lombok.NoArgsConstructor;
 public class Category extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    long id;
+    private long id;
 
     @Column(nullable = false)
-    CategoryName category;
+    private CategoryName category;
 
     public Category(CategoryName category) {
         this.category = category;
