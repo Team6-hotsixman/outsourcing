@@ -21,8 +21,13 @@ public class User extends BaseEntity {
 
     private String password;
 
+    private String name;
+
+    private Integer point;
+
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
+
 
     @Builder
     public User(String email,String password,UserRole userRole) {
