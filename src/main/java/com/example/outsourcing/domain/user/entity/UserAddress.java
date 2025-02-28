@@ -22,7 +22,7 @@ public class UserAddress extends BaseEntity {
     @Column(nullable = false)
     private String address;
 
-    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
     private AddressStatus addressStatus;
 
     @Builder
