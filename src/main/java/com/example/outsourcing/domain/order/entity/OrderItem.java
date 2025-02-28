@@ -1,13 +1,10 @@
-package com.example.outsourcing.domain.order.order_item;
+package com.example.outsourcing.domain.order.entity;
 
 import com.example.outsourcing.domain.menu.entity.Menu;
-import com.example.outsourcing.domain.order.entity.Order;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.awt.*;
 
 @Entity
 @Getter
