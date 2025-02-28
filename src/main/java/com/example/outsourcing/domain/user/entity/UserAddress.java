@@ -5,10 +5,12 @@ import com.example.outsourcing.domain.user.enums.AddressStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.yaml.snakeyaml.events.Event;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class UserAddress extends BaseEntity {
     @Id

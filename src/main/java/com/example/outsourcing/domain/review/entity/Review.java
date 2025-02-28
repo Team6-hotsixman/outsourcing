@@ -6,9 +6,11 @@ import com.example.outsourcing.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 @Entity
+@Getter
 @NoArgsConstructor(access= AccessLevel.PROTECTED)
 public class Review extends BaseEntity {
 
