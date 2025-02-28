@@ -2,6 +2,7 @@ package com.example.outsourcing.domain.menu.menuoption.entity;
 
 import com.example.outsourcing.domain.menu.entity.Menu;
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -23,6 +24,7 @@ public class MenuOption {
     @JoinColumn(name = "menu_id")
     private Menu menu;
 
+    @Builder
     public MenuOption(String optionName, Integer price, Menu menu) {
         this.optionName = optionName;
         this.price = price;

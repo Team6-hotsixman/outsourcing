@@ -5,6 +5,7 @@ import com.example.outsourcing.domain.category.enums.CategoryName;
 import com.example.outsourcing.domain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 @Entity
@@ -17,7 +18,8 @@ public class Category extends BaseEntity {
     @Column(nullable = false)
     private CategoryName category;
 
-    public Category(CategoryName category) {
+    @Builder
+    private Category(CategoryName category) {
         this.category = category;
     }
 
