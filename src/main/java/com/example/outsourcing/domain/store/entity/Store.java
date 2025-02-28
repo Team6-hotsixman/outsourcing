@@ -1,13 +1,17 @@
 package com.example.outsourcing.domain.store.entity;
 
 import com.example.outsourcing.domain.common.entity.BaseEntity;
+import com.example.outsourcing.domain.common.entity.Image;
+import com.example.outsourcing.domain.user.entity.User;
+import com.example.outsourcing.domain.category.entity.Category;
 import com.example.outsourcing.domain.store.enums.StoreStatus;
+
+
 import jakarta.persistence.*;
-import jdk.jfr.Category;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
-import java.awt.*;
+
 import java.time.LocalDateTime;
 
 @Entity
@@ -18,15 +22,15 @@ public class Store extends BaseEntity {
     private long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = id, nullable = false)
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = id, nullable = false)
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "image_id", nullable = false)
     private Image image;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = id, nullable = false)
+    @JoinColumn(name = "category_id", nullable = false)
     private Category category;
 
     @Column(nullable = false)
@@ -61,9 +65,9 @@ public class Store extends BaseEntity {
             LocalDateTime openTime,
             LocalDateTime closeTime
     ) {
-        this.ownerId = ownerId;
-        this.imageId = imageId;
-        this.categoryId = categoryId;
+        this.user = user;
+        this.image = image;
+        this.category = category;
         this.storeStatus = storeStatus;
         this.storeNotice = storeNotice;
         this.address = address;
