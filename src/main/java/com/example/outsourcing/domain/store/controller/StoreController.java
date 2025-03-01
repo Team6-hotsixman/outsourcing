@@ -24,7 +24,12 @@ public class StoreController {
 
     @PostMapping("/owners/stores")
     public ResponseEntity<StoreResponseDto> saveStore(@RequestBody @Valid StoreSaveRequestDto requestDto) {
-        return new ResponseEntity<>(storeService.saveStore(requestDto), HttpStatus.CREATED);
+        User authUser = User.builder()
+                .email("qwer@1234")
+                .password("password")
+                .userRole(UserRole.OWNER)
+                .build();
+        return new ResponseEntity<>(storeService.saveStore(authUser,requestDto), HttpStatus.CREATED);
     }
 
     @PatchMapping("owners/stores/{storeId}")

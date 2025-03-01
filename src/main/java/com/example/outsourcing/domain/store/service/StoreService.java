@@ -40,7 +40,7 @@ public class StoreService {
     /* hyen ho start */
     @Transactional
     public StoreResponseDto saveStore(User authUser, StoreSaveRequestDto dto) {
-        CategoryResponse categoryResponse = categoryService.getCategoryById(dto.getCatogoryId());
+        CategoryResponse categoryResponse = categoryService.getCategoryById(dto.getCategoryId());
         Image image = imageService.getImageById(dto.getImageId());
         User user = userRepository.findById(1L).orElseThrow();
 
@@ -68,17 +68,17 @@ public class StoreService {
     public StoreResponseDto updateStore(Long storeId, User user, StoreUpdateRequestDto requestDto) {
         Store store = storeRepository.findById(storeId).orElseThrow(NotFoundStoreException::new);
         // 현재 사용자와 가게 주인과 비교
-//        if (!store.getUser().getId().equals(user.getId())) {
-//            throw new UnauthorizedStoreOwnerException();
-//        }
+        // if (!store.getUser().getId().equals(user.getId())) {
+        //      throw new UnauthorizedStoreOwnerException();
+        //}
 
         if (requestDto.getImageId() != null) {
             Image newImage = imageService.getImageById(requestDto.getImageId());
             store.updateImage(newImage);
         }
         if (requestDto.getCategoryId() != null) {
-            Category category = categoryService.getCategoryById(requestDto.getCategoryId());
-            store.updateCategory(category);
+            CategoryResponse categoryResponse = categoryService.getCategoryById(requestDto.getCategoryId());
+            store.updateCategory(new Category(categoryResponse));
         }
         if (requestDto.getStoreName() != null && !requestDto.getStoreName().isBlank()) {
             store.updateStoreName(requestDto.getStoreName());
@@ -100,9 +100,9 @@ public class StoreService {
     public StoreStatusResponseDto updateStoreStatus(User authUser, Long storeId, StoreStatusUpdateRequestDto requestDto) {
         Store store = storeRepository.findById(storeId).orElseThrow(NotFoundStoreException::new);
         // 현재 사용자와 가게 주인과 비교
-//        if (!store.getUser().getId().equals(user.getId())) {
-//            throw new UnauthorizedStoreOwnerException();
-//        }
+        // if (!store.getUser().getId().equals(user.getId())) {
+        // throw new UnauthorizedStoreOwnerException();
+        // }
 
         // 현재 상태와 같으면 예외처리
         if (store.getStoreStatus().equals(requestDto.getStoreStatus())) {
@@ -142,9 +142,5 @@ public class StoreService {
         store.shutDownStore();
 
     }
-
-
-
-
     /* hyen ho end */
 }
