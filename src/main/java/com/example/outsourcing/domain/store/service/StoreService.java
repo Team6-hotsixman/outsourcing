@@ -1,6 +1,7 @@
 package com.example.outsourcing.domain.store.service;
 
 
+import com.example.outsourcing.domain.category.dto.response.CategoryResponse;
 import com.example.outsourcing.domain.category.entity.Category;
 import com.example.outsourcing.domain.common.entity.Image;
 import com.example.outsourcing.domain.common.exception.StoreLimitExceededException;
@@ -30,7 +31,7 @@ public class StoreService {
     /* hyen ho start */
     @Transactional
     public StoreResponseDto saveStore(User authUser, StoreSaveRequestDto dto) {
-        Category category = categoryService.getCategoryById(dto.getCatogoryId());
+        CategoryResponse categoryResponse = categoryService.getCategoryById(dto.getCatogoryId());
         Image image = imageService.getImageById(dto.getImageId());
         User user = userRepository.findById(1L).orElseThrow();
 
@@ -41,7 +42,7 @@ public class StoreService {
         Store store = Store.builder()
                 .user(user)
                 .image(image)
-                .category(category)
+                .category(new Category(categoryResponse))
                 .storeName(dto.getStoreName())
                 .storeStatus(dto.getStoreStatus())
                 .storeNotice(dto.getStoreNotice())
