@@ -1,7 +1,7 @@
 package com.example.outsourcing.domain.category.entity;
 
 
-import com.example.outsourcing.domain.category.enums.CategoryName;
+import com.example.outsourcing.domain.category.dto.response.CategoryResponse;
 import com.example.outsourcing.domain.common.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -17,12 +17,22 @@ public class Category extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @Enumerated(EnumType.STRING)
-    private CategoryName category;
+    @Column(nullable = false)
+    private String categoryName;
 
     @Builder
-    private Category(CategoryName category) {
-        this.category = category;
+    private Category(String categoryName) {
+        this.categoryName = categoryName;
     }
+
+    public Category(CategoryResponse categoryResponse) {
+        this.id = categoryResponse.getId();
+        this.categoryName = categoryResponse.getCategoryName();
+    }
+
+    public void updateCategoryName(String newCategoryName) {
+        this.categoryName = newCategoryName;
+    }
+
 
 }

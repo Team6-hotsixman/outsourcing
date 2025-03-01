@@ -42,7 +42,7 @@ public class StoreResponseDto {
                 store.getId(),
                 store.getUser().getId(),
                 store.getImage().getId(),
-                store.getCategory().getCategory().name(),
+                store.getCategory().getCategoryName(),
                 store.getStoreName(),
                 store.getStoreStatus(),
                 store.getStoreNotice(),
