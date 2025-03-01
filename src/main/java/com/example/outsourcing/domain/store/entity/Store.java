@@ -9,12 +9,14 @@ import com.example.outsourcing.domain.store.enums.StoreStatus;
 
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @NoArgsConstructor
 public class Store extends BaseEntity {
     @Id
@@ -58,6 +60,7 @@ public class Store extends BaseEntity {
             User user,
             Image image,
             Category category,
+            String storeName,
             StoreStatus storeStatus,
             String storeNotice,
             String address,
@@ -68,6 +71,7 @@ public class Store extends BaseEntity {
         this.user = user;
         this.image = image;
         this.category = category;
+        this.storeName = storeName;
         this.storeStatus = storeStatus;
         this.storeNotice = storeNotice;
         this.address = address;
