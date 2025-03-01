@@ -12,6 +12,7 @@ public enum ErrorCode {
     STORE_LIMIT_EXCEEDED("한 사장님은 최대 3개까지만 가게를 생성할 수 있습니다.", HttpStatus.BAD_REQUEST),
 
     METHOD_ARGUMENT_NOT_VALID("입력값이 올바르지 않습니다", HttpStatus.BAD_REQUEST),
+    NOT_FOUND_DEFAULT_ADDRESS("기본 배송지를 설정해주세요.", HttpStatus.NOT_FOUND),
     ;
 
     private final String message;
