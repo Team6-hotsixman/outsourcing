@@ -9,12 +9,14 @@ import com.example.outsourcing.domain.store.enums.StoreStatus;
 
 import jakarta.persistence.*;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
+@Getter
 @NoArgsConstructor
 public class Store extends BaseEntity {
     @Id
@@ -48,26 +50,28 @@ public class Store extends BaseEntity {
     private int minOrderPrice;
 
     @Column(nullable = false)
-    private LocalDateTime openTime;
+    private LocalTime openTime;
 
     @Column(nullable = false)
-    private LocalDateTime closeTime;
+    private LocalTime closeTime;
 
     @Builder
     public Store(
             User user,
             Image image,
             Category category,
+            String storeName,
             StoreStatus storeStatus,
             String storeNotice,
             String address,
             int minOrderPrice,
-            LocalDateTime openTime,
-            LocalDateTime closeTime
+            LocalTime openTime,
+            LocalTime closeTime
     ) {
         this.user = user;
         this.image = image;
         this.category = category;
+        this.storeName = storeName;
         this.storeStatus = storeStatus;
         this.storeNotice = storeNotice;
         this.address = address;
