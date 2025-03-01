@@ -8,11 +8,14 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Getter
 @AllArgsConstructor
 public class StoreResponseDto {
     private final long id;
+
+    private final long userId;
 
     private final long imageId;
 
@@ -28,9 +31,9 @@ public class StoreResponseDto {
 
     private final int minOrderPrice;
 
-    private final LocalDateTime openTime;
+    private final LocalTime openTime;
 
-    private final LocalDateTime closeTime;
+    private final LocalTime closeTime;
 
     private final LocalDateTime createdAt;
 
@@ -39,6 +42,7 @@ public class StoreResponseDto {
     public static StoreResponseDto of(Store store) {
         return new StoreResponseDto(
                 store.getId(),
+                store.getUser().getId(),
                 store.getImage().getId(),
                 store.getCategory().getId(),
                 store.getStoreName(),

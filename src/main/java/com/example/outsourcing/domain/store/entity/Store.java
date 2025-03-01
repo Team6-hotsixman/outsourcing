@@ -13,7 +13,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
 @Getter
@@ -50,10 +50,10 @@ public class Store extends BaseEntity {
     private int minOrderPrice;
 
     @Column(nullable = false)
-    private LocalDateTime openTime;
+    private LocalTime openTime;
 
     @Column(nullable = false)
-    private LocalDateTime closeTime;
+    private LocalTime closeTime;
 
     @Builder
     public Store(
@@ -65,8 +65,8 @@ public class Store extends BaseEntity {
             String storeNotice,
             String address,
             int minOrderPrice,
-            LocalDateTime openTime,
-            LocalDateTime closeTime
+            LocalTime openTime,
+            LocalTime closeTime
     ) {
         this.user = user;
         this.image = image;

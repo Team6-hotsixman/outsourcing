@@ -4,7 +4,7 @@ import com.example.outsourcing.domain.store.enums.StoreStatus;
 import lombok.Builder;
 import lombok.Getter;
 
-import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Getter
 public class StoreSaveRequestDto {
@@ -22,9 +22,9 @@ public class StoreSaveRequestDto {
 
     private final int minOrderPrice;
 
-    private final LocalDateTime openTime;
+    private final LocalTime openTime;
 
-    private final LocalDateTime closeTime;
+    private final LocalTime closeTime;
 
     @Builder
     public StoreSaveRequestDto(
@@ -35,8 +35,8 @@ public class StoreSaveRequestDto {
             String storeNotice,
             String address,
             int minOrderPrice,
-            LocalDateTime openTime,
-            LocalDateTime closeTime
+            LocalTime openTime,
+            LocalTime closeTime
     ) {
         this.imageId = imageId;
         this.catogoryId = catogoryId;
