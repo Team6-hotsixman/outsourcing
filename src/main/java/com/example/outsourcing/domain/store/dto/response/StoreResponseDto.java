@@ -19,7 +19,7 @@ public class StoreResponseDto {
 
     private final long imageId;
 
-    private final long catogoryId;
+    private final String catogoryName;
 
     private final String storeName;
 
@@ -44,7 +44,7 @@ public class StoreResponseDto {
                 store.getId(),
                 store.getUser().getId(),
                 store.getImage().getId(),
-                store.getCategory().getId(),
+                store.getCategory().getCategory().name(),
                 store.getStoreName(),
                 store.getStoreStatus(),
                 store.getStoreNotice(),

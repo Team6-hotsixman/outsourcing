@@ -39,7 +39,7 @@ public class StoreService {
         }
 
         Store store = Store.builder()
-                .user(authUser)
+                .user(user)
                 .image(image)
                 .category(category)
                 .storeName(dto.getStoreName())
