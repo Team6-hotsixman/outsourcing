@@ -2,22 +2,30 @@ package com.example.outsourcing.domain.common.service;
 
 import com.example.outsourcing.domain.common.dto.KaKaoLatLngResponse;
 import com.example.outsourcing.domain.common.dto.LatLng;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestTemplate;
 
 @Slf4j
 @Service
 public class GeoCodingService {
+
+    private final GeometryFactory geometryFactory;
 
     RestClient restClient;
     private static final String URL = "https://dapi.kakao.com/v2/local/search/address.json";
     @Value("${KAKAO_API_KEY}")
     private String apiKey;
 
-    public GeoCodingService() {
+    public GeoCodingService(GeometryFactory geometryFactory) {
+        this.geometryFactory = geometryFactory;
         restClient = RestClient.builder().build();
     }
 
@@ -37,6 +45,13 @@ public class GeoCodingService {
         }
 
         throw new RuntimeException("잘못된 주소입니다.");
+    }
+
+    public Point getPoint(String address){
+        LatLng latLng = getLatLng(address);
+        Point point = geometryFactory.createPoint(new Coordinate(latLng.getLongitude(), latLng.getLatitude()));
+        point.setSRID(4326);
+        return point;
     }
 
 }

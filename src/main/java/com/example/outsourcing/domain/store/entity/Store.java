@@ -55,7 +55,7 @@ public class Store extends BaseEntity {
     @Column(nullable = false)
     private LocalTime closeTime;
 
-    @Column(nullable = false)
+    @Column(nullable = false, columnDefinition = "POINT SRID 4326")
     private Point location;
 
     @Builder

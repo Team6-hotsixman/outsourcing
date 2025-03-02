@@ -32,9 +32,12 @@ public class StoreController {
 
      /* hyen ho end */
     @GetMapping("/stores")
-    public ResponseEntity<List<StoreResponseDto>> getAllStores(@RequestParam(required = false) String searchKeyword) {
+    public ResponseEntity<List<StoreResponseDto>> getAllStores(@RequestParam(name = "searchKeyword", required = false) String searchKeyword,
+                                                               @RequestParam(required = false, defaultValue = "3000") double distance,
+                                                               @RequestParam(required = false, defaultValue = "1") int page,
+                                                               @RequestParam(required = false, defaultValue = "10") int size) {
         long userId = 1L;
-        List<StoreResponseDto> stores = storeService.getAllStores(userId, searchKeyword);
+        List<StoreResponseDto> stores = storeService.getAllStores(userId, searchKeyword, distance, page, size);
 
         return ResponseEntity.ok(stores);
     }
