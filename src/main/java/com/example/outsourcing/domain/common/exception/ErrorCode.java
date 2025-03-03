@@ -20,8 +20,9 @@ public enum ErrorCode {
 
     METHOD_ARGUMENT_NOT_VALID("입력값이 올바르지 않습니다", HttpStatus.BAD_REQUEST),
 
-    Unauthorized_User("해당 작업에 대한 권한이 없습니다", HttpStatus.UNAUTHORIZED)
+    UNAUTHORIZED_STORE_OWNER("가게 주인이 아닙니다.", HttpStatus.FORBIDDEN),
 
+    STORE_STATUS_ALREADY_SAME("이미 해당 상태와 같습니다.", HttpStatus.BAD_REQUEST),
     ;
 
     private final String message;
