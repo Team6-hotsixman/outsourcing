@@ -1,5 +1,6 @@
 package com.example.outsourcing.domain.menu.entity;
 
+import com.example.outsourcing.domain.menu.dto.request.MenuUpdateRequestDto;
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.common.entity.Image;
 import com.example.outsourcing.domain.category.entity.Category;
@@ -7,8 +8,6 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-
-import java.awt.*;
 
 @Entity
 @Table(name = "menu")
@@ -56,4 +55,14 @@ public class Menu {
         this.image = image;
         this.category = category;
     }
+
+    public void updateMenu(MenuUpdateRequestDto requestDto, Category category) {
+        this.menuName = requestDto.getMenuName();
+        this.price = requestDto.getPrice();
+        this.description = requestDto.getDescription();
+        this.category = category;
+        this.isAvailable = requestDto.isAvailable();
+        this.image = requestDto.getImage();
+    }
+
 }
