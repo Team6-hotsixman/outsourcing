@@ -15,6 +15,7 @@ import com.example.outsourcing.domain.store.repository.StoreRepository;
 import com.example.outsourcing.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +25,7 @@ public class MenuService {
     private final StoreRepository storeRepository;
     private final CategoryRepository categoryRepository;
 
+    @Transactional
     public MenuResponseDto saveMenu(User user, MenuSaveRequestDto requestDto) {
         Store store = storeRepository.findById(requestDto.getStoreId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_STORE));
@@ -42,6 +44,7 @@ public class MenuService {
         return MenuResponseDto.of(menu);
     }
 
+    @Transactional
     public MenuResponseDto updateMenu(Long menuId, User user, MenuUpdateRequestDto requestDto) {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_USER));
