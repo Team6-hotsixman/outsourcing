@@ -7,6 +7,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Entity
 @NoArgsConstructor
@@ -28,11 +30,38 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+    private LocalDateTime createdAt;
+
+    private LocalDateTime modifiedAt;
+
 
     @Builder
-    public User(String email,String password,UserRole userRole) {
+    private User(
+            String email,
+            String password,
+            //String name,
+            //Integer point,
+            UserRole userRole
+            //LocalDateTime createdAt,
+            //LocalDateTime modifiedAt
+
+    ) {
         this.email = email;
         this.password = password;
+        //this.name = name;
+        //this.point = point;
+        this.userRole = userRole;
+        //this.createdAt = createdAt;
+        //this.modifiedAt = modifiedAt;
+
+    }
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
+
+    public void updateRole(UserRole userRole) {
         this.userRole = userRole;
     }
+
 }
