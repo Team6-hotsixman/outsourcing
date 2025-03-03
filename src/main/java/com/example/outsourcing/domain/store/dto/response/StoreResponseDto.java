@@ -1,10 +1,8 @@
 package com.example.outsourcing.domain.store.dto.response;
 
-import com.example.outsourcing.domain.store.dto.request.StoreSaveRequestDto;
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.store.enums.StoreStatus;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
@@ -13,13 +11,13 @@ import java.time.LocalTime;
 @Getter
 @AllArgsConstructor
 public class StoreResponseDto {
-    private final long id;
+    private final Long id;
 
-    private final long userId;
+    private final Long userId;
 
-    private final long imageId;
+    private final Long imageId;
 
-    private final String catogoryName;
+    private final String categoryName;
 
     private final String storeName;
 
@@ -29,7 +27,7 @@ public class StoreResponseDto {
 
     private final String address;
 
-    private final int minOrderPrice;
+    private final Integer minOrderPrice;
 
     private final LocalTime openTime;
 
