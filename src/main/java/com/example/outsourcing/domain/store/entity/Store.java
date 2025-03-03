@@ -11,17 +11,19 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.SQLRestriction;
 
 
 import java.time.LocalTime;
 
 @Entity
 @Getter
+@SQLRestriction("store_status != 'SHUTDOWN'")
 @NoArgsConstructor
 public class Store extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
@@ -47,7 +49,7 @@ public class Store extends BaseEntity {
     private String address;
 
     @Column(nullable = false)
-    private int minOrderPrice;
+    private Integer minOrderPrice;
 
     @Column(nullable = false)
     private LocalTime openTime;
@@ -67,7 +69,7 @@ public class Store extends BaseEntity {
             StoreStatus storeStatus,
             String storeNotice,
             String address,
-            int minOrderPrice,
+            Integer minOrderPrice,
             LocalTime openTime,
             LocalTime closeTime,
             Point location
@@ -83,5 +85,45 @@ public class Store extends BaseEntity {
         this.openTime = openTime;
         this.closeTime = closeTime;
         this.location = location;
+    }
+
+    public void updateImage(Image image) {
+        this.image = image;
+    }
+
+    public void updateCategory(Category category) {
+        this.category = category;
+    }
+
+    public void updateStoreName(String storeName) {
+        this.storeName = storeName;
+    }
+
+    public void updateMinOrderPrice(Integer minOrderPrice) {
+        this.minOrderPrice = minOrderPrice;
+    }
+
+    public void updateOpenTime(LocalTime openTime) {
+        this.openTime = openTime;
+    }
+
+    public void updateCloseTime(LocalTime closeTime) {
+        this.closeTime = closeTime;
+    }
+
+    public void openStore() {
+        this.storeStatus = StoreStatus.OPEN;
+    }
+
+    public void closeStore() {
+        this.storeStatus = StoreStatus.CLOSE;
+    }
+
+    public void shutDownStore() {
+        this.storeStatus = StoreStatus.SHUTDOWN;
+    }
+
+    public void updateNotice(String storeNotice) {
+        this.storeNotice = storeNotice;
     }
 }
