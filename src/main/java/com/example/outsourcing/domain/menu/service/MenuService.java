@@ -2,9 +2,11 @@ package com.example.outsourcing.domain.menu.service;
 
 import com.example.outsourcing.domain.category.entity.Category;
 import com.example.outsourcing.domain.category.repository.CategoryRepository;
+import com.example.outsourcing.domain.common.entity.Image;
 import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.common.exception.UnauthorizedUserException;
+import com.example.outsourcing.domain.common.repository.ImageRepository;
 import com.example.outsourcing.domain.menu.dto.request.MenuSaveRequestDto;
 import com.example.outsourcing.domain.menu.dto.request.MenuUpdateRequestDto;
 import com.example.outsourcing.domain.menu.dto.response.MenuResponseDto;
@@ -24,6 +26,7 @@ public class MenuService {
     private final MenuRepository menuRepository;
     private final StoreRepository storeRepository;
     private final CategoryRepository categoryRepository;
+    private final ImageRepository imageRepository;
 
     @Transactional
     public MenuResponseDto saveMenu(User user, MenuSaveRequestDto requestDto) {
@@ -33,12 +36,15 @@ public class MenuService {
         Category category = categoryRepository.findById(requestDto.getCategoryId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_CATEGORY));
 
+        Image image = imageRepository.findById(requestDto.getImageId())
+                .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_IMAGE));
+
         // 권한 검증 - 추후 AOP 분리
         if (!store.getUser().getId().equals(user.getId())) {
             throw new UnauthorizedUserException();
         }
 
-        Menu menu = MenuSaveRequestDto.toEntity(requestDto, store, category);
+        Menu menu = MenuSaveRequestDto.toEntity(requestDto, store, category, image);
 
         menuRepository.save(menu);
         return MenuResponseDto.of(menu);

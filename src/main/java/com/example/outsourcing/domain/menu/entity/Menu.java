@@ -40,9 +40,9 @@ public class Menu {
     private Category category;
 
     @Builder
-    public Menu(String menuName,
+    public Menu(java.lang.String menuName,
                 Integer price,
-                String description,
+                java.lang.String description,
                 boolean isAvailable,
                 Store store,
                 Image image,

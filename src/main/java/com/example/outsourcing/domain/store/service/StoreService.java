@@ -7,7 +7,6 @@ import com.example.outsourcing.domain.common.entity.Image;
 import com.example.outsourcing.domain.common.exception.StoreLimitExceededException;
 import com.example.outsourcing.domain.common.exception.NotFoundStoreException;
 import com.example.outsourcing.domain.common.exception.StoreStatusAlreadySameException;
-import com.example.outsourcing.domain.common.exception.UnauthorizedStoreOwnerException;
 import com.example.outsourcing.domain.common.service.ImageService;
 import com.example.outsourcing.domain.store.dto.request.StoreDeleteRequestDto;
 import com.example.outsourcing.domain.store.dto.request.StoreSaveRequestDto;

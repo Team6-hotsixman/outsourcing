@@ -11,11 +11,11 @@ import lombok.Getter;
 @AllArgsConstructor
 public class MenuUpdateRequestDto {
 
-    private final String menuName;
+    private final java.lang.String menuName;
 
     private final Integer price;
 
-    private final String description;
+    private final java.lang.String description;
 
     private final Image image;
 

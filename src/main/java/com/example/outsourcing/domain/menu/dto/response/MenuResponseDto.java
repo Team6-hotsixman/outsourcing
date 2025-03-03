@@ -20,7 +20,7 @@ public class MenuResponseDto {
 
     private String category;
 
-    private Long image;
+    private String imagePath;
 
 
     public static MenuResponseDto of(Menu menu) {
@@ -31,7 +31,7 @@ public class MenuResponseDto {
                 menu.isAvailable(),
                 menu.getStore().getStoreName(),
                 menu.getCategory().getCategoryName(),
-                menu.getImage().getId());
+                menu.getImage().getImagePath());
     }
 
 }
