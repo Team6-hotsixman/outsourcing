@@ -3,13 +3,17 @@ package com.example.outsourcing.domain.user.entity;
 import com.example.outsourcing.domain.common.entity.BaseEntity;
 import com.example.outsourcing.domain.user.enums.UserRole;
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
+
 @Getter
 @Entity
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+
 public class User extends BaseEntity {
 
     @Id
@@ -23,16 +27,41 @@ public class User extends BaseEntity {
 
     private String name;
 
-    private Integer point;
+    //private Integer point;
 
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+    private LocalDateTime createdAt;
+
+    private LocalDateTime modifiedAt;
+
 
     @Builder
-    public User(String email,String password,UserRole userRole) {
+    private User(
+            String email,
+            String password,
+            String name,
+            UserRole userRole,
+            LocalDateTime createdAt,
+            LocalDateTime modifiedAt
+
+    ) {
         this.email = email;
         this.password = password;
+        this.name = name;
+        this.userRole = userRole;
+        this.createdAt = createdAt;
+        this.modifiedAt = modifiedAt;
+
+    }
+
+    public void changePassword(String password) {
+        this.password = password;
+    }
+
+    public void updateRole(UserRole userRole) {
         this.userRole = userRole;
     }
+
 }
