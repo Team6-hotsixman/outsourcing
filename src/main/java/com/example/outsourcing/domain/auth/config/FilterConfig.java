@@ -1,7 +1,7 @@
 package com.example.outsourcing.domain.auth.config;
 
-import com.example.outsourcing.domain.auth.jwt.JwtFilter;
-import com.example.outsourcing.domain.auth.jwt.JwtUtil;
+import com.example.outsourcing.domain.common.filter.JwtFilter;
+import com.example.outsourcing.domain.common.jwt.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;

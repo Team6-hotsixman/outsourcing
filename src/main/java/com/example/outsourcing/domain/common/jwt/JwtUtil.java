@@ -1,4 +1,4 @@
-package com.example.outsourcing.domain.auth.jwt;
+package com.example.outsourcing.domain.common.jwt;
 
 import com.example.outsourcing.domain.user.enums.UserRole;
 import io.jsonwebtoken.Claims;

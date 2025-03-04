@@ -1,5 +1,6 @@
-package com.example.outsourcing.domain.auth.jwt;
+package com.example.outsourcing.domain.common.filter;
 
+import com.example.outsourcing.domain.common.jwt.JwtUtil;
 import com.example.outsourcing.domain.user.enums.UserRole;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

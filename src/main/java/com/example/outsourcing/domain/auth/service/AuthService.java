@@ -6,7 +6,7 @@ import com.example.outsourcing.domain.auth.dto.request.AuthSignupRequestDto;
 import com.example.outsourcing.domain.auth.dto.response.AuthLoginResponseDto;
 import com.example.outsourcing.domain.auth.dto.response.AuthSingupResponseDto;
 import com.example.outsourcing.domain.auth.exception.AuthException;
-import com.example.outsourcing.domain.auth.jwt.JwtUtil;
+import com.example.outsourcing.domain.common.jwt.JwtUtil;
 import com.example.outsourcing.domain.common.exception.InvalidRequestException;
 import com.example.outsourcing.domain.user.entity.User;
 import com.example.outsourcing.domain.user.enums.UserRole;
