@@ -9,6 +9,7 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -43,6 +44,28 @@ public class StoreResponseDto {
 
     private final LocalDateTime modifiedAt;
 
+    private double distance;
+
+    private double rate;
+
+    public StoreResponseDto(Store store, double distance, double rate) {
+        this.id = store.getId();
+        this.userId = store.getUser().getId();
+        this.imageId = store.getImage().getId();
+        this.categoryName = store.getCategory().getCategoryName();
+        this.storeName = store.getStoreName();
+        this.storeStatus = store.getStoreStatus();
+        this.storeNotice = store.getStoreNotice();
+        this.address = store.getAddress();
+        this.menus = new ArrayList<>();
+        this.minOrderPrice = store.getMinOrderPrice();
+        this.openTime = store.getOpenTime();
+        this.closeTime = store.getCloseTime();
+        this.createdAt = store.getCreatedAt();
+        this.modifiedAt = store.getModifiedAt();
+        this.distance = distance;
+        this.rate = rate;
+    }
     public static StoreResponseDto of(Store store, List<Menu> menus) {
         return new StoreResponseDto(
                 store.getId(),
@@ -60,7 +83,9 @@ public class StoreResponseDto {
                 store.getOpenTime(),
                 store.getCloseTime(),
                 store.getCreatedAt(),
-                store.getModifiedAt()
+                store.getModifiedAt(),
+                0,
+                0
                 );
     }
 }
