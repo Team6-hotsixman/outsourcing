@@ -16,6 +16,11 @@ public class Image extends BaseEntity {
     @Column(nullable = false)
     String imagePath;
 
+    public Image(long id, String imagePath) {
+        this.id = id;
+        this.imagePath = imagePath;
+    }
+
     public Image(String imagePath) {
         this.imagePath = imagePath;
     }

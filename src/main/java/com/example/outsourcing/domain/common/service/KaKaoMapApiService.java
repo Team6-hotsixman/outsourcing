@@ -39,7 +39,7 @@ public class KaKaoMapApiService {
                 .body(KaKaoMapResponse.class);
         if(response != null){
             log.debug("Kakao response: {}", response);
-            return response.getDocuments().get(0).getLatLng();
+            return response.getDocuments().get(0);
         }
 
         throw new RuntimeException("잘못된 주소입니다.");

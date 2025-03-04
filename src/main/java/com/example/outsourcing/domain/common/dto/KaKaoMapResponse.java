@@ -10,5 +10,5 @@ import java.util.List;
 @NoArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true) // 불필요한 필드 무시
 public class KaKaoMapResponse {
-    private List<Address> documents;
+    private List<LatLng> documents;
 }
