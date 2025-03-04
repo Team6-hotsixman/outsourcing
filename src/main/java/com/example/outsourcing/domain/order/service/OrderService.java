@@ -104,35 +104,17 @@ public class OrderService {
         return OrderResponseDto.of(order);
     }
 
-    //주문 취소
-    @Transactional
-    public void cancelOrder(Long userId, Long orderId, Long storeId) {
+    //주문 내역 조회
+    @Transactional(readOnly = true)
+    public Page<OrderResponseDto> findAll(int page, int size, Long userId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new ApplicationException(ErrorCode.NOT_FOUND_USER)
         );
-        Store store = storeRepository.findById(storeId).orElseThrow(
-                () -> new ApplicationException(ErrorCode.NOT_FOUND_STORE)
-        );
-        Orders order = orderRepository.findById(orderId).orElseThrow(
-                () -> new ApplicationException(ErrorCode.NOT_FOUND_ORDER)
-        );
 
-        //조회한 주문이 해당 가게에서 발생한 주문이 아닐 경우
-        if (!store.getId().equals(order.getStore().getId())) {
-            throw new ApplicationException(ErrorCode.MISMATCHED_ORDER_WITH_STORE);
-        }
-
-        //주문을 요청한 고객만 주문 취소 가능
-        if (!user.getId().equals(order.getUser().getId())) {
-            throw new ApplicationException(ErrorCode.MISMATCHED_ORDER_WITH_USER);
-        }
-
-        //가게에서 주문을 수락 전에만 취소 가능
-        if (!order.getOrderStatus().equals(OrderStatus.NEW)) {
-            throw new ApplicationException(ErrorCode.CANT_CANCEL_AFTER_COOKING);
-        }
-
-        orderRepository.deleteById(orderId);
+        int adjustedPage = (page > 0) ? page - 1 : 0;
+        PageRequest pageable = PageRequest.of(adjustedPage, size, Sort.by("orderAt").descending());
+        Page<Orders> orderPage = orderRepository.findAllByUserId(userId, pageable);
+        return orderPage.map(OrderResponseDto::of);
     }
 
     //주문 수락/거절/배달중/배달완료 상태 변경
@@ -174,16 +156,34 @@ public class OrderService {
         return OrderResponseDto.of(order);
     }
 
-    //주문 내역 조회
-    @Transactional(readOnly = true)
-    public Page<OrderResponseDto> findAll(int page, int size, Long userId) {
+    //주문 취소
+    @Transactional
+    public void cancelOrder(Long userId, Long orderId, Long storeId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new ApplicationException(ErrorCode.NOT_FOUND_USER)
         );
+        Store store = storeRepository.findById(storeId).orElseThrow(
+                () -> new ApplicationException(ErrorCode.NOT_FOUND_STORE)
+        );
+        Orders order = orderRepository.findById(orderId).orElseThrow(
+                () -> new ApplicationException(ErrorCode.NOT_FOUND_ORDER)
+        );
 
-        int adjustedPage = (page > 0) ? page - 1 : 0;
-        PageRequest pageable = PageRequest.of(adjustedPage, size, Sort.by("orderAt").descending());
-        Page<Orders> orderPage = orderRepository.findAllByUserId(userId, pageable);
-        return orderPage.map(OrderResponseDto::of);
+        //조회한 주문이 해당 가게에서 발생한 주문이 아닐 경우
+        if (!store.getId().equals(order.getStore().getId())) {
+            throw new ApplicationException(ErrorCode.MISMATCHED_ORDER_WITH_STORE);
+        }
+
+        //주문을 요청한 고객만 주문 취소 가능
+        if (!user.getId().equals(order.getUser().getId())) {
+            throw new ApplicationException(ErrorCode.MISMATCHED_ORDER_WITH_USER);
+        }
+
+        //가게에서 주문을 수락 전에만 취소 가능
+        if (!order.getOrderStatus().equals(OrderStatus.NEW)) {
+            throw new ApplicationException(ErrorCode.CANT_CANCEL_AFTER_COOKING);
+        }
+
+        orderRepository.deleteById(orderId);
     }
 }

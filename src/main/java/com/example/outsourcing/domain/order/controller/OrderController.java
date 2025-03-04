@@ -26,6 +26,16 @@ public class OrderController {
         return orderService.placeOrder(userId, storeId, requestDto);
     }
 
+    @GetMapping("/orders")
+    public Page<OrderResponseDto> getOrders(
+            HttpServletRequest httpServletRequest,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userID")));
+        return orderService.findAll(page, size, userId);
+    }
+
     @PutMapping("/orders/status")
     public OrderResponseDto updateOrderStatus(
             HttpServletRequest httpServletRequest,
@@ -45,15 +55,5 @@ public class OrderController {
     ) {
         Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userID")));
         orderService.cancelOrder(userId, orderId, storeId);
-    }
-
-    @GetMapping("/orders")
-    public Page<OrderResponseDto> getOrders(
-            HttpServletRequest httpServletRequest,
-            @RequestParam(defaultValue = "1") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userID")));
-        return orderService.findAll(page, size, userId);
     }
 }
