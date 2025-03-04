@@ -1,4 +1,4 @@
-package com.example.outsourcing.domain.order.dto;
+package com.example.outsourcing.domain.order.dto.request;
 
 import com.example.outsourcing.domain.order.entity.Orders;
 import com.example.outsourcing.domain.order.enums.OrderStatus;

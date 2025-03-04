@@ -48,4 +48,8 @@ public class Orders {
         this.store = store;
         this.user = user;
     }
+
+    public void updateOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
+    }
 }
