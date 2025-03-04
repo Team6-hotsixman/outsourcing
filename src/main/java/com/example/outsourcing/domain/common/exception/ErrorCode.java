@@ -14,6 +14,8 @@ public enum ErrorCode {
     NOT_FOUND_MENU("없는 메뉴 입니다.", HttpStatus.NOT_FOUND),
     NOT_FOUND_IMAGE("없는 이미지 입니다.", HttpStatus.NOT_FOUND),
     NOT_FOUND_MENU_OPTION("없는 메뉴 옵션 입니다.", HttpStatus.NOT_FOUND),
+    NOT_FOUND_REVIEW("없는 리뷰 입니다.", HttpStatus.NOT_FOUND),
+    NOT_FOUND_ORDER("없는 주문 입니다.", HttpStatus.NOT_FOUND),
 
     //카테고리 에러
     DUPLICATE_CATEGORY("이미 존재하는 카테고리입니다.", HttpStatus.BAD_REQUEST),

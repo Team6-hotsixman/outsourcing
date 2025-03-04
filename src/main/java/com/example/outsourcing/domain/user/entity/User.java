@@ -57,7 +57,7 @@ public class User extends BaseEntity {
 
     }
 
-    private User(Long id, String email, UserRole userRole) {
+    private User(Long id, String email, UserRole userRole){
         this.id = id;
         this.email = email;
         this.userRole = userRole;
