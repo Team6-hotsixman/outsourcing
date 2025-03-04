@@ -13,6 +13,7 @@ import com.example.outsourcing.domain.order.enums.OrderStatus;
 import com.example.outsourcing.domain.order.repository.OrderItemRepository;
 import com.example.outsourcing.domain.order.repository.OrderRepository;
 import com.example.outsourcing.domain.store.entity.Store;
+import com.example.outsourcing.domain.store.enums.StoreStatus;
 import com.example.outsourcing.domain.store.repository.StoreRepository;
 import com.example.outsourcing.domain.user.entity.User;
 import com.example.outsourcing.domain.user.repository.UserRepository;
@@ -46,7 +47,11 @@ public class OrderService {
         Store store = storeRepository.findById(storeId).orElseThrow(
                 () -> new ApplicationException(ErrorCode.NOT_FOUND_STORE)
         );
-        //todo 가게 영업 시간 확인 로직 필요
+
+        //가게 오픈시에만 주문 가능
+        if (!store.getStoreStatus().equals(StoreStatus.OPEN)) {
+            throw new ApplicationException(ErrorCode.NOT_OPENED_STORE);
+        }
 
         //주문 금액 계산
         Integer totalPriceAmount = 0;
@@ -54,7 +59,7 @@ public class OrderService {
             Menu menu = menuRepository.findById(orderItem.getMenuId()).orElseThrow(
                     () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU)
             );
-            totalPriceAmount += menu.getPrice() * orderItem.getQuantity();
+            totalPriceAmount += (menu.getPrice() * orderItem.getQuantity());
         }
 
         //최소 주문 금액 확인
@@ -70,14 +75,14 @@ public class OrderService {
         totalPriceAmount -= requestDto.getUsedPoint();
 
         //주문 생성
-        Orders order = Orders.builder()
-                .totalPriceAmount(totalPriceAmount)
-                .usedPoint(requestDto.getUsedPoint())
-                .orderAt(LocalDateTime.now())
-                .orderStatus(OrderStatus.NEW)
-                .store(store)
-                .user(user)
-                .build();
+        Orders order = OrderRequestDto.toEntity(
+                totalPriceAmount,
+                requestDto.getUsedPoint(),
+                LocalDateTime.now(),
+                OrderStatus.NEW,
+                store,
+                user
+        );
 
         //주문 저장
         orderRepository.save(order);
@@ -87,11 +92,7 @@ public class OrderService {
             Menu menu = menuRepository.findById(itemRequestDto.getMenuId()).orElseThrow(
                     () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU)
             );
-            OrderItem orderItem = new OrderItem(
-                    itemRequestDto.getQuantity(),
-                    order,
-                    menu
-                    );
+            OrderItem orderItem = OrderItemRequestDto.toEntity(itemRequestDto.getQuantity(), order, menu);
             orderItemRepository.save(orderItem);
         }
 

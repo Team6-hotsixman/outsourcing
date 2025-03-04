@@ -32,7 +32,8 @@ public enum ErrorCode {
     // 주문 에러
     LESS_THAN_MIN_ORDER_PRICE("최소 주문 금액 이상으로 주문 가능합니다.", HttpStatus.BAD_REQUEST),
 
-    NOT_ENOUGH_POINT("보유 포인트가 부족합니다.", HttpStatus.BAD_REQUEST)
+    NOT_ENOUGH_POINT("보유 포인트가 부족합니다.", HttpStatus.BAD_REQUEST),
+    NOT_OPENED_STORE("가게 오픈 이후에 주문 가능합니다.", HttpStatus.BAD_REQUEST)
     ;
     private final String message;
 

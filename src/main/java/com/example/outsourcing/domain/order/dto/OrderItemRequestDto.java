@@ -1,5 +1,8 @@
 package com.example.outsourcing.domain.order.dto;
 
+import com.example.outsourcing.domain.menu.entity.Menu;
+import com.example.outsourcing.domain.order.entity.OrderItem;
+import com.example.outsourcing.domain.order.entity.Orders;
 import lombok.Getter;
 
 @Getter
@@ -7,4 +10,12 @@ public class OrderItemRequestDto {
 
     private Long menuId;
     private int quantity;
+
+    public static OrderItem toEntity(int quantity, Orders order, Menu menu) {
+        return OrderItem.builder()
+                .quantity(quantity)
+                .order(order)
+                .menu(menu)
+                .build();
+    }
 }
