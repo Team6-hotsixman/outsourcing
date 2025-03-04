@@ -19,6 +19,9 @@ import com.example.outsourcing.domain.store.repository.StoreRepository;
 import com.example.outsourcing.domain.user.entity.User;
 import com.example.outsourcing.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
@@ -132,6 +135,7 @@ public class OrderService {
         orderRepository.deleteById(orderId);
     }
 
+    //주문 수락/거절/배달중/배달완료 상태 변경
     @Transactional
     public OrderResponseDto updateOrderStatus(
             Long userId,
@@ -168,5 +172,18 @@ public class OrderService {
         order.updateOrderStatus(requestDto.getOrderStatus());
 
         return OrderResponseDto.of(order);
+    }
+
+    //주문 내역 조회
+    @Transactional(readOnly = true)
+    public Page<OrderResponseDto> findAll(int page, int size, Long userId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new ApplicationException(ErrorCode.NOT_FOUND_USER)
+        );
+
+        int adjustedPage = (page > 0) ? page - 1 : 0;
+        PageRequest pageable = PageRequest.of(adjustedPage, size, Sort.by("orderAt").descending());
+        Page<Orders> orderPage = orderRepository.findAllByUserId(userId, pageable);
+        return orderPage.map(OrderResponseDto::of);
     }
 }

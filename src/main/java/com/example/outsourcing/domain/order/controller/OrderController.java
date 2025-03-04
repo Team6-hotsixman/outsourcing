@@ -6,6 +6,7 @@ import com.example.outsourcing.domain.order.dto.request.OrderStatusRequestDto;
 import com.example.outsourcing.domain.order.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -46,5 +47,13 @@ public class OrderController {
         orderService.cancelOrder(userId, orderId, storeId);
     }
 
-
+    @GetMapping("/orders")
+    public Page<OrderResponseDto> getOrders(
+            HttpServletRequest httpServletRequest,
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userID")));
+        return orderService.findAll(page, size, userId);
+    }
 }
