@@ -1,6 +1,7 @@
 package com.example.outsourcing.domain.menu.controller;
 
 import com.example.outsourcing.domain.common.annotation.Auth;
+import com.example.outsourcing.domain.common.annotation.Owner;
 import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.menu.dto.request.MenuSaveRequestDto;
 import com.example.outsourcing.domain.menu.dto.request.MenuUpdateRequestDto;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
+@Owner
 public class MenuController {
 
     private final MenuService menuService;

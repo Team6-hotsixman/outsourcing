@@ -1,5 +1,10 @@
 package com.example.outsourcing.domain.common.aspect;
 
+import com.example.outsourcing.domain.common.exception.ApplicationException;
+import com.example.outsourcing.domain.common.exception.ErrorCode;
+import com.example.outsourcing.domain.user.dto.response.UserResponseDto;
+import com.example.outsourcing.domain.user.enums.UserRole;
+import com.example.outsourcing.domain.user.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -16,24 +21,27 @@ import org.springframework.util.StopWatch;
 public class AdminAspect {
     private final HttpServletRequest request;
 
-        @Around("@annotation(com.example.outsourcing.domain.common.annotation.Admin) ||" +
-                "@within(com.example.outsourcing.domain.common.annotation.Admin)")
-        public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
-            Long userId = (Long) request.getAttribute("userId");
+    private final UserService userService;
 
-
-
-            String url = request.getRequestURI();
-            StopWatch stopWatch = new StopWatch();
-            stopWatch.start();
-
-            log.info("Request: userId={}, URL={}", userId, url);
-
-            Object result = joinPoint.proceed();
-
-            stopWatch.stop();
-            log.info("Response: time={}", stopWatch.getTotalTimeMillis());
-
-            return result;
+    @Around("@annotation(com.example.outsourcing.domain.common.annotation.Admin) ||" +
+            "@within(com.example.outsourcing.domain.common.annotation.Admin)")
+    public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
+        Long userId = (Long) request.getAttribute("userId");
+        UserResponseDto userResponseDto = userService.getUser(userId);
+        if (userResponseDto.getUserRole() != UserRole.ADMIN) {
+            throw new ApplicationException(ErrorCode.NOT_FOUND_USER);
         }
+        String url = request.getRequestURI();
+        StopWatch stopWatch = new StopWatch();
+        stopWatch.start();
+
+        log.info("Request: userId={}, URL={}", userId, url);
+
+        Object result = joinPoint.proceed();
+
+        stopWatch.stop();
+        log.info("Response: time={}", stopWatch.getTotalTimeMillis());
+
+        return result;
+    }
 }

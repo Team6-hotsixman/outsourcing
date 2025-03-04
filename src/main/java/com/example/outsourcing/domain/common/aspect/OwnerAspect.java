@@ -1,5 +1,11 @@
 package com.example.outsourcing.domain.common.aspect;
 
+import com.example.outsourcing.domain.common.exception.ApplicationException;
+import com.example.outsourcing.domain.common.exception.ErrorCode;
+import com.example.outsourcing.domain.user.dto.response.UserResponseDto;
+import com.example.outsourcing.domain.user.entity.User;
+import com.example.outsourcing.domain.user.enums.UserRole;
+import com.example.outsourcing.domain.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -9,8 +15,6 @@ import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StopWatch;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
 @Aspect
 @Component
@@ -20,10 +24,16 @@ public class OwnerAspect {
 
     private final HttpServletRequest request;
 
+    private final UserService userService;
+
     @Around("@annotation(com.example.outsourcing.domain.common.annotation.Owner) ||" +
             "@within(com.example.outsourcing.domain.common.annotation.Owner)")
     public Object logOwnerApiAccess(ProceedingJoinPoint joinPoint) throws Throwable {
         Long userId = (Long) request.getAttribute("userId");
+        UserResponseDto userResponseDto = userService.getUser(userId);
+        if (userResponseDto.getUserRole() != UserRole.OWNER) {
+            throw new ApplicationException(ErrorCode.NOT_FOUND_USER);
+        }
         String url = request.getRequestURI();
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
