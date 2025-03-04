@@ -60,8 +60,8 @@ public class ReviewService {
         return ReviewResponse.of(save);
     }
 
-    public List<ReviewResponse> getReviewsByStoreId(long storeId, LocalDateTime last) {
-        List<Review> reviewsByStoreId = reviewRepository.findReviewsByStoreId(storeId, last);
+    public List<ReviewResponse> getReviewsByStoreId(long storeId,int start, int end, LocalDateTime last) {
+        List<Review> reviewsByStoreId = reviewRepository.findReviewsByStoreId(storeId, start, end, last);
         return reviewsByStoreId.stream().map(ReviewResponse::of).toList();
     }
 

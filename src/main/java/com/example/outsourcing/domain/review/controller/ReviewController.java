@@ -34,9 +34,11 @@ public class ReviewController {
 
     @GetMapping("/reviews/stores/{storeId}")
     public ResponseEntity<List<ReviewResponse>> getAll(@PathVariable long storeId,
-                                                       @RequestParam(name = "last",required = false, defaultValue = "") Optional<LocalDateTime> last){
+                                                       @RequestParam(name = "last",required = false, defaultValue = "") Optional<LocalDateTime> last,
+                                                       @RequestParam(name = "start", required = false, defaultValue ="0") int start,
+                                                       @RequestParam(name = "end", required = false, defaultValue ="5") int end){
         LocalDateTime lastDate = last.orElse(LocalDateTime.now());
-        List<ReviewResponse> reviews = reviewService.getReviewsByStoreId(storeId, lastDate);
+        List<ReviewResponse> reviews = reviewService.getReviewsByStoreId(storeId, start, end, lastDate);
 
         return ResponseEntity.ok(reviews);
     }
