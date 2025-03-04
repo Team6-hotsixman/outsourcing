@@ -1,8 +1,9 @@
 package com.example.outsourcing.domain.auth.config;
 
-import com.example.outsourcing.domain.auth.exception.AuthException;
 import com.example.outsourcing.domain.common.annotation.Auth;
 import com.example.outsourcing.domain.common.dto.AuthUser;
+import com.example.outsourcing.domain.common.exception.ApplicationException;
+import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.user.enums.UserRole;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.core.MethodParameter;
@@ -21,7 +22,7 @@ public class AuthUserArgumentResolver implements HandlerMethodArgumentResolver {
 
         // @Auth 어노테이션과 AuthUser 타입이 함께 사용되지 않은 경우 예외 발생
         if (hasAuthAnnotation != isAuthUserType) {
-            throw new AuthException("@Auth와 AuthUser 타입은 함께 사용되어야 합니다.");
+            throw new ApplicationException(ErrorCode.AUTH_EXCEPTION);
         }
 
         return hasAuthAnnotation;
