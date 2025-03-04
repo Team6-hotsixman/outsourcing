@@ -27,7 +27,7 @@ public class StoreController {
 
 
     @GetMapping("/stores/{storeId}")
-    public ResponseEntity<StoreResponseDto>  getStore(
+    public ResponseEntity<StoreResponseDto> getStore(
             @PathVariable Long storeId
     ) {
         return ResponseEntity.ok(storeService.getStoreAndMenu(storeId));
