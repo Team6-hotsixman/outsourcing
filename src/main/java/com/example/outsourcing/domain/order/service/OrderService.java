@@ -73,9 +73,6 @@ public class OrderService {
         }
 
         //포인트 확인 및 차감
-        if (requestDto.getUsedPoint() > user.getPoint()) {
-            throw new ApplicationException(ErrorCode.NOT_ENOUGH_POINT);
-        }
         user.subtractPoint(requestDto.getUsedPoint());
         totalPriceAmount -= requestDto.getUsedPoint();
 

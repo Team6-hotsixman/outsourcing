@@ -2,6 +2,8 @@ package com.example.outsourcing.domain.user.entity;
 
 import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.common.entity.BaseEntity;
+import com.example.outsourcing.domain.common.exception.ApplicationException;
+import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.user.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -78,7 +80,7 @@ public class User extends BaseEntity {
     // 유저 point 차감 메소드
     public void subtractPoint(Integer pointToSubtract) {
         if (this.point < pointToSubtract) {
-            throw new RuntimeException("포인트가 부족합니다.");
+            throw new ApplicationException(ErrorCode.NOT_ENOUGH_POINT);
         }
         this.point -= pointToSubtract;
     }
