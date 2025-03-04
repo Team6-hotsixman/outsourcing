@@ -1,16 +1,19 @@
 package com.example.outsourcing.domain.store.service;
 
 
+import com.example.outsourcing.domain.auth.config.PasswordEncoder;
+import com.example.outsourcing.domain.auth.exception.AuthException;
 import com.example.outsourcing.domain.category.dto.response.CategoryResponse;
 import com.example.outsourcing.domain.category.entity.Category;
 import com.example.outsourcing.domain.category.service.CategoryService;
+import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.common.entity.Image;
 import com.example.outsourcing.domain.common.exception.NotFoundStoreException;
 import com.example.outsourcing.domain.common.exception.StoreLimitExceededException;
 import com.example.outsourcing.domain.common.exception.StoreStatusAlreadySameException;
+import com.example.outsourcing.domain.common.exception.UnauthorizedStoreOwnerException;
 import com.example.outsourcing.domain.common.service.ImageService;
 import com.example.outsourcing.domain.common.service.KaKaoMapApiService;
-import com.example.outsourcing.domain.menu.entity.Menu;
 import com.example.outsourcing.domain.menu.service.MenuService;
 import com.example.outsourcing.domain.store.dto.request.StoreDeleteRequestDto;
 import com.example.outsourcing.domain.store.dto.request.StoreSaveRequestDto;
@@ -27,8 +30,6 @@ import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class OwnerStoreService {
@@ -36,20 +37,18 @@ public class OwnerStoreService {
 
     private final CategoryService categoryService;
 
-    private final MenuService menuService;
-
     private final KaKaoMapApiService kaKaoMapApiService;
 
     private final ImageService imageService;
 
-    private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     /* hyen ho start */
     @Transactional
-    public SaveStoreResponseDto saveStore(User authUser, StoreSaveRequestDto dto) {
+    public SaveStoreResponseDto saveStore(AuthUser authUser, StoreSaveRequestDto dto) {
         CategoryResponse categoryResponse = categoryService.getCategoryById(dto.getCategoryId());
         Image image = imageService.getImageById(dto.getImageId());
-        User user = userRepository.findById(1L).orElseThrow();
+        User user = User.fromAuthUser(authUser);
         Point point = kaKaoMapApiService.getPoint(dto.getAddress());
         if (storeRepository.countStoresByUserId(user.getId()) >= 3) {
             throw new StoreLimitExceededException();
@@ -73,12 +72,14 @@ public class OwnerStoreService {
     }
 
     @Transactional
-    public UpdateStoreResponseDto updateStore(Long storeId, User user, StoreUpdateRequestDto requestDto) {
+    public UpdateStoreResponseDto updateStore(Long storeId, AuthUser authUser, StoreUpdateRequestDto requestDto) {
         Store store = storeRepository.findById(storeId).orElseThrow(NotFoundStoreException::new);
+        User user = User.fromAuthUser(authUser);
+
         // 현재 사용자와 가게 주인과 비교
-        // if (!store.getUser().getId().equals(user.getId())) {
-        //      throw new UnauthorizedStoreOwnerException();
-        //}
+         if (!store.getUser().getId().equals(user.getId())) {
+              throw new UnauthorizedStoreOwnerException();
+        }
 
         if (requestDto.getImageId() != null) {
             Image newImage = imageService.getImageById(requestDto.getImageId());
@@ -105,12 +106,14 @@ public class OwnerStoreService {
     }
 
     @Transactional
-    public StoreStatusResponseDto updateStoreStatus(User authUser, Long storeId, StoreStatusUpdateRequestDto requestDto) {
+    public StoreStatusResponseDto updateStoreStatus(AuthUser authUser, Long storeId, StoreStatusUpdateRequestDto requestDto) {
         Store store = storeRepository.findById(storeId).orElseThrow(NotFoundStoreException::new);
+        User user = User.fromAuthUser(authUser);
+
         // 현재 사용자와 가게 주인과 비교
-        // if (!store.getUser().getId().equals(user.getId())) {
-        // throw new UnauthorizedStoreOwnerException();
-        // }
+         if (!store.getUser().getId().equals(user.getId())) {
+         throw new UnauthorizedStoreOwnerException();
+         }
 
         // 현재 상태와 같으면 예외처리
         if (store.getStoreStatus().equals(requestDto.getStoreStatus())) {
@@ -128,27 +131,35 @@ public class OwnerStoreService {
     }
 
     @Transactional
-    public StoreNoticeResponseDto updateStoreNotice(User authUser, Long storeId, StoreNoticeResponseDto requestDto) {
+    public StoreNoticeResponseDto updateStoreNotice(AuthUser authUser, Long storeId, StoreNoticeResponseDto requestDto) {
         Store store = storeRepository.findById(storeId).orElseThrow(NotFoundStoreException::new);
+        User user = User.fromAuthUser(authUser);
+
         // 현재 사용자와 가게 주인과 비교
-        // if (!store.getUser().getId().equals(user.getId())) {
-        //    throw new UnauthorizedStoreOwnerException();
-//      //  }
+        if (!store.getUser().getId().equals(user.getId())) {
+            throw new UnauthorizedStoreOwnerException();
+        }
         store.updateNotice(requestDto.getStoreNotice());
 
         return new StoreNoticeResponseDto(store.getStoreNotice());
     }
 
-    @Transactional
-    public void deleteStore(User authUser, Long storeId, StoreDeleteRequestDto requestDto) {
-        Store store = storeRepository.findById(storeId).orElseThrow(NotFoundStoreException::new);
-        // 현재 사용자와 가게 주인과 비교
-//        if (!store.getUser().getId().equals(user.getId())) {
-//            throw new UnauthorizedStoreOwnerException();
-//        }
-        // 현재 사용자 비번 확인 필요 인코딩 기능 추가시 추가 예정
-        store.shutDownStore();
 
+    @Transactional
+    public void deleteStore(AuthUser authUser, Long storeId, StoreDeleteRequestDto requestDto) {
+        Store store = storeRepository.findById(storeId).orElseThrow(NotFoundStoreException::new);
+        User user = User.fromAuthUser(authUser);
+
+        // 현재 사용자와 가게 주인과 비교
+        if (!store.getUser().getId().equals(user.getId())) {
+            throw new UnauthorizedStoreOwnerException();
+        }
+        // 현재 사용자 비번 확인
+//        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+//            // 예외처리는 아직 미구현 되있음 수정 예정
+//            throw new AuthException("잘못된 비밀번호입니다.");
+//        }
+        store.shutDownStore();
     }
     /* hyen ho end */
 }

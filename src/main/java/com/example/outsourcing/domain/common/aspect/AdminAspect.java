@@ -1,5 +1,7 @@
 package com.example.outsourcing.domain.common.aspect;
 
+import jakarta.servlet.http.HttpServletRequest;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
@@ -7,31 +9,35 @@ import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StopWatch;
 
 @Aspect
 @Component
 @Slf4j
+@RequiredArgsConstructor
 public class AdminAspect {
+    private final HttpServletRequest request;
+
+    private final UserService userService;
 
         @Around("@annotation(com.example.outsourcing.domain.common.annotation.Admin) ||" +
                 "@within(com.example.outsourcing.domain.common.annotation.Admin)")
         public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
-            long startTime = System.currentTimeMillis();
-            String username = "example";
-            log.info("USER : {}", username);
-            log.info("METHOD : {}", joinPoint.getSignature().toShortString());//메서드를 축약해서 표현한 문장을 출력
-            log.info("PARAMS : {}", joinPoint.getArgs());
+            Long userId = (Long) request.getAttribute("userId");
 
-            try {
-                Object result = joinPoint.proceed();
-                long endTime = System.currentTimeMillis();
-                log.info("TIME : {} ms", endTime - startTime);
-                log.info("RESULT : {}", result);
-                return result;
-            } catch (Exception e) {
-                log.error("ERROR : {}", e);
-                throw e;
-            }
 
+
+            String url = request.getRequestURI();
+            StopWatch stopWatch = new StopWatch();
+            stopWatch.start();
+
+            log.info("Request: userId={}, URL={}", userId, url);
+
+            Object result = joinPoint.proceed();
+
+            stopWatch.stop();
+            log.info("Response: time={}", stopWatch.getTotalTimeMillis());
+
+            return result;
         }
 }

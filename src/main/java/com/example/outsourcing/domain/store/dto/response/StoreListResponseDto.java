@@ -8,7 +8,6 @@ import lombok.Getter;
 ;
 
 @Getter
-@AllArgsConstructor
 public class StoreListResponseDto {
     private final Long id;
 
