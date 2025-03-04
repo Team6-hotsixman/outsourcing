@@ -3,7 +3,6 @@ package com.example.outsourcing.config;
 import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.common.exception.ErrorResponse;
-import com.example.outsourcing.domain.common.exception.StoreLimitExceededException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
