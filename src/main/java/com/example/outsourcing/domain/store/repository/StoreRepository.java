@@ -1,10 +1,16 @@
 package com.example.outsourcing.domain.store.repository;
 
+import com.example.outsourcing.domain.store.dto.response.StoreResponseDto;
 import com.example.outsourcing.domain.store.entity.Store;
+import org.locationtech.jts.geom.Point;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
-public interface StoreRepository extends JpaRepository<Store, Long> {
+import java.util.List;
+
+public interface StoreRepository extends JpaRepository<Store, Long>, StoreRepositoryForSearch {
 
     @Query("SELECT COUNT(s) " +
             "FROM Store s " +

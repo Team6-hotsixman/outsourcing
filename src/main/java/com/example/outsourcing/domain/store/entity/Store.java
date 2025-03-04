@@ -5,7 +5,7 @@ import com.example.outsourcing.domain.common.entity.Image;
 import com.example.outsourcing.domain.user.entity.User;
 import com.example.outsourcing.domain.category.entity.Category;
 import com.example.outsourcing.domain.store.enums.StoreStatus;
-
+import org.locationtech.jts.geom.Point;
 
 import jakarta.persistence.*;
 import lombok.Builder;
@@ -57,6 +57,9 @@ public class Store extends BaseEntity {
     @Column(nullable = false)
     private LocalTime closeTime;
 
+    @Column(nullable = false, columnDefinition = "POINT SRID 4326")
+    private Point location;
+
     @Builder
     public Store(
             User user,
@@ -68,7 +71,8 @@ public class Store extends BaseEntity {
             String address,
             Integer minOrderPrice,
             LocalTime openTime,
-            LocalTime closeTime
+            LocalTime closeTime,
+            Point location
     ) {
         this.user = user;
         this.image = image;
@@ -80,6 +84,7 @@ public class Store extends BaseEntity {
         this.minOrderPrice = minOrderPrice;
         this.openTime = openTime;
         this.closeTime = closeTime;
+        this.location = location;
     }
 
     public void updateImage(Image image) {

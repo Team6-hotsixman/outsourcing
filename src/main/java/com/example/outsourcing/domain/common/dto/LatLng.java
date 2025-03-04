@@ -1,18 +1,13 @@
 package com.example.outsourcing.domain.common.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Getter
-@NoArgsConstructor
-@AllArgsConstructor
+@Setter
 public class LatLng {
 
-    @JsonProperty("y")
+    private double longitude;
     private double latitude;
 
-    @JsonProperty("x")
-    private double longitude;
 }
