@@ -56,13 +56,13 @@ public class Menu {
         this.category = category;
     }
 
-    public void updateMenu(MenuUpdateRequestDto requestDto, Category category) {
+    public void updateMenu(MenuUpdateRequestDto requestDto, Category category, Image image) {
         this.menuName = requestDto.getMenuName();
         this.price = requestDto.getPrice();
         this.description = requestDto.getDescription();
         this.category = category;
         this.isAvailable = requestDto.isAvailable();
-        this.image = requestDto.getImage();
+        this.image = image;
     }
 
 }

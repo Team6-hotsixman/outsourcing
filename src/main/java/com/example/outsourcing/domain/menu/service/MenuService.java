@@ -58,6 +58,9 @@ public class MenuService {
         Category category = categoryRepository.findById(requestDto.getCategoryId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_CATEGORY));
 
+        Image image = imageRepository.findById(requestDto.getImageId())
+                .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_IMAGE));
+
         Store store = menu.getStore();
 
         // 권한 검증 - 추후 AOP 분리
@@ -65,7 +68,7 @@ public class MenuService {
             throw new UnauthorizedUserException();
         };
 
-        menu.updateMenu(requestDto, category);
+        menu.updateMenu(requestDto, category, image);
 
         return MenuResponseDto.of(menu);
     }
