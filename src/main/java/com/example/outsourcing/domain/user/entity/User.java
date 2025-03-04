@@ -35,4 +35,12 @@ public class User extends BaseEntity {
         this.password = password;
         this.userRole = userRole;
     }
+
+    // 유저 point 차감 메소드
+    public void subtractPoint(Integer pointToSubtract) {
+        if (this.point < pointToSubtract) {
+            throw new RuntimeException("포인트가 부족합니다.");
+        }
+        this.point -= pointToSubtract;
+    }
 }
