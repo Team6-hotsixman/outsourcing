@@ -1,7 +1,9 @@
 package com.example.outsourcing.domain.user.entity;
 
 import com.example.outsourcing.domain.common.entity.BaseEntity;
+import com.example.outsourcing.domain.user.dto.response.UserResponseDto;
 import com.example.outsourcing.domain.user.enums.UserRole;
+import com.example.outsourcing.domain.user.enums.UserStatus;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -36,6 +38,8 @@ public class User extends BaseEntity {
 
     private LocalDateTime modifiedAt;
 
+    @Enumerated(EnumType.STRING)
+    private UserStatus userStatus;
 
     @Builder
     private User(
@@ -43,25 +47,30 @@ public class User extends BaseEntity {
             String password,
             String name,
             UserRole userRole,
+            UserStatus userStatus,
             LocalDateTime createdAt,
             LocalDateTime modifiedAt
-
     ) {
         this.email = email;
         this.password = password;
         this.name = name;
         this.userRole = userRole;
+        this.userStatus = userStatus;
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
-
     }
 
-    public void changePassword(String password) {
+    public void getUser(UserResponseDto userResponseDto) {
+        this.email = userResponseDto.getEmail();
+        this.name = userResponseDto.getName();
+    }
+
+    public void passwordUpdate(String password) {
         this.password = password;
     }
 
-    public void updateRole(UserRole userRole) {
-        this.userRole = userRole;
+    public void UpdateUserStatus(UserStatus userStatus) {
+        this.userStatus = userStatus;
     }
 
 }
