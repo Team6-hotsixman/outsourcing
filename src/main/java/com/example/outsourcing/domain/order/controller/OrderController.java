@@ -1,11 +1,12 @@
 package com.example.outsourcing.domain.order.controller;
 
 import com.example.outsourcing.domain.order.dto.request.OrderRequestDto;
-import com.example.outsourcing.domain.order.dto.request.OrderResponseDto;
+import com.example.outsourcing.domain.order.dto.response.OrderResponseDto;
 import com.example.outsourcing.domain.order.dto.request.OrderStatusRequestDto;
 import com.example.outsourcing.domain.order.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -18,10 +19,21 @@ public class OrderController {
     public OrderResponseDto placeOrder(
             HttpServletRequest httpServletRequest,
             @RequestParam Long storeId,
-            @RequestBody OrderRequestDto requestDto
+            @Validated @RequestBody OrderRequestDto requestDto
             ) {
         Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userID")));
         return orderService.placeOrder(userId, storeId, requestDto);
+    }
+
+    @PutMapping("/orders/status")
+    public OrderResponseDto updateOrderStatus(
+            HttpServletRequest httpServletRequest,
+            @RequestParam Long storeId,
+            @RequestParam Long orderId,
+            @Validated @RequestBody OrderStatusRequestDto requestDto
+            ) {
+        Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userID")));
+        return orderService.updateOrderStatus(userId, storeId, orderId, requestDto);
     }
 
     @DeleteMapping("/orders")
@@ -34,15 +46,5 @@ public class OrderController {
         orderService.cancelOrder(userId, orderId, storeId);
     }
 
-    @PutMapping("/orders/status")
-    public OrderResponseDto updateOrderStatus(
-            HttpServletRequest httpServletRequest,
-            @RequestParam Long storeId,
-            @RequestParam Long orderId,
-            @RequestBody OrderStatusRequestDto requestDto
-            ) {
-        Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userID")));
-        return orderService.updateOrderStatus(userId, storeId, orderId, requestDto);
-    }
 
 }

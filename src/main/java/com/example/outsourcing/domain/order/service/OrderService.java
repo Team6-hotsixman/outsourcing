@@ -2,12 +2,11 @@ package com.example.outsourcing.domain.order.service;
 
 import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
-import com.example.outsourcing.domain.common.exception.StoreStatusAlreadySameException;
 import com.example.outsourcing.domain.menu.entity.Menu;
 import com.example.outsourcing.domain.menu.repository.MenuRepository;
 import com.example.outsourcing.domain.order.dto.request.OrderItemRequestDto;
 import com.example.outsourcing.domain.order.dto.request.OrderRequestDto;
-import com.example.outsourcing.domain.order.dto.request.OrderResponseDto;
+import com.example.outsourcing.domain.order.dto.response.OrderResponseDto;
 import com.example.outsourcing.domain.order.dto.request.OrderStatusRequestDto;
 import com.example.outsourcing.domain.order.entity.OrderItem;
 import com.example.outsourcing.domain.order.entity.Orders;
