@@ -1,7 +1,5 @@
 package com.example.outsourcing.domain.store.dto.response;
 
-import com.example.outsourcing.domain.menu.dto.response.MenuResponseDto;
-import com.example.outsourcing.domain.menu.entity.Menu;
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.store.enums.StoreStatus;
 import lombok.AllArgsConstructor;
@@ -9,12 +7,10 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.List;
-import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
-public class StoreResponseDto {
+public class UpdateStoreResponseDto {
     private final Long id;
 
     private final Long userId;
@@ -31,8 +27,6 @@ public class StoreResponseDto {
 
     private final String address;
 
-    private final List<MenuResponseDto> menus;
-
     private final Integer minOrderPrice;
 
     private final LocalTime openTime;
@@ -43,8 +37,8 @@ public class StoreResponseDto {
 
     private final LocalDateTime modifiedAt;
 
-    public static StoreResponseDto of(Store store, List<Menu> menus) {
-        return new StoreResponseDto(
+    public static UpdateStoreResponseDto of(Store store) {
+        return new UpdateStoreResponseDto(
                 store.getId(),
                 store.getUser().getId(),
                 store.getImage().getId(),
@@ -53,9 +47,6 @@ public class StoreResponseDto {
                 store.getStoreStatus(),
                 store.getStoreNotice(),
                 store.getAddress(),
-                menus.stream()
-                        .map(MenuResponseDto::of)
-                        .collect(Collectors.toList()),
                 store.getMinOrderPrice(),
                 store.getOpenTime(),
                 store.getCloseTime(),
