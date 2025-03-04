@@ -2,6 +2,7 @@ package com.example.outsourcing.domain.menu.service;
 
 import com.example.outsourcing.domain.category.entity.Category;
 import com.example.outsourcing.domain.category.repository.CategoryRepository;
+import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.common.entity.Image;
 import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
@@ -19,7 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -31,9 +32,14 @@ public class MenuService {
     private final ImageRepository imageRepository;
 
     @Transactional
-    public MenuResponseDto saveMenu(User user, MenuSaveRequestDto requestDto) {
+    public MenuResponseDto saveMenu(AuthUser user, MenuSaveRequestDto requestDto) {
         Store store = storeRepository.findById(requestDto.getStoreId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_STORE));
+
+        // 권한 검증
+        if (!store.getUser().getId().equals(user.getId())) {
+            throw new UnauthorizedUserException();
+        }
 
         Category category = categoryRepository.findById(requestDto.getCategoryId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_CATEGORY));
@@ -53,35 +59,42 @@ public class MenuService {
     }
 
     @Transactional
-    public MenuResponseDto updateMenu(Long menuId, User user, MenuUpdateRequestDto requestDto) {
+    public MenuResponseDto updateMenu(Long menuId, AuthUser user, MenuUpdateRequestDto requestDto) {
         Menu menu = menuRepository.findById(menuId)
-                .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_USER));
-
-        Category category = categoryRepository.findById(requestDto.getCategoryId())
-                .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_CATEGORY));
-
-        Image image = imageRepository.findById(requestDto.getImageId())
-                .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_IMAGE));
+                .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_MENU));
 
         Store store = menu.getStore();
 
-        // 권한 검증 - 추후 AOP 분리
+        // 권한 검증
         if (!store.getUser().getId().equals(user.getId())) {
             throw new UnauthorizedUserException();
         };
 
-        menu.updateMenu(requestDto, category, image);
+        Optional<Category> category = categoryRepository.findById(requestDto.getCategoryId());
+
+        Optional<Image> image = imageRepository.findById(requestDto.getImageId());
+
+        menu.updateMenuName(requestDto.getMenuName());
+        menu.updatePrice(requestDto.getPrice());
+        menu.updateDescription(requestDto.getDescription());
+        menu.updateIsAvailable(requestDto.isAvailable());
+        menu.updateCategory(category.orElse(null));
+        menu.updateImage(image.orElse(null));
 
         return MenuResponseDto.of(menu);
     }
 
-    public void deleteMenu(Long menuId) {
+    public void deleteMenu(AuthUser user, Long menuId) {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_MENU));
-        menuRepository.delete(menu);
-    }
 
-    public List<Menu> getMenus(Long storeId) {
-        return menuRepository.findByStoreId(storeId);
+        Store store = menu.getStore();
+
+        // 권한 검증
+        if (!store.getUser().getId().equals(user.getId())) {
+            throw new UnauthorizedUserException();
+        };
+
+        menuRepository.delete(menu);
     }
 }

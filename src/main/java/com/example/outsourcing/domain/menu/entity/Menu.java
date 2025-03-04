@@ -1,6 +1,5 @@
 package com.example.outsourcing.domain.menu.entity;
 
-import com.example.outsourcing.domain.menu.dto.request.MenuUpdateRequestDto;
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.common.entity.Image;
 import com.example.outsourcing.domain.category.entity.Category;
@@ -56,13 +55,37 @@ public class Menu {
         this.category = category;
     }
 
-    public void updateMenu(MenuUpdateRequestDto requestDto, Category category, Image image) {
-        this.menuName = requestDto.getMenuName();
-        this.price = requestDto.getPrice();
-        this.description = requestDto.getDescription();
-        this.category = category;
-        this.isAvailable = requestDto.isAvailable();
-        this.image = image;
+    public void updateMenuName(String menuName) {
+        if (menuName != null) {
+            this.menuName = menuName;
+        }
     }
 
+    public void updatePrice(Integer price) {
+        if (price != null) {
+            this.price = price;
+        }
+    }
+
+    public void updateDescription(String description) {
+        if (description != null) {
+            this.description = description;
+        }
+    }
+
+    public void updateCategory(Category category) {
+        if (category != null) {
+            this.category = category;
+        }
+    }
+
+    public void updateImage(Image image) {
+        if (image != null) {
+            this.image = image;
+        }
+    }
+
+    public void updateIsAvailable(boolean isAvailable) {
+        this.isAvailable = isAvailable;
+    }
 }
