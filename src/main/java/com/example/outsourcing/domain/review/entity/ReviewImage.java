@@ -3,10 +3,7 @@ package com.example.outsourcing.domain.review.entity;
 import com.example.outsourcing.domain.common.entity.BaseEntity;
 import com.example.outsourcing.domain.common.entity.Image;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Getter
@@ -24,9 +21,10 @@ public class ReviewImage extends BaseEntity {
     @JoinColumn(name = "image_id")
     private Image image;
 
-    @Builder
-    private ReviewImage(Review review, Image image) {
+
+    public ReviewImage(Review review, Image image) {
         this.review = review;
         this.image = image;
     }
+
 }

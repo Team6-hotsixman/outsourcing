@@ -1,5 +1,7 @@
 package com.example.outsourcing.domain.store.dto.response;
 
+import com.example.outsourcing.domain.menu.dto.response.MenuResponseDto;
+import com.example.outsourcing.domain.menu.entity.Menu;
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.store.enums.StoreStatus;
 import lombok.AllArgsConstructor;
@@ -7,6 +9,9 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @AllArgsConstructor
@@ -27,6 +32,8 @@ public class StoreResponseDto {
 
     private final String address;
 
+    private final List<MenuResponseDto> menus;
+
     private final Integer minOrderPrice;
 
     private final LocalTime openTime;
@@ -38,6 +45,7 @@ public class StoreResponseDto {
     private final LocalDateTime modifiedAt;
 
     private double distance;
+
     private double rate;
 
     public StoreResponseDto(Store store, double distance, double rate) {
@@ -49,6 +57,7 @@ public class StoreResponseDto {
         this.storeStatus = store.getStoreStatus();
         this.storeNotice = store.getStoreNotice();
         this.address = store.getAddress();
+        this.menus = new ArrayList<>();
         this.minOrderPrice = store.getMinOrderPrice();
         this.openTime = store.getOpenTime();
         this.closeTime = store.getCloseTime();
@@ -57,8 +66,7 @@ public class StoreResponseDto {
         this.distance = distance;
         this.rate = rate;
     }
-
-    public static StoreResponseDto of(Store store) {
+    public static StoreResponseDto of(Store store, List<Menu> menus) {
         return new StoreResponseDto(
                 store.getId(),
                 store.getUser().getId(),
@@ -68,6 +76,9 @@ public class StoreResponseDto {
                 store.getStoreStatus(),
                 store.getStoreNotice(),
                 store.getAddress(),
+                menus.stream()
+                        .map(MenuResponseDto::of)
+                        .collect(Collectors.toList()),
                 store.getMinOrderPrice(),
                 store.getOpenTime(),
                 store.getCloseTime(),
