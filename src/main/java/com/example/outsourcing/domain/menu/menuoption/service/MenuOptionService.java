@@ -17,6 +17,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class MenuOptionService {
@@ -43,6 +45,18 @@ public class MenuOptionService {
         menuOptionRepository.save(menuOption);
 
         return MenuOptionResponseDto.of(menuOption);
+    }
+
+    public List<MenuOptionResponseDto> getMenuOptions() {
+        return menuOptionRepository.findAll().stream()
+                .map(option -> new MenuOptionResponseDto(
+                        option.getOptionName(),
+                        option.getPrice(),
+                        option.getDescription(),
+                        option.getMenu().getMenuName(),
+                        option.isAvailable(),
+                        option.getImage().getImagePath()
+                )).toList();
     }
 
     @Transactional
