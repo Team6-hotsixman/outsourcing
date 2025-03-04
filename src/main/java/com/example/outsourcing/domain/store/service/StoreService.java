@@ -10,7 +10,6 @@ import com.example.outsourcing.domain.common.exception.StoreLimitExceededExcepti
 import com.example.outsourcing.domain.common.service.GeoCodingService;
 import com.example.outsourcing.domain.common.exception.NotFoundStoreException;
 import com.example.outsourcing.domain.common.exception.StoreStatusAlreadySameException;
-import com.example.outsourcing.domain.common.exception.UnauthorizedStoreOwnerException;
 import com.example.outsourcing.domain.common.service.ImageService;
 import com.example.outsourcing.domain.common.service.SearchKeywordRankingService;
 import com.example.outsourcing.domain.store.dto.request.StoreDeleteRequestDto;
