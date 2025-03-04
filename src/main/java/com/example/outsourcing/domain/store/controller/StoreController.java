@@ -30,7 +30,7 @@ public class StoreController {
     public ResponseEntity<StoreResponseDto>  getStore(
             @PathVariable Long storeId
     ) {
-        return new ResponseEntity<>(storeService.getStore(storeId), HttpStatus.OK);
+        return new ResponseEntity<>(storeService.getStoreAndMenu(storeId), HttpStatus.OK);
     }
 
      /* hyen ho end */

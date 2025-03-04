@@ -66,6 +66,7 @@ public class StoreResponseDto {
         this.distance = distance;
         this.rate = rate;
     }
+
     public static StoreResponseDto of(Store store, List<Menu> menus) {
         return new StoreResponseDto(
                 store.getId(),
