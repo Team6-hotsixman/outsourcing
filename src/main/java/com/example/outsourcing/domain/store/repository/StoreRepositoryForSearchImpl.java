@@ -6,6 +6,7 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.TypedQuery;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -16,15 +17,15 @@ public class StoreRepositoryForSearchImpl implements StoreRepositoryForSearch{
     private final EntityManager entityManager;
 
     @Override
-    public List<StoreResponseDto> findStoresByArea(Point area, int size, OrderBy orderBy) {
+    public List<StoreResponseDto> findStoresByArea(Point area, Pageable page, OrderBy orderBy) {
         String base = "SELECT new com.example.outsourcing.domain.store.dto.response.StoreResponseDto("
-                + "s, "
-                + "CAST( ST_Distance_Sphere(s.location, :area) AS double), "
-                + "CAST( COALESCE(AVG(r.rate), 0) AS double)) "
-                + "FROM Store s "
-                + "LEFT JOIN Orders o ON o.store = s "
-                + "LEFT JOIN Review r ON r.order = o "
-                + "WHERE 1 = 1 ";
+                    + "s "
+                    + ", CAST( ST_Distance_Sphere(s.location, :area) AS double) "
+                    + ", CAST( COALESCE(AVG(r.rate), 0) AS double)) "
+                    + "FROM Store s "
+                    + "LEFT JOIN Orders o ON o.store = s "
+                    + "LEFT JOIN Review r ON r.order = o "
+                    + "WHERE 1 = 1 ";
         if(area != null) {
             base += "AND ST_CONTAINS(ST_BUFFER(:area, 3000), s.location) ";
         }
@@ -39,17 +40,18 @@ public class StoreRepositoryForSearchImpl implements StoreRepositoryForSearch{
 
         TypedQuery<StoreResponseDto> query = entityManager.createQuery(base, StoreResponseDto.class);
         query.setParameter("area", area);
-        query.setMaxResults(size);
+        query.setFirstResult(((int) page.getOffset()));
+        query.setMaxResults(page.getPageSize());
 
         return query.getResultList();
     }
 
     @Override
-    public List<StoreResponseDto> findStoresByCategory(Point area, Long categoryId, int size, OrderBy orderBy) {
+    public List<StoreResponseDto> findStoresByCategory(Point area, Long categoryId, Pageable page, OrderBy orderBy) {
         String base = "SELECT new com.example.outsourcing.domain.store.dto.response.StoreResponseDto("
-                + "s, "
-                + "CAST( ST_Distance_Sphere(s.location, :area) AS double), "
-                + "CAST( COALESCE(AVG(r.rate), 0) AS double)) "
+                + "s "
+                + ", CAST( ST_Distance_Sphere(s.location, :area) AS double) "
+                + ", CAST( COALESCE(AVG(r.rate), 0) AS double)) "
                 + "FROM Store s "
                 + "LEFT JOIN Category c ON s.category = c "
                 + "LEFT JOIN Orders o ON o.store = s "
@@ -71,17 +73,18 @@ public class StoreRepositoryForSearchImpl implements StoreRepositoryForSearch{
         TypedQuery<StoreResponseDto> query = entityManager.createQuery(base, StoreResponseDto.class);
         query.setParameter("area", area);
         query.setParameter("category", categoryId);
-        query.setMaxResults(size);
+        query.setFirstResult(((int) page.getOffset()));
+        query.setMaxResults(page.getPageSize());
 
         return query.getResultList();
     }
 
     @Override
-    public List<StoreResponseDto> findStoresBySearch(Point area, String search, int size, OrderBy orderBy) {
+    public List<StoreResponseDto> findStoresBySearch(Point area, String search, Pageable page, OrderBy orderBy) {
         String base = "SELECT new com.example.outsourcing.domain.store.dto.response.StoreResponseDto("
-                + "s, "
-                + "CAST( ST_Distance_Sphere(s.location, :area) AS double), "
-                + "CAST( COALESCE(AVG(r.rate), 0) AS double)) "
+                + "s "
+                + ", CAST( ST_Distance_Sphere(s.location, :area) AS double) "
+                + ", CAST( COALESCE(AVG(r.rate), 0) AS double)) "
                 + "FROM Store s "
                 + "LEFT JOIN Orders o ON o.store = s "
                 + "LEFT JOIN Review r ON r.order = o "
@@ -107,7 +110,8 @@ public class StoreRepositoryForSearchImpl implements StoreRepositoryForSearch{
         TypedQuery<StoreResponseDto> query = entityManager.createQuery(base, StoreResponseDto.class);
         query.setParameter("area", area);
         query.setParameter("search", search);
-        query.setMaxResults(size);
+        query.setFirstResult(((int) page.getOffset()));
+        query.setMaxResults(page.getPageSize());
 
         return query.getResultList();
     }

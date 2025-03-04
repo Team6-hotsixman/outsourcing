@@ -31,6 +31,7 @@ import com.example.outsourcing.domain.user.repository.UserAddressRepository;
 import com.example.outsourcing.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.*;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StopWatch;
@@ -62,7 +63,7 @@ public class StoreService {
     /* hyen ho end */
 
     @Transactional(readOnly = true)
-    public List<StoreResponseDto> searchStore(long userId, String searchKeyword, int size, OrderBy orderBy) {
+    public List<StoreResponseDto> searchStore(long userId, String searchKeyword, Pageable page, OrderBy orderBy) {
         //사용자의 기본 배송지를 가져온다
         UserAddress address = userAddressRepository.findByUserIdAndAddressStatus(userId, AddressStatus.DEFAULT)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_DEFAULT_ADDRESS));
@@ -73,9 +74,9 @@ public class StoreService {
         List<StoreResponseDto> storesByArea = List.of();
 
         if(searchKeyword == null || searchKeyword.isEmpty()){
-            storesByArea = storeRepository.findStoresByArea(point,size, orderBy);
+            storesByArea = storeRepository.findStoresByArea(point, page, orderBy);
         } else {
-            storesByArea = storeRepository.findStoresBySearch(point, searchKeyword, size, orderBy);
+            storesByArea = storeRepository.findStoresBySearch(point, searchKeyword, page, orderBy);
             if(!storesByArea.isEmpty()) {
                 searchKeywordRankingService.increaseCount(searchKeyword);
             }
@@ -85,13 +86,13 @@ public class StoreService {
     }
 
     @Transactional(readOnly = true)
-    public List<StoreResponseDto> searchStoreByCategory(long userId, long categoryId,  int size, OrderBy orderBy) {
+    public List<StoreResponseDto> searchStoreByCategory(long userId, long categoryId, Pageable page, OrderBy orderBy) {
         //사용자의 기본 배송지를 가져온다
         UserAddress address = userAddressRepository.findByUserIdAndAddressStatus(userId, AddressStatus.DEFAULT)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_DEFAULT_ADDRESS));
 
         Point point = kaKaoMapApiService.getPoint(address.getAddress());
 
-        return storeRepository.findStoresByCategory(point, categoryId, size, orderBy);
+        return storeRepository.findStoresByCategory(point, categoryId, page, orderBy);
     }
 }
