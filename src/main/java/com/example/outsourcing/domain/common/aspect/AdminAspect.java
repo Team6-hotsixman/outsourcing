@@ -16,8 +16,6 @@ import org.springframework.util.StopWatch;
 public class AdminAspect {
     private final HttpServletRequest request;
 
-    private final UserService userService;
-
         @Around("@annotation(com.example.outsourcing.domain.common.annotation.Admin) ||" +
                 "@within(com.example.outsourcing.domain.common.annotation.Admin)")
         public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
