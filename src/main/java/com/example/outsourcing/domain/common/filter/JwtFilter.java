@@ -24,7 +24,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws ServletException, IOException {
         String url = request.getRequestURI();
 
-        if (url.startsWith("/auth")) {
+        if (url.startsWith("/")) {
             chain.doFilter(request, response);
             return;
         }

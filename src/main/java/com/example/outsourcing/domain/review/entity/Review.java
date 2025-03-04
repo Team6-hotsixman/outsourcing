@@ -8,6 +8,10 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.BatchSize;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -32,6 +36,10 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "order_id")
     private Orders order;
 
+    @BatchSize(size = 100)
+    @OneToMany(mappedBy = "review", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    private List<ReviewImage> images = new ArrayList<>();
+
 
     @Builder
     private Review(String content, int rate, User user, Orders order) {
@@ -39,5 +47,17 @@ public class Review extends BaseEntity {
         this.rate = rate;
         this.user = user;
         this.order = order;
+    }
+
+    public void updateContent(String contents) {
+        if(!this.content.equals(contents)) {
+            this.content = contents;
+        }
+    }
+
+    public void updateRate(int rate) {
+        if(this.rate != rate) {
+            this.rate = rate;
+        }
     }
 }
