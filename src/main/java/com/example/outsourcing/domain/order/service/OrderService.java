@@ -1,5 +1,7 @@
 package com.example.outsourcing.domain.order.service;
 
+import com.example.outsourcing.domain.common.exception.ApplicationException;
+import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.menu.entity.Menu;
 import com.example.outsourcing.domain.menu.repository.MenuRepository;
 import com.example.outsourcing.domain.order.dto.OrderItemRequestDto;
@@ -17,7 +19,6 @@ import com.example.outsourcing.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDateTime;
 
 @Service
@@ -39,36 +40,31 @@ public class OrderService {
             Long storeId,
             OrderRequestDto requestDto
     ) {
-        //todo 예외 처리 수정 예정
         User user = userRepository.findById(userId).orElseThrow(
-                () -> new IllegalStateException("유저 없음")
+                () -> new ApplicationException(ErrorCode.NOT_FOUND_USER)
         );
-        //todo 예외 처리 수정 예정
         Store store = storeRepository.findById(storeId).orElseThrow(
-                () -> new IllegalStateException("가게 없음")
+                () -> new ApplicationException(ErrorCode.NOT_FOUND_STORE)
         );
         //todo 가게 영업 시간 확인 로직 필요
 
         //주문 금액 계산
         Integer totalPriceAmount = 0;
         for (OrderItemRequestDto orderItem : requestDto.getOrderItems()) {
-            //todo 예외 처리 수정 예정
             Menu menu = menuRepository.findById(orderItem.getMenuId()).orElseThrow(
-                    () -> new IllegalStateException("메뉴 없음")
+                    () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU)
             );
             totalPriceAmount += menu.getPrice() * orderItem.getQuantity();
         }
 
         //최소 주문 금액 확인
         if (totalPriceAmount < store.getMinOrderPrice()) {
-            //todo 예외 처리 수정 예정
-            throw new IllegalStateException("최소 주문 금액 이상으로 주문 가능합니다.");
+            throw new ApplicationException(ErrorCode.LESS_THAN_MIN_ORDER_PRICE);
         }
 
         //포인트 확인 및 차감
         if (requestDto.getUsedPoint() > user.getPoint()) {
-            //todo 예외 처리 수정 예정
-            throw new IllegalStateException("포인트가 부족합니다.");
+            throw new ApplicationException(ErrorCode.NOT_ENOUGH_POINT);
         }
         user.subtractPoint(requestDto.getUsedPoint());
         totalPriceAmount -= requestDto.getUsedPoint();
@@ -88,9 +84,8 @@ public class OrderService {
 
         //주문 아이템 저장
         for (OrderItemRequestDto itemRequestDto : requestDto.getOrderItems()) {
-            //todo 예외 처리 수정 예정
             Menu menu = menuRepository.findById(itemRequestDto.getMenuId()).orElseThrow(
-                    () -> new IllegalStateException("메뉴 없음")
+                    () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU)
             );
             OrderItem orderItem = new OrderItem(
                     itemRequestDto.getQuantity(),

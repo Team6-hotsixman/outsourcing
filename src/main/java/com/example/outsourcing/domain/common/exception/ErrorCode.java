@@ -27,9 +27,13 @@ public enum ErrorCode {
 
     STORE_STATUS_ALREADY_SAME("이미 해당 상태와 같습니다.", HttpStatus.BAD_REQUEST),
 
-    Unauthorized_User("해당 권한이 없습니다", HttpStatus.UNAUTHORIZED)
-    ;
+    Unauthorized_User("해당 권한이 없습니다", HttpStatus.UNAUTHORIZED),
 
+    // 주문 에러
+    LESS_THAN_MIN_ORDER_PRICE("최소 주문 금액 이상으로 주문 가능합니다.", HttpStatus.BAD_REQUEST),
+
+    NOT_ENOUGH_POINT("보유 포인트가 부족합니다.", HttpStatus.BAD_REQUEST)
+    ;
     private final String message;
 
     private final HttpStatus httpStatus;
