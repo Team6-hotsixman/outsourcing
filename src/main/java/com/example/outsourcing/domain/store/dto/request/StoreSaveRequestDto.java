@@ -20,7 +20,7 @@ public class StoreSaveRequestDto {
 
     private final String address;
 
-    private final int minOrderPrice;
+    private final Integer minOrderPrice;
 
     private final LocalTime openTime;
 
