@@ -2,7 +2,6 @@ package com.example.outsourcing.domain.store.service;
 
 
 import com.example.outsourcing.domain.auth.config.PasswordEncoder;
-import com.example.outsourcing.domain.auth.exception.AuthException;
 import com.example.outsourcing.domain.category.dto.response.CategoryResponse;
 import com.example.outsourcing.domain.category.entity.Category;
 import com.example.outsourcing.domain.category.service.CategoryService;
@@ -14,7 +13,6 @@ import com.example.outsourcing.domain.common.exception.StoreStatusAlreadySameExc
 import com.example.outsourcing.domain.common.exception.UnauthorizedStoreOwnerException;
 import com.example.outsourcing.domain.common.service.ImageService;
 import com.example.outsourcing.domain.common.service.KaKaoMapApiService;
-import com.example.outsourcing.domain.menu.service.MenuService;
 import com.example.outsourcing.domain.store.dto.request.StoreDeleteRequestDto;
 import com.example.outsourcing.domain.store.dto.request.StoreSaveRequestDto;
 import com.example.outsourcing.domain.store.dto.request.StoreStatusUpdateRequestDto;
