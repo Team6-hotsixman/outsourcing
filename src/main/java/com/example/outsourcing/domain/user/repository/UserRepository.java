@@ -4,7 +4,6 @@ import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.user.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.http.HttpStatus;
 
 import java.util.Optional;
 

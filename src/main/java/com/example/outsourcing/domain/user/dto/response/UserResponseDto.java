@@ -6,14 +6,18 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 @Getter
-@AllArgsConstructor
 public class UserResponseDto {
 
-    private final String email;
+    private final Long id;
     private final String name;
+    private final String email;
+    private final UserRole userRole;
 
 
-    public static UserResponseDto of(User user) {
-        return new UserResponseDto(user.getEmail(),user.getName());
+    public UserResponseDto(User user) {
+        this.id = user.getId();
+        this.name = user.getName();
+        this.email = user.getEmail();
+        this.userRole = user.getUserRole();
     }
 }

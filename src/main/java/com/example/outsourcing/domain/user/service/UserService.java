@@ -21,9 +21,9 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
-    public UserResponseDto getUser(Long userId) {
+    public UserResponseDto getUser(long userId) {
         User user = userRepository.findByIdOrElseThrow(userId);
-        return UserResponseDto.of(user);
+        return new UserResponseDto(user);
     }
 
     public UserResponseDto passwordUpdate(Long userId, UserUpdateRequestDto requestDto) {
@@ -39,7 +39,7 @@ public class UserService {
 
         user.passwordUpdate(passwordEncoder.encode(requestDto.getNewPassword()));
 
-        return UserResponseDto.of(user);
+        return new UserResponseDto(user);
     }
 
     @Transactional

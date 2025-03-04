@@ -8,10 +8,12 @@ import com.example.outsourcing.domain.user.dto.response.UserResponseDto;
 import com.example.outsourcing.domain.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/users")
@@ -19,21 +21,20 @@ public class UserController {
 
     private final UserService userService;
 
-    // 내 정보 조회
-    @GetMapping("/{userid}")
-    public ResponseEntity<UserResponseDto> getUser(@PathVariable long userid) {
-        return ResponseEntity.ok(userService.getUser(userid));
+    @GetMapping("/{id}")
+    public ResponseEntity<UserResponseDto> getUser(@PathVariable long id) {
+        log.info("id" +id);
+        return ResponseEntity.ok(userService.getUser(id));
     }
 
-    // 내 정보 수정
     @PutMapping
     public ResponseEntity<UserResponseDto> passwordUpdate(@Auth AuthUser authUser, @Valid @RequestBody UserUpdateRequestDto userUpdateRequest) {
         return ResponseEntity.ok(userService.passwordUpdate(authUser.getId(), userUpdateRequest));
     }
 
-    /*@PutMapping()
+    @PutMapping("/delete")
     public ResponseEntity<Void> deleteUser(@Auth AuthUser authUser, @Valid @RequestBody UserDeleteRequestDto userDeleteRequest) {
         userService.deleteUser(authUser.getId(), userDeleteRequest);
         return new ResponseEntity<>(HttpStatus.OK);
-    }*/
+    }
 }

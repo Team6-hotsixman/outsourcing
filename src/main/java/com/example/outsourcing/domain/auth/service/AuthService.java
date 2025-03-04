@@ -10,6 +10,7 @@ import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.common.jwt.JwtUtil;
 import com.example.outsourcing.domain.user.entity.User;
 import com.example.outsourcing.domain.user.enums.UserRole;
+import com.example.outsourcing.domain.user.enums.UserStatus;
 import com.example.outsourcing.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -28,6 +29,10 @@ public class AuthService {
     @Transactional
     public AuthSingupResponseDto signup(AuthSignupRequestDto authSignupRequestDto) {
 
+        if(userRepository.existsByEmailAndUserStatus_DELETE(authSignupRequestDto.getEmail())) {
+            throw new ApplicationException(ErrorCode.USER_STATUS_DELETE);
+        }
+
         if (userRepository.existsByEmail(authSignupRequestDto.getEmail())) {
             throw new ApplicationException(ErrorCode.DUPLICATE_EMAIL);
         }
@@ -35,6 +40,7 @@ public class AuthService {
         String encodedPassword = passwordEncoder.encode(authSignupRequestDto.getPassword());
 
         UserRole userRole = UserRole.of(authSignupRequestDto.getUserRole());
+
 
         User user = User.builder().
                 email(authSignupRequestDto.getEmail()).
@@ -44,6 +50,8 @@ public class AuthService {
                 createdAt(LocalDateTime.now()).
                 modifiedAt(LocalDateTime.now()).
                 build();
+        UserStatus userStatus = UserStatus.ACTIVE;
+
         User savedUser = userRepository.save(user);
 
         String bearerToken = jwtUtil.createToken(savedUser.getId(), savedUser.getEmail(), userRole);
@@ -56,7 +64,6 @@ public class AuthService {
         User user = userRepository.findByEmail(authLoginRequestDto.getEmail()).orElseThrow(
                 () -> new ApplicationException(ErrorCode.NOT_FOUND_USER));
 
-        // 로그인 시 이메일과 비밀번호가 일치하지 않을 경우 401을 반환합니다.
         if (!passwordEncoder.matches(authLoginRequestDto.getPassword(), user.getPassword())) {
             throw new ApplicationException(ErrorCode.PASSWORD_ARGUMENT_NOT_VALID);
         }

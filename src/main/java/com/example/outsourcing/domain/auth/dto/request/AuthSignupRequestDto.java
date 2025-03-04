@@ -24,13 +24,14 @@ public class AuthSignupRequestDto {
     @NotBlank
     private String userRole;
 
+
     private String name;
 
     @Builder
-    private AuthSignupRequestDto(String email,String password,String name, String userRole) {
+    private AuthSignupRequestDto(String email,String password,String name, String userRole ) {
         this.email = email;
         this.password = password;
         this.name = name;
-        this. userRole = userRole;
+        this.userRole = userRole;
     }
 }
