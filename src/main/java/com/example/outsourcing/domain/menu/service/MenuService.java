@@ -19,6 +19,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class MenuService {
@@ -77,5 +79,9 @@ public class MenuService {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_MENU));
         menuRepository.delete(menu);
+    }
+
+    public List<Menu> getMenus(Long storeId) {
+        return menuRepository.findByStoreId(storeId);
     }
 }

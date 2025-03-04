@@ -1,5 +1,6 @@
 package com.example.outsourcing.domain.user.entity;
 
+import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.common.entity.BaseEntity;
 import com.example.outsourcing.domain.user.enums.UserRole;
 import jakarta.persistence.*;
@@ -54,6 +55,16 @@ public class User extends BaseEntity {
         this.createdAt = createdAt;
         this.modifiedAt = modifiedAt;
 
+    }
+
+    private User(Long id, String email, UserRole userRole){
+        this.id = id;
+        this.email = email;
+        this.userRole = userRole;
+    }
+
+    public static User fromAuthUser(AuthUser authUser) {
+        return new User(authUser.getId(), authUser.getEmail(), authUser.getUserRole());
     }
 
     public void changePassword(String password) {
