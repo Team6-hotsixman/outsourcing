@@ -1,10 +1,12 @@
 package com.example.outsourcing.domain.review.service;
 
+import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.common.entity.Image;
 import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.common.service.ImageService;
 import com.example.outsourcing.domain.order.entity.Orders;
+import com.example.outsourcing.domain.order.enums.OrderStatus;
 import com.example.outsourcing.domain.order.repository.OrderRepository;
 import com.example.outsourcing.domain.review.dto.request.ReviewCreateRequest;
 import com.example.outsourcing.domain.review.dto.request.ReviewUpdateRequest;
@@ -16,10 +18,12 @@ import com.example.outsourcing.domain.user.entity.User;
 import com.example.outsourcing.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -30,9 +34,14 @@ public class ReviewService {
     private final ReviewRepository reviewRepository;
     private final ImageService imageService;
 
-    public ReviewResponse save(long orderId, long userId, ReviewCreateRequest request, List<MultipartFile> images) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_USER));
-        Orders orders = orderRepository.findById(orderId).orElseThrow(() -> new ApplicationException(ErrorCode.METHOD_ARGUMENT_NOT_VALID));
+    @Transactional
+    public ReviewResponse save(long orderId, AuthUser authUser, ReviewCreateRequest request, List<MultipartFile> images) {
+        User user = userRepository.findById(authUser.getId()).orElseThrow(()->new ApplicationException(ErrorCode.NOT_FOUND_USER));
+        Orders orders = orderRepository.findById(orderId).orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_ORDER));
+        if(orders.getOrderStatus() != OrderStatus.COMPLETED){
+            //수정필요 : 메시지 합의
+            new ApplicationException(ErrorCode.METHOD_ARGUMENT_NOT_VALID);
+        }
         Review review = Review.builder()
                 .order(orders)
                 .user(user)
@@ -41,7 +50,7 @@ public class ReviewService {
                 .build();
 
         for (MultipartFile image : images) {
-            //이미지저장
+            //수정필요
             Image save = imageService.save(image);
             review.getImages().add(new ReviewImage(review, new Image(1, "good")));
         }
@@ -56,8 +65,9 @@ public class ReviewService {
         return reviewsByStoreId.stream().map(ReviewResponse::of).toList();
     }
 
+    @Transactional
     public ReviewResponse updateReview(long reviewId, long userId, ReviewUpdateRequest request, List<MultipartFile> images) {
-        Review review = reviewRepository.findByIdWithUser(reviewId).orElseThrow(()->new ApplicationException(ErrorCode.NOT_FOUND_REVIEW));
+        Review review = reviewRepository.findByIdWithUserAndOrder(reviewId).orElseThrow(()->new ApplicationException(ErrorCode.NOT_FOUND_REVIEW));
         if(review.getUser().getId() != userId){
             throw new ApplicationException(ErrorCode.Unauthorized_User);
         }
@@ -67,22 +77,30 @@ public class ReviewService {
             //리뷰의 이미지를 비우고 새로운 이미지로 채운다
             review.getImages().clear();
             for(MultipartFile image : images){
+                //수정필요
                 Image save = imageService.save(image);
                 long newId = 2L;
                 review.getImages().add(new ReviewImage(review, new Image(newId, "good")));
             }
         }
 
-        if(request.getContents() != null){
-            review.updateContent(request.getContents());
+        if(request.getContent() != null){
+            review.updateContent(request.getContent());
         }
         if(request.getRate() != null){
             review.updateRate(request.getRate());
         }
-        review = reviewRepository.save(review);
+        reviewRepository.save(review);
 
         return ReviewResponse.of(review);
     }
 
 
+    public void deleteReview(Long userId, long reviewId) {
+        Review review = reviewRepository.findByIdWithUserAndOrder(reviewId).orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_REVIEW));
+        if(review.getUser().getId() != userId){
+            throw new ApplicationException(ErrorCode.Unauthorized_User);
+        }
+        reviewRepository.delete(review);
+    }
 }

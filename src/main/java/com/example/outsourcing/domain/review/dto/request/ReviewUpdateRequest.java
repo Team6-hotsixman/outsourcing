@@ -8,5 +8,5 @@ import lombok.Getter;
 @AllArgsConstructor
 public class ReviewUpdateRequest {
     private Integer rate;
-    private String contents;
+    private String content;
 }

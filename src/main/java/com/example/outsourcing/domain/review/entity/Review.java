@@ -37,7 +37,7 @@ public class Review extends BaseEntity {
     private Orders order;
 
     @BatchSize(size = 100)
-    @OneToMany(mappedBy = "review", cascade = CascadeType.PERSIST, orphanRemoval = true)
+    @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> images = new ArrayList<>();
 
 

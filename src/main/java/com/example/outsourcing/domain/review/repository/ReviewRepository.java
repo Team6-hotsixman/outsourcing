@@ -23,6 +23,6 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
             "limit 10 ")
     List<Review> findReviewsByStoreId(Long storeId, LocalDateTime last);
 
-    @Query("select r from Review r join fetch r.user where r.id = :reviewId ")
-    Optional<Review> findByIdWithUser(long reviewId);
+    @Query("select r from Review r join fetch r.user join fetch r.order where r.id = :reviewId ")
+    Optional<Review> findByIdWithUserAndOrder(long reviewId);
 }

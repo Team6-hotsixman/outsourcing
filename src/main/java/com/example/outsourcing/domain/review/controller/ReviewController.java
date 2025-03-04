@@ -1,5 +1,7 @@
 package com.example.outsourcing.domain.review.controller;
 
+import com.example.outsourcing.domain.common.annotation.Auth;
+import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.review.dto.request.ReviewCreateRequest;
 import com.example.outsourcing.domain.review.dto.request.ReviewUpdateRequest;
 import com.example.outsourcing.domain.review.dto.response.ReviewResponse;
@@ -21,11 +23,12 @@ public class ReviewController {
     private final ReviewService reviewService;
 
     @PostMapping(value ="/reviews/orders/{orderId}")
-    public ResponseEntity<ReviewResponse> save(@PathVariable long orderId,
-                                              @RequestPart(value = "create", required = false) ReviewCreateRequest reviewCreateRequest,
-                                              @RequestPart(value = "images", required = false) List<MultipartFile> images) {
-        long userId =1L;
-        ReviewResponse reviewResponse = reviewService.save(orderId, userId, reviewCreateRequest, images);
+    public ResponseEntity<ReviewResponse> save(@Auth AuthUser authUser,
+                                               @PathVariable long orderId,
+                                               @RequestPart(value = "create", required = false) ReviewCreateRequest reviewCreateRequest,
+                                               @RequestPart(value = "images", required = false) List<MultipartFile> images) {
+
+        ReviewResponse reviewResponse = reviewService.save(orderId, authUser, reviewCreateRequest, images);
         return ResponseEntity.ok(reviewResponse);
     }
 
@@ -39,13 +42,21 @@ public class ReviewController {
     }
 
     @PatchMapping("/reviews/{reviewId}")
-    public ResponseEntity<ReviewResponse> update(@PathVariable long reviewId,
+    public ResponseEntity<ReviewResponse> update(@Auth AuthUser authUser,
+                                                 @PathVariable long reviewId,
                                                  @RequestPart(value = "update", required = false) ReviewUpdateRequest reviewUpdateRequest,
                                                  @RequestPart(value = "images", required = false) List<MultipartFile> images){
-        long userId =1L;
-        ReviewResponse reviewResponse = reviewService.updateReview(reviewId, userId, reviewUpdateRequest, images);
+        ReviewResponse reviewResponse = reviewService.updateReview(reviewId, authUser.getId(), reviewUpdateRequest, images);
 
         return ResponseEntity.ok(reviewResponse);
+    }
+
+    @DeleteMapping("/reviews/{reviewId}")
+    public ResponseEntity<Void> delete(@Auth AuthUser authUser,
+                                       @PathVariable long reviewId) {
+        reviewService.deleteReview(authUser.getId(), reviewId);
+
+        return ResponseEntity.ok().build();
     }
 
 }
