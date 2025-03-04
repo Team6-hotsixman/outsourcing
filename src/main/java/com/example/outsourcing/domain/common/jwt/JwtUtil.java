@@ -7,7 +7,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
 import com.example.outsourcing.domain.common.exception.ServerException;
-import com.example.outsourcing.domain.user.enums.UserRole;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -17,7 +16,6 @@ import java.security.Key;
 import java.util.Date;
 import java.util.Base64;
 
-//@Slf4j(topic="JwtUtil")
 @Component
 public class JwtUtil {
 
