@@ -7,9 +7,9 @@ import com.example.outsourcing.domain.common.entity.Image;
 import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.common.exception.StoreLimitExceededException;
-import com.example.outsourcing.domain.common.service.GeoCodingService;
 import com.example.outsourcing.domain.common.exception.NotFoundStoreException;
 import com.example.outsourcing.domain.common.exception.StoreStatusAlreadySameException;
+import com.example.outsourcing.domain.common.service.KaKaoMapApiService;
 import com.example.outsourcing.domain.common.service.ImageService;
 import com.example.outsourcing.domain.common.service.SearchKeywordRankingService;
 import com.example.outsourcing.domain.store.dto.request.StoreDeleteRequestDto;
@@ -20,6 +20,7 @@ import com.example.outsourcing.domain.store.dto.response.StoreNoticeResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreStatusResponseDto;
 import com.example.outsourcing.domain.store.entity.Store;
+import com.example.outsourcing.domain.store.enums.OrderBy;
 import com.example.outsourcing.domain.store.enums.StoreStatus;
 import com.example.outsourcing.domain.store.repository.StoreRepository;
 import com.example.outsourcing.domain.category.service.CategoryService;
@@ -30,12 +31,9 @@ import com.example.outsourcing.domain.user.repository.UserAddressRepository;
 import com.example.outsourcing.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.*;
-import org.locationtech.jts.operation.buffer.BufferOp;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StopWatch;
 
 import java.util.List;
 
@@ -50,7 +48,7 @@ public class StoreService {
 
     private final UserRepository userRepository;
 
-    private final GeoCodingService geoCodingService;
+    private final KaKaoMapApiService kaKaoMapApiService;
     private final UserAddressRepository userAddressRepository;
     private final SearchKeywordRankingService searchKeywordRankingService;
 
@@ -62,7 +60,7 @@ public class StoreService {
         User user = userRepository.findById(1L).orElseThrow();
 
         //주소지를 좌표로 변환
-        Point location =geoCodingService.getPoint(dto.getAddress());
+        Point location =kaKaoMapApiService.getPoint(dto.getAddress());
 
         if (storeRepository.countStoresByUserId(user.getId()) >= 3) {
             throw new StoreLimitExceededException();
@@ -167,28 +165,37 @@ public class StoreService {
     }
     /* hyen ho end */
 
-    public List<StoreResponseDto> getAllStores(long userId, String searchKeyword, double distance, int page, int size) {
-        Pageable pageable = PageRequest.of(page - 1, size);
-
+    @Transactional(readOnly = true)
+    public List<StoreResponseDto> searchStore(long userId, String searchKeyword, int size, OrderBy orderBy) {
         //사용자의 기본 배송지를 가져온다
         UserAddress address = userAddressRepository.findByUserIdAndAddressStatus(userId, AddressStatus.DEFAULT)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_DEFAULT_ADDRESS));
 
-        //주소지를 좌표로 변환
-        Point center = geoCodingService.getPoint(address.getAddress());
+        //사용자의 기본 배송지 좌표
+        Point point = kaKaoMapApiService.getPoint(address.getAddress());
 
-        Page<Store> stores;
-        //좌표기준 distance내분에있는 가게리스트 반환
-        if(searchKeyword == null || searchKeyword.isEmpty()) {
-            stores = storeRepository.findStoresByArea(center, distance, pageable);
+        List<StoreResponseDto> storesByArea = List.of();
+
+        if(searchKeyword == null || searchKeyword.isEmpty()){
+            storesByArea = storeRepository.findStoresByArea(point,size, orderBy);
         } else {
-            stores = storeRepository.findStoresByAreaAndSearch(center, distance, searchKeyword, pageable);
-            //검색결과가 존재하고 검색어가 null이 아니라면 redis에 검색어 등록
-            if(!stores.isEmpty()){
+            storesByArea = storeRepository.findStoresBySearch(point, searchKeyword, size, orderBy);
+            if(!storesByArea.isEmpty()) {
                 searchKeywordRankingService.increaseCount(searchKeyword);
             }
         }
 
-        return stores.getContent().stream().map(StoreResponseDto::of).toList();
+        return storesByArea;
+    }
+
+    @Transactional(readOnly = true)
+    public List<StoreResponseDto> searchStoreByCategory(long userId, long categoryId,  int size, OrderBy orderBy) {
+        //사용자의 기본 배송지를 가져온다
+        UserAddress address = userAddressRepository.findByUserIdAndAddressStatus(userId, AddressStatus.DEFAULT)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_DEFAULT_ADDRESS));
+
+        Point point = kaKaoMapApiService.getPoint(address.getAddress());
+
+        return storeRepository.findStoresByCategory(point, categoryId, size, orderBy);
     }
 }

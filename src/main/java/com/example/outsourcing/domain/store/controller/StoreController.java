@@ -7,6 +7,7 @@ import com.example.outsourcing.domain.store.dto.request.StoreUpdateRequestDto;
 import com.example.outsourcing.domain.store.dto.response.StoreNoticeResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreStatusResponseDto;
+import com.example.outsourcing.domain.store.enums.OrderBy;
 import com.example.outsourcing.domain.store.service.StoreService;
 import com.example.outsourcing.domain.user.entity.User;
 import com.example.outsourcing.domain.user.enums.UserRole;
@@ -91,12 +92,21 @@ public class StoreController {
 
      /* hyen ho end */
     @GetMapping("/stores")
-    public ResponseEntity<List<StoreResponseDto>> getAllStores(@RequestParam(name = "searchKeyword", required = false) String searchKeyword,
-                                                               @RequestParam(required = false, defaultValue = "3000") double distance,
-                                                               @RequestParam(required = false, defaultValue = "1") int page,
-                                                               @RequestParam(required = false, defaultValue = "10") int size) {
+    public ResponseEntity<List<StoreResponseDto>> searchStore(@RequestParam(name = "searchKeyword", required = false) String searchKeyword,
+                                                              @RequestParam(required = false, defaultValue = "10") int size,
+                                                              @RequestParam(required = false, defaultValue = "distance") String orderBy) {
         long userId = 1L;
-        List<StoreResponseDto> stores = storeService.getAllStores(userId, searchKeyword, distance, page, size);
+        List<StoreResponseDto> stores = storeService.searchStore(userId, searchKeyword, size, OrderBy.valueOf(orderBy.toUpperCase()));
+
+        return ResponseEntity.ok(stores);
+    }
+
+    @GetMapping("/stores/categories/{categoryId}")
+    public ResponseEntity<List<StoreResponseDto>> searchStoreByCategory(@PathVariable long categoryId,
+                                                                        @RequestParam(required = false, defaultValue = "10") int size,
+                                                                        @RequestParam(required = false, defaultValue = "distance") String orderBy){
+        long userId = 1L;
+        List<StoreResponseDto> stores = storeService.searchStoreByCategory(userId, categoryId, size, OrderBy.valueOf(orderBy.toUpperCase()));
 
         return ResponseEntity.ok(stores);
     }
