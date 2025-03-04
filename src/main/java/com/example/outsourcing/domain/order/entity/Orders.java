@@ -17,9 +17,10 @@ public class Orders {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private int totalPriceAmount;
-    private int usedPoints;
+    private Integer totalPriceAmount;
+    private Integer usedPoint;
     private LocalDateTime orderAt;
+
     @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus;
 
@@ -33,18 +34,22 @@ public class Orders {
 
     @Builder
     public Orders(
-            int totalPriceAmount,
-            int usedPoints,
+            Integer totalPriceAmount,
+            Integer usedPoint,
             LocalDateTime orderAt,
             OrderStatus orderStatus,
             Store store,
             User user
     ) {
         this.totalPriceAmount = totalPriceAmount;
-        this.usedPoints = usedPoints;
+        this.usedPoint = usedPoint;
         this.orderAt = orderAt;
         this.orderStatus = orderStatus;
         this.store = store;
         this.user = user;
+    }
+
+    public void updateOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
     }
 }

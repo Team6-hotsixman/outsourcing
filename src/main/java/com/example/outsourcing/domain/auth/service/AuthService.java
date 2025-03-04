@@ -29,10 +29,6 @@ public class AuthService {
     @Transactional
     public AuthSingupResponseDto signup(AuthSignupRequestDto authSignupRequestDto) {
 
-        if(userRepository.existsByEmailAndUserStatus_DELETE(authSignupRequestDto.getEmail())) {
-            throw new ApplicationException(ErrorCode.USER_STATUS_DELETE);
-        }
-
         if (userRepository.existsByEmail(authSignupRequestDto.getEmail())) {
             throw new ApplicationException(ErrorCode.DUPLICATE_EMAIL);
         }
