@@ -9,6 +9,7 @@ import com.example.outsourcing.domain.common.exception.NotFoundStoreException;
 import com.example.outsourcing.domain.common.exception.StoreLimitExceededException;
 import com.example.outsourcing.domain.common.exception.StoreStatusAlreadySameException;
 import com.example.outsourcing.domain.common.service.ImageService;
+import com.example.outsourcing.domain.common.service.KaKaoMapApiService;
 import com.example.outsourcing.domain.menu.entity.Menu;
 import com.example.outsourcing.domain.menu.service.MenuService;
 import com.example.outsourcing.domain.store.dto.request.StoreDeleteRequestDto;
@@ -22,6 +23,7 @@ import com.example.outsourcing.domain.store.repository.StoreRepository;
 import com.example.outsourcing.domain.user.entity.User;
 import com.example.outsourcing.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +38,8 @@ public class OwnerStoreService {
 
     private final MenuService menuService;
 
+    private final KaKaoMapApiService kaKaoMapApiService;
+
     private final ImageService imageService;
 
     private final UserRepository userRepository;
@@ -46,7 +50,7 @@ public class OwnerStoreService {
         CategoryResponse categoryResponse = categoryService.getCategoryById(dto.getCategoryId());
         Image image = imageService.getImageById(dto.getImageId());
         User user = userRepository.findById(1L).orElseThrow();
-
+        Point point = kaKaoMapApiService.getPoint(dto.getAddress());
         if (storeRepository.countStoresByUserId(user.getId()) >= 3) {
             throw new StoreLimitExceededException();
         }
@@ -62,6 +66,7 @@ public class OwnerStoreService {
                 .minOrderPrice(dto.getMinOrderPrice())
                 .openTime(dto.getOpenTime())
                 .closeTime(dto.getCloseTime())
+                .location(point)
                 .build();
         storeRepository.save(store);
         return SaveStoreResponseDto.of(store);
