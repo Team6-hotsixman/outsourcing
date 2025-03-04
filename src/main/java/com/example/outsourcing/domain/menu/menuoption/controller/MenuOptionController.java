@@ -9,6 +9,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 public class MenuOptionController {
@@ -20,6 +22,11 @@ public class MenuOptionController {
             User user,
             @RequestBody MenuOptionSaveRequestDto requestDto) {
         return ResponseEntity.ok(menuOptionService.saveMenuOption(user, requestDto));
+    }
+
+    @GetMapping("/options")
+    public ResponseEntity<List<MenuOptionResponseDto>> getMenuOptions() {
+        return ResponseEntity.ok(menuOptionService.getMenuOptions());
     }
 
     @PatchMapping("/options/{optionId}")
