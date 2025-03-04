@@ -13,6 +13,7 @@ public class OrderItem {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    private int quantity;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "order_id", nullable = false)
@@ -23,7 +24,8 @@ public class OrderItem {
     private Menu menu;
 
     @Builder
-    public OrderItem(Orders order, Menu menu) {
+    public OrderItem(int quantity, Orders order, Menu menu) {
+        this.quantity = quantity;
         this.order = order;
         this.menu = menu;
     }
