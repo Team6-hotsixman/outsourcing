@@ -12,7 +12,6 @@ import com.example.outsourcing.domain.order.enums.OrderStatus;
 import com.example.outsourcing.domain.store.dto.response.*;
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.store.enums.OrderBy;
-import com.example.outsourcing.domain.store.enums.StoreStatus;
 import com.example.outsourcing.domain.store.repository.StoreRepository;
 import com.example.outsourcing.domain.user.entity.UserAddress;
 import com.example.outsourcing.domain.user.enums.AddressStatus;
@@ -39,12 +38,16 @@ public class StoreService {
     private final SearchKeywordRankingService searchKeywordRankingService;
 
     /* hyen ho start */
-    public StoreResponseDto getStore(Long storeId) {
+    public StoreResponseDto getStoreAndMenu(Long storeId) {
         Store store = storeRepository.findById(storeId).orElseThrow(NotFoundStoreException::new);
 
         List<Menu> menus = menuService.getMenus(storeId);
 
         return StoreResponseDto.of(store, menus);
+    }
+
+    public Store getStore(Long storeId) {
+        return storeRepository.findById(storeId).orElseThrow(NotFoundStoreException::new);
     }
     /* hyen ho end */
 
