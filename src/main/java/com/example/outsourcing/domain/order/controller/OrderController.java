@@ -38,6 +38,15 @@ public class OrderController {
         return orderService.findAll(userId);
     }
 
+    @GetMapping("/orders/{orderId}")
+    public OrderResponseDto getOrder(
+            @PathVariable Long orderId,
+            HttpServletRequest httpServletRequest
+    ) {
+        Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userID")));
+        return orderService.findOne(orderId, userId);
+    }
+
     @PutMapping("/orders/status")
     public OrderSimpleResponseDto updateOrderStatus(
             @Auth AuthUser authUser,

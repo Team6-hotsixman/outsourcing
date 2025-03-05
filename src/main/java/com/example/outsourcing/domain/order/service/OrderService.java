@@ -185,6 +185,55 @@ public class OrderService {
         return orderDtos;
     }
 
+    //주문 단건 조회
+    @Transactional(readOnly = true)
+    public OrderResponseDto findOne(Long orderId, Long userId) {
+
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new ApplicationException(ErrorCode.NOT_FOUND_USER)
+        );
+        Orders order = orderRepository.findById(orderId).orElseThrow(
+                () -> new ApplicationException(ErrorCode.NOT_FOUND_ORDER)
+        );
+
+        //주문 아이템 조회
+        List<OrderItem> menus = orderItemRepository.findAllByOrderId(order.getId());
+        // 주문 아이템 DTO 리스트 생성
+        List<OrderItemResponseDto> orderItemDtos = menus.stream().map(
+                item -> {
+                    //주문 아이템 옵션 조회
+                    List<OrderItemOption> options = orderItemOptionRepository.findAllByOrderItemId(item.getId());
+
+                    // 주문 아이템 옵션 DTO 생성
+                    List<OrderItemOptionResponseDto> optionDtos = options.stream().map(
+                            option -> {
+                                MenuOption menuOption = menuOptionRepository.findById(option.getMenuOption().getId()).orElseThrow(
+                                        () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU_OPTION)
+                                );
+                                return new OrderItemOptionResponseDto(
+                                        menuOption.getId(),
+                                        menuOption.getOptionName(),
+                                        option.getQuantity()
+                                );
+                            }
+                    ).toList();
+
+                    // 주문 아이템 DTO 생성
+                    Menu menu = menuRepository.findById(item.getMenu().getId()).orElseThrow(
+                            () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU)
+                    );
+                    return new OrderItemResponseDto(
+                            menu.getId(),
+                            menu.getMenuName(),
+                            item.getQuantity(),
+                            optionDtos
+                    );
+                }
+        ).toList();
+
+        return OrderResponseDto.of(order, orderItemDtos);
+    }
+
     //주문 수락/거절/배달중/배달완료 상태 변경
     @Transactional
     public OrderSimpleResponseDto updateOrderStatus(
