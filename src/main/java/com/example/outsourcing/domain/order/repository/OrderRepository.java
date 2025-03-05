@@ -16,28 +16,39 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
 
     Page<Orders> findAllByUserId(Long userId, Pageable pageable);
 
+    // 관리자 통계 시작
     @Query("select o.store.storeName , sum (o.totalPriceAmount) from Orders o " +
-            "where Date(o.orderAt) = DATE(:date)" +
+            "WHERE function('date_format', o.orderAt, '%Y-%m-%d') = :localDate " +
+            "AND o.orderStatus = 'COMPLETED' " +
             "group by o.store.storeName")
-    List<StatisticsPriceResponseDto> getTotalPriceByStoreAndDate(@Param("date") LocalDate date);
+    List<StatisticsPriceResponseDto> getTotalPriceByStoreAndDate(@Param("localDate") LocalDate localDate);
 
     @Query("select o.store.storeName, sum(o.totalPriceAmount) from Orders o " +
-            "where function('YEAR', o.orderAt) = :year " +
-            "and function('MONTH', o.orderAt) = :month " +
+            "WHERE function('date_format', o.orderAt, '%Y-%m-%d') BETWEEN :startDate AND :endDate " +
+            "AND o.orderStatus = 'COMPLETED' " +
             "group by o.store.storeName")
-    List<StatisticsPriceResponseDto> getTotalPriceByStoreAndMonth(@Param("year") int year, @Param("month") int month);
+    List<StatisticsPriceResponseDto> getTotalPriceByStoreAndMonth(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
 
     @Query("select count(o) from Orders o " +
-            "where function('YEAR', o.orderAt) = :year " +
-            "and function('MONTH', o.orderAt) = :month " +
+            "WHERE function('date_format', o.orderAt, '%Y-%m-%d') BETWEEN :startDate AND :endDate " +
+            "AND o.orderStatus = 'COMPLETED' " +
             "group by o.store.storeName")
-    List<StatisticsCountResponseDto> getCountOrdersByStoreAndMonth(@Param("year") int year, @Param("month") int month);
+    List<StatisticsCountResponseDto> getCountOrdersByStoreAndMonth(
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate);
 
-    @Query("select count(o) from Orders o " +
-            "where DATE(o.orderAt) = DATE(:date) " +
+    @Query("select new com.example.outsourcing.domain.statistics.dto.response.StatisticsCountResponseDto(o.store.storeName, count(o)) " +
+            "from Orders o " +
+            "WHERE function('date_format', o.orderAt, '%Y-%m-%d') = :localDate " +
+            "AND o.orderStatus = 'COMPLETED' " +
             "group by o.store.storeName")
-    List<StatisticsCountResponseDto> getCountOrdersByStoreAndDate(@Param("date") LocalDate date);
+    List<StatisticsCountResponseDto> getCountOrdersByStoreAndDate(@Param("localDate") LocalDate localDate);
 
+    // 관리자 통계 끝
+
+    // 가게 통계 시작
     @Query("SELECT new com.example.outsourcing.domain.statistics.dto.response.StatisticsCountResponseDto(o.store.storeName, count(o)) " +
             "FROM Orders o " +
             "WHERE function('date_format', o.orderAt, '%Y-%m-%d') BETWEEN :startDate AND :endDate " +
@@ -78,5 +89,8 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
             "AND o.orderStatus = 'COMPLETED' " +
             "GROUP BY o.store.id")
     StatisticsPriceResponseDto findTotalRevenueByDay(@Param("storeId") Long storeId, @Param("localDate") LocalDate localDate);
+
+    // 가게 통계 끝
+
 }
 
