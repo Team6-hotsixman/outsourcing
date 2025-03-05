@@ -1,5 +1,6 @@
 package com.example.outsourcing.domain.order.service;
 
+import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.menu.entity.Menu;
@@ -110,21 +111,19 @@ public class OrderService {
 
         int adjustedPage = (page > 0) ? page - 1 : 0;
         PageRequest pageable = PageRequest.of(adjustedPage, size, Sort.by("orderAt").descending());
-        Page<Orders> orderPage = orderRepository.findAllByUserId(userId, pageable);
+        Page<Orders> orderPage = orderRepository.findAllByUserId(user.getId(), pageable);
         return orderPage.map(OrderResponseDto::of);
     }
 
     //주문 수락/거절/배달중/배달완료 상태 변경
     @Transactional
     public OrderResponseDto updateOrderStatus(
-            Long userId,
+            AuthUser authUser,
             Long storeId,
             Long orderId,
             OrderStatusRequestDto requestDto
     ) {
-        User user = userRepository.findById(userId).orElseThrow(
-                () -> new ApplicationException(ErrorCode.NOT_FOUND_USER)
-        );
+        User user = User.fromAuthUser(authUser);
         Store store = storeRepository.findById(storeId).orElseThrow(
                 () -> new ApplicationException(ErrorCode.NOT_FOUND_STORE)
         );

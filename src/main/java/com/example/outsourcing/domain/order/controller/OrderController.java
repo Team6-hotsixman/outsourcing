@@ -1,5 +1,7 @@
 package com.example.outsourcing.domain.order.controller;
 
+import com.example.outsourcing.domain.common.annotation.Auth;
+import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.order.dto.request.OrderRequestDto;
 import com.example.outsourcing.domain.order.dto.response.OrderResponseDto;
 import com.example.outsourcing.domain.order.dto.request.OrderStatusRequestDto;
@@ -38,13 +40,12 @@ public class OrderController {
 
     @PutMapping("/orders/status")
     public OrderResponseDto updateOrderStatus(
-            HttpServletRequest httpServletRequest,
+            @Auth AuthUser authUser,
             @RequestParam Long storeId,
             @RequestParam Long orderId,
             @Validated @RequestBody OrderStatusRequestDto requestDto
             ) {
-        Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userID")));
-        return orderService.updateOrderStatus(userId, storeId, orderId, requestDto);
+        return orderService.updateOrderStatus(authUser, storeId, orderId, requestDto);
     }
 
     @DeleteMapping("/orders")
