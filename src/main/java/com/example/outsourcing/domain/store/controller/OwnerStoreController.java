@@ -1,85 +1,68 @@
 package com.example.outsourcing.domain.store.controller;
 
+import com.example.outsourcing.domain.common.annotation.Auth;
+import com.example.outsourcing.domain.common.annotation.Owner;
+import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.store.dto.request.StoreDeleteRequestDto;
 import com.example.outsourcing.domain.store.dto.request.StoreSaveRequestDto;
 import com.example.outsourcing.domain.store.dto.request.StoreStatusUpdateRequestDto;
 import com.example.outsourcing.domain.store.dto.request.StoreUpdateRequestDto;
 import com.example.outsourcing.domain.store.dto.response.*;
 import com.example.outsourcing.domain.store.service.OwnerStoreService;
-import com.example.outsourcing.domain.user.entity.User;
-import com.example.outsourcing.domain.user.enums.UserRole;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/stores")
+@Owner
 public class OwnerStoreController {
     private final OwnerStoreService ownerStoreService;
 
     @PostMapping
-    public ResponseEntity<SaveStoreResponseDto> saveStore(@RequestBody @Valid StoreSaveRequestDto requestDto) {
-        User authUser = User.builder()
-                .email("qwer@1234")
-                .password("password")
-                .userRole(UserRole.OWNER)
-                .build();
-        return new ResponseEntity<>(ownerStoreService.saveStore(authUser,requestDto), HttpStatus.CREATED);
+    public ResponseEntity<SaveStoreResponseDto> saveStore(
+            @Auth AuthUser authUser,
+            @RequestBody @Valid StoreSaveRequestDto requestDto
+    ) {
+        return ResponseEntity.ok(ownerStoreService.saveStore(authUser, requestDto));
     }
 
     @PatchMapping("/{storeId}")
     public ResponseEntity<UpdateStoreResponseDto> updateStore(
+            @Auth AuthUser authUser,
             @PathVariable Long storeId,
             @RequestBody @Valid StoreUpdateRequestDto requestDto)
     {
-        User authUser = User.builder()
-                .email("qwer@1234")
-                .password("password")
-                .userRole(UserRole.OWNER)
-                .build();
-        return new ResponseEntity<>(ownerStoreService.updateStore(storeId, authUser, requestDto), HttpStatus.OK);
+        return ResponseEntity.ok(ownerStoreService.updateStore(storeId, authUser, requestDto));
     }
 
     @PatchMapping("/{storeId}/status")
     public ResponseEntity<StoreStatusResponseDto> updateStoreStatus(
+            @Auth AuthUser authUser,
             @PathVariable Long storeId,
             @RequestBody @Valid StoreStatusUpdateRequestDto requestDto
     ) {
-        User authUser = User.builder()
-                .email("qwer@1234")
-                .password("password")
-                .userRole(UserRole.OWNER)
-                .build();
-        return new ResponseEntity<>(ownerStoreService.updateStoreStatus(authUser, storeId, requestDto), HttpStatus.OK);
+        return ResponseEntity.ok(ownerStoreService.updateStoreStatus(authUser, storeId, requestDto));
     }
 
     @PatchMapping("/{storeId}/notice")
     public ResponseEntity<StoreNoticeResponseDto> updateStoreStatus(
+            @Auth AuthUser authUser,
             @PathVariable Long storeId,
             @RequestBody @Valid StoreNoticeResponseDto requestDto
     ) {
-        User authUser = User.builder()
-                .email("qwer@1234")
-                .password("password")
-                .userRole(UserRole.OWNER)
-                .build();
-        return new ResponseEntity<>(ownerStoreService.updateStoreNotice(authUser, storeId, requestDto), HttpStatus.OK);
+        return ResponseEntity.ok(ownerStoreService.updateStoreNotice(authUser, storeId, requestDto));
     }
 
     @DeleteMapping("/{storeId}")
     public ResponseEntity<Void> deleteStore(
+            @Auth AuthUser authUser,
             @PathVariable Long storeId,
             @RequestBody @Valid StoreDeleteRequestDto requestDto
     ) {
-        User authUser = User.builder()
-                .email("qwer@1234")
-                .password("password")
-                .userRole(UserRole.OWNER)
-                .build();
         ownerStoreService.deleteStore(authUser, storeId, requestDto);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok().build();
     }
 }
