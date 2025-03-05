@@ -19,6 +19,7 @@ public class Orders {
     private Long id;
     private Integer totalPriceAmount;
     private Integer usedPoint;
+    @Column(updatable = false)
     private LocalDateTime orderAt;
 
     @Enumerated(EnumType.STRING)

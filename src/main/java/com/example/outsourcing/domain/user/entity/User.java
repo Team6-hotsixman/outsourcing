@@ -3,6 +3,8 @@ package com.example.outsourcing.domain.user.entity;
 import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.common.entity.BaseEntity;
 import com.example.outsourcing.domain.user.dto.response.UserResponseDto;
+import com.example.outsourcing.domain.common.exception.ApplicationException;
+import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.user.enums.UserRole;
 import com.example.outsourcing.domain.user.enums.UserStatus;
 import jakarta.persistence.*;
@@ -84,10 +86,15 @@ public class User extends BaseEntity {
         this.userStatus = userStatus;
     }
 
-    // 유저 point 차감 메소드
+    //유저 point 적립 메소드
+    public void earnPoint(Integer pointToEarn) {
+        this.point += pointToEarn;
+    }
+
+    //유저 point 차감 메소드
     public void subtractPoint(Integer pointToSubtract) {
         if (this.point < pointToSubtract) {
-            throw new RuntimeException("포인트가 부족합니다.");
+            throw new ApplicationException(ErrorCode.NOT_ENOUGH_POINT);
         }
         this.point -= pointToSubtract;
     }

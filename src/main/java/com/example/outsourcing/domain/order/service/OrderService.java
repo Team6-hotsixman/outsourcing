@@ -74,9 +74,6 @@ public class OrderService {
         }
 
         //포인트 확인 및 차감
-        if (requestDto.getUsedPoint() > user.getPoint()) {
-            throw new ApplicationException(ErrorCode.NOT_ENOUGH_POINT);
-        }
         user.subtractPoint(requestDto.getUsedPoint());
         totalPriceAmount -= requestDto.getUsedPoint();
 
@@ -153,6 +150,15 @@ public class OrderService {
 
         //Status 변경
         order.updateOrderStatus(requestDto.getOrderStatus());
+
+        //주문 배달 완료 시 주문 고객 포인트 적립
+        if (order.getOrderStatus().equals(OrderStatus.COMPLETED)) {
+            User customer = userRepository.findById(order.getUser().getId()).orElseThrow(
+                    () -> new ApplicationException(ErrorCode.NOT_FOUND_USER)
+            );
+            Integer pointToEarn = (int) (order.getTotalPriceAmount() * 0.03);
+            customer.earnPoint(pointToEarn);
+        }
 
         return OrderResponseDto.of(order);
     }
