@@ -26,7 +26,7 @@ public class ImageUploadController {
     public ResponseEntity<?> getImage(@PathVariable Long id) {
         return ResponseEntity.ok(imageService.getImageById(id));
     }
-    s
+
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteFile(@RequestParam("fileName") String fileName) {
         imageService.deleteFile(fileName);
