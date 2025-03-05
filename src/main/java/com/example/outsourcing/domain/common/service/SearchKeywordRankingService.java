@@ -30,17 +30,29 @@ public class SearchKeywordRankingService {
 
         redisTemplate.opsForZSet().incrementScore(key, keyword, 1);
         //1시간후에 만료되도록 설정
-        redisTemplate.expire(key, 1, TimeUnit.HOURS);
+        redisTemplate.expire(key, 1, TimeUnit.DAYS);
     }
 
     public double getScore(String keyword){
+        LocalDateTime now = LocalDateTime.now();
+        int hour = now.getHour();
+        int minute = now.getMinute();
+        // 15분 단위로 변환 (00, 15, 30, 45)
+        int min = (minute / 15) * 15;
+        String key = "search_ranking:" + String.format("%02d:%02d", hour,min);
         ZSetOperations<String, Object> zSetOperations = redisTemplate.opsForZSet();
-        Double searchRanking = zSetOperations.score("search_ranking", keyword);
+        Double searchRanking = zSetOperations.score(key, keyword);
         return searchRanking == null ? 0 : searchRanking;
     }
 
     public List<String> getTop10SearchKeyword(){
-        Set<Object> searchRanking = redisTemplate.opsForZSet().reverseRange("search_ranking", 0, 9);
+        LocalDateTime now = LocalDateTime.now();
+        int hour = now.getHour();
+        int minute = now.getMinute();
+        // 15분 단위로 변환 (00, 15, 30, 45)
+        int min = (minute / 15) * 15;
+        String key = "search_ranking:" + String.format("%02d:%02d", hour,min);
+        Set<Object> searchRanking = redisTemplate.opsForZSet().reverseRange(key, 0, 9);
 
         return searchRanking.stream()
                 .map(v -> (String) v)

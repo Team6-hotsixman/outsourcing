@@ -7,7 +7,10 @@ import com.example.outsourcing.domain.store.dto.request.StoreDeleteRequestDto;
 import com.example.outsourcing.domain.store.dto.request.StoreSaveRequestDto;
 import com.example.outsourcing.domain.store.dto.request.StoreStatusUpdateRequestDto;
 import com.example.outsourcing.domain.store.dto.request.StoreUpdateRequestDto;
-import com.example.outsourcing.domain.store.dto.response.*;
+import com.example.outsourcing.domain.store.dto.response.SaveStoreResponseDto;
+import com.example.outsourcing.domain.store.dto.response.StoreNoticeResponseDto;
+import com.example.outsourcing.domain.store.dto.response.StoreStatusResponseDto;
+import com.example.outsourcing.domain.store.dto.response.UpdateStoreResponseDto;
 import com.example.outsourcing.domain.store.service.OwnerStoreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/stores")
 @Owner
 public class OwnerStoreController {
+
     private final OwnerStoreService ownerStoreService;
 
     @PostMapping

@@ -34,4 +34,16 @@ public class UserAddress extends BaseEntity {
         this.addressStatus = addressStatus;
     }
 
+    public void updateAddress(String newAddress) {
+        if(this.address.equals(newAddress)) return;
+        this.address = newAddress;
+    }
+
+    public void setDefault(){
+        this.addressStatus = AddressStatus.DEFAULT;
+    }
+
+    public void setAnother(){
+        this.addressStatus = AddressStatus.ANOTHER;
+    }
 }

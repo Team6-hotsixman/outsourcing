@@ -3,13 +3,11 @@ package com.example.outsourcing.domain.statistics.service;
 import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
-import com.example.outsourcing.domain.order.repository.OrderRepository;
 import com.example.outsourcing.domain.order.service.OrderService;
 import com.example.outsourcing.domain.statistics.dto.response.StatisticsCountResponseDto;
 import com.example.outsourcing.domain.statistics.dto.response.StatisticsPriceResponseDto;
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.store.service.StoreService;
-import com.example.outsourcing.domain.user.enums.UserRole;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,47 +21,41 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StatisticsService {
 
-    private final OrderRepository orderRepository;
-
     private final OrderService orderService;
 
     private final StoreService storeService;
 
-    // 관리자 통계 start
     @Transactional(readOnly = true)
-    public List<StatisticsPriceResponseDto> getTotalPriceByStoreAndMonth(AuthUser user, int year, int month) {
-        if (user.getUserRole().equals(UserRole.ADMIN)) {
-            throw new ApplicationException(ErrorCode.Unauthorized_User);
+    public List<StatisticsPriceResponseDto> getTotalPrice(String date) {
+        if (date.length() == 7) {
+            YearMonth yearMonth = YearMonth.parse(date, DateTimeFormatter.ofPattern("yyyy-MM"));
+            LocalDate startDate = yearMonth.atDay(1);
+            LocalDate endDate = yearMonth.atEndOfMonth();
+            return orderService.getTotalPriceByStoreAndMonth(startDate, endDate);
         }
-        return orderRepository.getTotalPriceByStoreAndMonth(year, month);
+        if (date.length() == 10) {
+            LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
+            return orderService.getTotalPriceByStoreAndDate(localDate);
+        }
+
+        throw new ApplicationException(ErrorCode.INVALID_DATE_FORMAT);
     }
 
     @Transactional(readOnly = true)
-    public List<StatisticsPriceResponseDto> getTotalPriceByStoreAndDate(AuthUser user, LocalDate date) {
-        if (user.getUserRole().equals(UserRole.ADMIN)) {
-            throw new ApplicationException(ErrorCode.Unauthorized_User);
+    public List<StatisticsCountResponseDto> getCountOrders(String date) {
+        if (date.length() == 7) {
+            YearMonth yearMonth = YearMonth.parse(date, DateTimeFormatter.ofPattern("yyyy-MM"));
+            LocalDate startDate = yearMonth.atDay(1);
+            LocalDate endDate = yearMonth.atEndOfMonth();
+            return orderService.getCountOrdersByStoreAndMonth(startDate, endDate);
         }
-        return orderRepository.getTotalPriceByStoreAndDate(date);
-    }
-
-    @Transactional(readOnly = true)
-    public List<StatisticsCountResponseDto> getCountOrdersByStoreAndDate(AuthUser user, LocalDate date) {
-        if (user.getUserRole().equals(UserRole.ADMIN)) {
-            throw new ApplicationException(ErrorCode.Unauthorized_User);
+        if (date.length() == 10) {
+            LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
+            return orderService.getCountOrdersByStoreAndDate(localDate);
         }
-        return orderRepository.getCountOrdersByStoreAndDate(date);
-    }
 
-    @Transactional(readOnly = true)
-    public List<StatisticsCountResponseDto> getCountOrdersByStoreAndMonth(AuthUser user, int year, int month) {
-        if (user.getUserRole().equals(UserRole.ADMIN)) {
-            throw new ApplicationException(ErrorCode.Unauthorized_User);
-        }
-        return orderRepository.getCountOrdersByStoreAndMonth(year, month);
+        throw new ApplicationException(ErrorCode.INVALID_DATE_FORMAT);
     }
-
-    // 관리자 통계 end
-    // 가게 단일 통계 start
 
     @Transactional(readOnly = true)
     public StatisticsCountResponseDto getCountOrdersByStore(String date, Long storeId, AuthUser authUser) {
@@ -105,5 +97,4 @@ public class StatisticsService {
 
         throw new ApplicationException(ErrorCode.INVALID_DATE_FORMAT);
     }
-    // 가게 단일 통계 end
 }
