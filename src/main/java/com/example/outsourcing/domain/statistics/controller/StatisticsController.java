@@ -22,8 +22,6 @@ public class StatisticsController {
 
     private final StatisticsService statisticsService;
 
-    // 관리자 통계 start
-
     @Admin
     @GetMapping("/statistics/orders")
     public ResponseEntity<List<StatisticsCountResponseDto>> getCountOrders(
@@ -38,9 +36,6 @@ public class StatisticsController {
         return ResponseEntity.ok(statisticsService.getTotalPrice(date));
     }
 
-    // 관리자 통계 end
-
-    // 가게 통계 start
     @Owner
     @GetMapping("/statistics/orders/{storeId}")
     public ResponseEntity<StatisticsCountResponseDto> getCountOrdersByStore(
@@ -60,8 +55,4 @@ public class StatisticsController {
     ) {
         return ResponseEntity.ok(statisticsService.getTotalRevenueByStore(date, storeId, user));
     }
-
-
-    // 가게 통계 end
-
 }

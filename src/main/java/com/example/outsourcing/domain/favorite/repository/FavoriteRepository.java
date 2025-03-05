@@ -7,11 +7,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
-
-
+    //같은 가게와 유저가 존재하면 삭제 없다면 생성
     default void toggleFavorite(Store store, User user) {
         if (existsByStoreIdAndUserId(store.getId(), user.getId())) {
             deleteByStoreIdAndUserId(store.getId(), user.getId());
@@ -22,13 +20,11 @@ public interface FavoriteRepository extends JpaRepository<Favorite, Long> {
                     .build());
         }
     }
+
     boolean existsByStoreIdAndUserId(Long storeId, Long userId);
 
     void deleteByStoreIdAndUserId(Long storeId, Long userId);
 
-    @Query ("SELECT f.store " +
-            "FROM Favorite f " +
-            "WHERE f.user.id = :userId"
-    )
+    @Query ("SELECT f.store " + "FROM Favorite f " + "WHERE f.user.id = :userId")
     List<Store> findStoresByUserId(Long userId);
 }
