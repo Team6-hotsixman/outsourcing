@@ -13,6 +13,8 @@ import com.example.outsourcing.domain.order.entity.Orders;
 import com.example.outsourcing.domain.order.enums.OrderStatus;
 import com.example.outsourcing.domain.order.repository.OrderItemRepository;
 import com.example.outsourcing.domain.order.repository.OrderRepository;
+import com.example.outsourcing.domain.statistics.dto.response.StatisticsCountResponseDto;
+import com.example.outsourcing.domain.statistics.dto.response.StatisticsPriceResponseDto;
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.store.enums.StoreStatus;
 import com.example.outsourcing.domain.store.repository.StoreRepository;
@@ -24,6 +26,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Service
@@ -73,9 +77,6 @@ public class OrderService {
         }
 
         //포인트 확인 및 차감
-        if (requestDto.getUsedPoint() > user.getPoint()) {
-            throw new ApplicationException(ErrorCode.NOT_ENOUGH_POINT);
-        }
         user.subtractPoint(requestDto.getUsedPoint());
         totalPriceAmount -= requestDto.getUsedPoint();
 
@@ -153,6 +154,15 @@ public class OrderService {
         //Status 변경
         order.updateOrderStatus(requestDto.getOrderStatus());
 
+        //주문 배달 완료 시 주문 고객 포인트 적립
+        if (order.getOrderStatus().equals(OrderStatus.COMPLETED)) {
+            User customer = userRepository.findById(order.getUser().getId()).orElseThrow(
+                    () -> new ApplicationException(ErrorCode.NOT_FOUND_USER)
+            );
+            Integer pointToEarn = (int) (order.getTotalPriceAmount() * 0.03);
+            customer.earnPoint(pointToEarn);
+        }
+
         return OrderResponseDto.of(order);
     }
 
@@ -186,4 +196,22 @@ public class OrderService {
 
         orderRepository.deleteById(orderId);
     }
+
+    // store 통계 시작
+    public StatisticsCountResponseDto getCountOrdersByMonth(Long storeId, LocalDate startDate, LocalDate endDate) {
+        return orderRepository.findCountOrdersByMonth(storeId, startDate, endDate);
+    }
+
+    public StatisticsCountResponseDto getCountOrdersByDay(Long storeId, LocalDate localDate) {
+        return orderRepository.findCountOrdersByDay(storeId, localDate);
+    }
+
+    public StatisticsPriceResponseDto getTotalRevenueByMonth(Long storeId, LocalDate startDate, LocalDate endDate) {
+        return orderRepository.findTotalRevenueByMonth(storeId, startDate, endDate);
+    }
+
+    public StatisticsPriceResponseDto getTotalRevenueByDay(Long storeId, LocalDate localDate) {
+        return orderRepository.findTotalRevenueByDay(storeId, localDate);
+    }
+    // store 통계 끝
 }
