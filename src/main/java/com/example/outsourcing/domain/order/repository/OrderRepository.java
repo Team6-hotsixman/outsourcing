@@ -34,4 +34,6 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
             "where DATE(o.orderAt) = DATE(:date) " +
             "group by o.store.storeName")
     Page<Orders> countOrdersByStoreAndDay(@Param("date") LocalDate date, Pageable pageable);
+
+
 }

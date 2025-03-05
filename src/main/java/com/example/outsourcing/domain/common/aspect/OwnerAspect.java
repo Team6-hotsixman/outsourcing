@@ -3,8 +3,10 @@ package com.example.outsourcing.domain.common.aspect;
 import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.user.dto.response.UserResponseDto;
+import com.example.outsourcing.domain.user.entity.User;
 import com.example.outsourcing.domain.user.enums.UserRole;
 import com.example.outsourcing.domain.user.service.UserService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,17 +20,18 @@ import org.springframework.util.StopWatch;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class AdminAspect {
+public class OwnerAspect {
+
     private final HttpServletRequest request;
 
     private final UserService userService;
 
-    @Around("@annotation(com.example.outsourcing.domain.common.annotation.Admin) ||" +
-            "@within(com.example.outsourcing.domain.common.annotation.Admin)")
-    public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
+    @Around("@annotation(com.example.outsourcing.domain.common.annotation.Owner) ||" +
+            "@within(com.example.outsourcing.domain.common.annotation.Owner)")
+    public Object logOwnerApiAccess(ProceedingJoinPoint joinPoint) throws Throwable {
         Long userId = (Long) request.getAttribute("userId");
         UserResponseDto userResponseDto = userService.getUser(userId);
-        if (userResponseDto.getUserRole() != UserRole.ADMIN) {
+        if (userResponseDto.getUserRole() != UserRole.OWNER) {
             throw new ApplicationException(ErrorCode.NOT_FOUND_USER);
         }
         String url = request.getRequestURI();
@@ -45,3 +48,6 @@ public class AdminAspect {
         return result;
     }
 }
+
+
+
