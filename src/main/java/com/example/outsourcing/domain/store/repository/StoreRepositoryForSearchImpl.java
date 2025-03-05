@@ -23,11 +23,12 @@ public class StoreRepositoryForSearchImpl implements StoreRepositoryForSearch{
                     + ", CAST( ST_Distance_Sphere(s.location, :area) AS double) "
                     + ", CAST( COALESCE(AVG(r.rate), 0) AS double)) "
                     + "FROM Store s "
+                    + "JOIN FETCH s.category "
                     + "LEFT JOIN Orders o ON o.store = s "
                     + "LEFT JOIN Review r ON r.order = o "
                     + "WHERE 1 = 1 ";
         if(area != null) {
-            base += "AND ST_CONTAINS(ST_BUFFER(:area, 3000), s.location) ";
+            base += "AND ST_CONTAINS(ST_BUFFER(:area, 5000), s.location) ";
         }
 
         base += "GROUP BY s";
@@ -53,12 +54,12 @@ public class StoreRepositoryForSearchImpl implements StoreRepositoryForSearch{
                 + ", CAST( ST_Distance_Sphere(s.location, :area) AS double) "
                 + ", CAST( COALESCE(AVG(r.rate), 0) AS double)) "
                 + "FROM Store s "
-                + "LEFT JOIN Category c ON s.category = c "
+                + "JOIN FETCH s.category "
                 + "LEFT JOIN Orders o ON o.store = s "
                 + "LEFT JOIN Review r ON r.order = o "
                 + "WHERE 1 = 1 ";
         if(area != null) {
-            base += "AND ST_CONTAINS(ST_BUFFER(:area, 3000), s.location) ";
+            base += "AND ST_CONTAINS(ST_BUFFER(:area, 5000), s.location) ";
         }
         if(categoryId != null) {
             base += "AND c.id = :category ";
@@ -86,6 +87,7 @@ public class StoreRepositoryForSearchImpl implements StoreRepositoryForSearch{
                 + ", CAST( ST_Distance_Sphere(s.location, :area) AS double) "
                 + ", CAST( COALESCE(AVG(r.rate), 0) AS double)) "
                 + "FROM Store s "
+                + "JOIN FETCH s.category "
                 + "LEFT JOIN Orders o ON o.store = s "
                 + "LEFT JOIN Review r ON r.order = o "
                 + "LEFT JOIN Menu m ON m.store = s "
@@ -93,7 +95,7 @@ public class StoreRepositoryForSearchImpl implements StoreRepositoryForSearch{
 
         //next 정보 넣기
         if(area != null) {
-            base += "AND ST_CONTAINS(ST_BUFFER(:area, 3000), s.location) ";
+            base += "AND ST_CONTAINS(ST_BUFFER(:area, 5000), s.location) ";
         }
         if (search != null && !search.trim().isEmpty()) {
             base += "AND (s.storeName LIKE CONCAT('%', :search, '%') OR  m.menuName LIKE CONCAT('%', :search, '%') ) ";

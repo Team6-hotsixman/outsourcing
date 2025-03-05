@@ -44,7 +44,7 @@ public class StoreController {
                                                               @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
                                                               @RequestParam(required = false, defaultValue = "10") Integer size,
                                                               @RequestParam(required = false, defaultValue = "distance") String orderBy) {
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page-1, size);
         List<StoreResponseDto> stores = storeService.searchStore(authUser.getId(), searchKeyword, pageable, OrderBy.valueOf(orderBy.toUpperCase()));
 
         return ResponseEntity.ok(stores);
@@ -56,7 +56,7 @@ public class StoreController {
                                                                         @RequestParam(required = false, defaultValue = "10") int size,
                                                                         @RequestParam(name = "page", required = false, defaultValue = "1") Integer page,
                                                                         @RequestParam(required = false, defaultValue = "distance") String orderBy){
-        Pageable pageable = PageRequest.of(page, size);
+        Pageable pageable = PageRequest.of(page-1, size);
         List<StoreResponseDto> stores = storeService.searchStoreByCategory(authUser.getId(), categoryId, pageable, OrderBy.valueOf(orderBy.toUpperCase()));
 
         return ResponseEntity.ok(stores);
