@@ -22,6 +22,8 @@ import com.example.outsourcing.domain.order.enums.OrderStatus;
 import com.example.outsourcing.domain.order.repository.OrderItemOptionRepository;
 import com.example.outsourcing.domain.order.repository.OrderItemRepository;
 import com.example.outsourcing.domain.order.repository.OrderRepository;
+import com.example.outsourcing.domain.statistics.dto.response.StatisticsCountResponseDto;
+import com.example.outsourcing.domain.statistics.dto.response.StatisticsPriceResponseDto;
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.store.enums.StoreStatus;
 import com.example.outsourcing.domain.store.repository.StoreRepository;
@@ -30,7 +32,7 @@ import com.example.outsourcing.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -196,6 +198,11 @@ public class OrderService {
                 () -> new ApplicationException(ErrorCode.NOT_FOUND_ORDER)
         );
 
+        //user.getId()와 order.getUser.getId() 비교
+        if (!user.getId().equals(order.getUser().getId())) {
+            throw new ApplicationException(ErrorCode.MISMATCHED_ORDER_WITH_USER);
+        }
+
         //주문 아이템 조회
         List<OrderItem> menus = orderItemRepository.findAllByOrderId(order.getId());
         // 주문 아이템 DTO 리스트 생성
@@ -310,4 +317,22 @@ public class OrderService {
 
         orderRepository.deleteById(orderId);
     }
+
+    // store 통계 시작
+    public StatisticsCountResponseDto getCountOrdersByMonth(Long storeId, LocalDate startDate, LocalDate endDate) {
+        return orderRepository.findCountOrdersByMonth(storeId, startDate, endDate);
+    }
+
+    public StatisticsCountResponseDto getCountOrdersByDay(Long storeId, LocalDate localDate) {
+        return orderRepository.findCountOrdersByDay(storeId, localDate);
+    }
+
+    public StatisticsPriceResponseDto getTotalRevenueByMonth(Long storeId, LocalDate startDate, LocalDate endDate) {
+        return orderRepository.findTotalRevenueByMonth(storeId, startDate, endDate);
+    }
+
+    public StatisticsPriceResponseDto getTotalRevenueByDay(Long storeId, LocalDate localDate) {
+        return orderRepository.findTotalRevenueByDay(storeId, localDate);
+    }
+    // store 통계 끝
 }

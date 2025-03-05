@@ -1,26 +1,27 @@
 package com.example.outsourcing.domain.common.jwt;
 
 import com.example.outsourcing.domain.user.enums.UserRole;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import com.example.outsourcing.domain.common.exception.ServerException;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import jakarta.annotation.PostConstruct;
-import com.example.outsourcing.domain.common.exception.ServerException;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-
 import java.security.Key;
-import java.util.Date;
 import java.util.Base64;
+import java.util.Date;
 
+@Slf4j
 @Component
 public class JwtUtil {
 
-    private static final String BEARER_PERFIX = "Bearer ";
-    private static final long TOKEN_TIME = 60 * 60 * 1000L;
+    private static final String BEARER_PREFIX = "Bearer ";
+
+    private static final long ACCESS_TOKEN_EXPIRATION = 60 * 60 * 1000L; // 1시간
+    private static final long REFRESH_TOKEN_EXPIRATION = 14 * 24 * 60 * 60 * 1000L; // 14일
 
     @Value("${jwt.secret.key}")
     private String secretKey;
@@ -33,24 +34,45 @@ public class JwtUtil {
         key = Keys.hmacShaKeyFor(bytes);
     }
 
-    public String createToken(Long userId,String email, UserRole userRole) {
-        Date date = new Date();
+    public String createAccessToken(Long userId, String email, UserRole userRole) {
+        return generateToken(userId, email, userRole, ACCESS_TOKEN_EXPIRATION, "access");
+    }
 
-        return BEARER_PERFIX + Jwts.builder()
+    public String createRefreshToken(Long userId) {
+        return generateToken(userId, null, null, REFRESH_TOKEN_EXPIRATION, "refresh");
+    }
+
+    private String generateToken(Long userId, String email, UserRole userRole, long expirationTime, String type) {
+        Date now = new Date();
+        JwtBuilder builder = Jwts.builder()
                 .setSubject(String.valueOf(userId))
-                .claim("email",email)
-                .claim("userRole",userRole)
-                .setExpiration(new Date(date.getTime() + TOKEN_TIME))//만료일
-                .setIssuedAt(date)//발급일
-                .signWith(key, signatureAlgorithm)//암호화
-                .compact();
+                .setExpiration(new Date(now.getTime() + expirationTime))
+                .setIssuedAt(now)
+                .signWith(key, signatureAlgorithm);
+
+        if (email != null) builder.claim("email", email);
+        if (userRole != null) builder.claim("userRole", userRole);
+        builder.claim("type", type); // "access" 또는 "refresh"
+
+        return BEARER_PREFIX + builder.compact();
     }
 
     public String substringToken(String tokenValue) {
-        if (StringUtils.hasText(tokenValue) && tokenValue.startsWith(BEARER_PERFIX)) {
-            return tokenValue.substring(7);
+        log.info("Received token: '{}'", tokenValue);
+
+        if (!StringUtils.hasText(tokenValue)) {
+            log.error("Token is empty or null.");
+            throw new ServerException("토큰이 비어 있습니다.");
         }
-        throw new ServerException("토큰을 찾을수 없습니다.");
+
+        if (tokenValue.startsWith(BEARER_PREFIX)) {
+            String extractedToken = tokenValue.substring(BEARER_PREFIX.length());
+            log.info("Extracted token: '{}'", extractedToken);
+            return extractedToken;
+        } else {
+            log.warn("Token does not start with 'Bearer '. Assuming raw token format.");
+            return tokenValue; // Bearer 없이 들어온 경우 그대로 반환
+        }
     }
 
     public Claims extractClaims(String token) {
@@ -61,4 +83,34 @@ public class JwtUtil {
                 .getBody();
     }
 
+    public Long getUserIdFromToken(String token) {
+        return Long.parseLong(extractClaims(token).getSubject());
+    }
+
+    public String getEmailFromToken(String token) {
+        return extractClaims(token).get("email", String.class);
+    }
+
+    public UserRole getUserRoleFromToken(String token) {
+        return UserRole.valueOf(extractClaims(token).get("userRole", String.class));
+    }
+
+    public boolean isAccessToken(String token) {
+        return "access".equals(extractClaims(token).get("type", String.class));
+    }
+
+    public boolean isRefreshToken(String token) {
+        return "refresh".equals(extractClaims(token).get("type", String.class));
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
+            return true;
+        } catch (ExpiredJwtException e) {
+            throw new ServerException("토큰이 만료되었습니다.");
+        } catch (JwtException e) {
+            throw new ServerException("유효하지 않은 토큰입니다.");
+        }
+    }
 }

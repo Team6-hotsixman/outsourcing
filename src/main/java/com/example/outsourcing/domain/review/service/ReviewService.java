@@ -51,7 +51,7 @@ public class ReviewService {
 
         for (MultipartFile image : images) {
             //수정필요
-            Image save = imageService.save(image);
+            //Image save = imageService.save(image);
             review.getImages().add(new ReviewImage(review, new Image(1, "good")));
         }
 
@@ -78,7 +78,7 @@ public class ReviewService {
             review.getImages().clear();
             for(MultipartFile image : images){
                 //수정필요
-                Image save = imageService.save(image);
+                //Image save = imageService.save(image);
                 long newId = 2L;
                 review.getImages().add(new ReviewImage(review, new Image(newId, "good")));
             }

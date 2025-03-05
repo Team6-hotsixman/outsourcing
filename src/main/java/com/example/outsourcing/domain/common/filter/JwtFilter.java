@@ -29,6 +29,11 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
+        if (url.startsWith("/image")) {
+            chain.doFilter(request, response);
+            return;
+        }
+
         String bearerJwt = request.getHeader("Authorization");
 
         if (bearerJwt == null) {

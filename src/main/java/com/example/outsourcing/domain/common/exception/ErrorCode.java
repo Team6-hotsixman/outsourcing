@@ -45,6 +45,8 @@ public enum ErrorCode {
 
     AUTH_EXCEPTION("@AUTH와 AUTHUSER는 같이 사용되어야 합니다.",HttpStatus.INTERNAL_SERVER_ERROR),
 
+    INVALID_REFRESH_TOKEN("Refresh Token이 올바르지 않거나 만료되었습니다.",HttpStatus.BAD_REQUEST),
+
     // 주문 에러
     LESS_THAN_MIN_ORDER_PRICE("최소 주문 금액 이상으로 주문 가능합니다.", HttpStatus.BAD_REQUEST),
 
@@ -54,11 +56,14 @@ public enum ErrorCode {
 
     MISMATCHED_ORDER_WITH_STORE("해당 가게에서 주문하지 않았습니다.", HttpStatus.BAD_REQUEST),
 
-    MISMATCHED_ORDER_WITH_USER("주문을 요청한 고객만 주문 취소 가능합니다.", HttpStatus.UNAUTHORIZED),
+    MISMATCHED_ORDER_WITH_USER("주문을 요청한 고객이 아닙니다.", HttpStatus.UNAUTHORIZED),
 
     ORDER_STATUS_ALREADY_SAME("이미 해당 상태와 같습니다.", HttpStatus.BAD_REQUEST),
 
-    CANT_CANCEL_AFTER_COOKING("주문 수락 이후에는 취소할 수 없습니다. 가게로 연락하세요", HttpStatus.NOT_ACCEPTABLE)
+    CANT_CANCEL_AFTER_COOKING("주문 수락 이후에는 취소할 수 없습니다. 가게로 연락하세요", HttpStatus.NOT_ACCEPTABLE),
+
+    // 통계
+    INVALID_DATE_FORMAT("유효하지 않은 날짜 형식입니다.", HttpStatus.BAD_REQUEST),
     ;
 
     private final String message;
