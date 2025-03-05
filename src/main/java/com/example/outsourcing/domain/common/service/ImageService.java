@@ -52,6 +52,7 @@ public class ImageService {
         } catch (IOException e) {
             throw new RuntimeException("파일 업로드 실패", e);
         }
+
     }
 
     //S3에서 파일 조회 URL 생성
