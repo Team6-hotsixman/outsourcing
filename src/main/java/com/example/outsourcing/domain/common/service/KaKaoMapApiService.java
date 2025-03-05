@@ -2,6 +2,8 @@ package com.example.outsourcing.domain.common.service;
 
 import com.example.outsourcing.domain.common.dto.KaKaoMapResponse;
 import com.example.outsourcing.domain.common.dto.LatLng;
+import com.example.outsourcing.domain.common.exception.ApplicationException;
+import com.example.outsourcing.domain.common.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -37,12 +39,12 @@ public class KaKaoMapApiService {
                 .header("Authorization", "KakaoAK " + apiKey)
                 .retrieve()
                 .body(KaKaoMapResponse.class);
-        if(response != null){
+        if(response != null && !response.getDocuments().isEmpty()){
             log.debug("Kakao response: {}", response);
             return response.getDocuments().get(0);
         }
 
-        throw new RuntimeException("잘못된 주소입니다.");
+        throw new ApplicationException(ErrorCode.INVALID_ADDRESS);
     }
 
     public Point getPoint(String address){
