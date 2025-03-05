@@ -10,6 +10,9 @@ import com.example.outsourcing.domain.menu.repository.MenuRepository;
 import com.example.outsourcing.domain.order.dto.request.OrderItemOptionRequestDto;
 import com.example.outsourcing.domain.order.dto.request.OrderItemRequestDto;
 import com.example.outsourcing.domain.order.dto.request.OrderRequestDto;
+import com.example.outsourcing.domain.order.dto.response.OrderItemOptionResponseDto;
+import com.example.outsourcing.domain.order.dto.response.OrderItemResponseDto;
+import com.example.outsourcing.domain.order.dto.response.OrderSimpleResponseDto;
 import com.example.outsourcing.domain.order.dto.response.OrderResponseDto;
 import com.example.outsourcing.domain.order.dto.request.OrderStatusRequestDto;
 import com.example.outsourcing.domain.order.entity.OrderItem;
@@ -25,12 +28,11 @@ import com.example.outsourcing.domain.store.repository.StoreRepository;
 import com.example.outsourcing.domain.user.entity.User;
 import com.example.outsourcing.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -50,7 +52,7 @@ public class OrderService {
 
     //주문 생성
     @Transactional
-    public OrderResponseDto placeOrder(
+    public OrderSimpleResponseDto placeOrder(
             Long userId,
             Long storeId,
             OrderRequestDto requestDto
@@ -124,25 +126,68 @@ public class OrderService {
             }
         }
 
-        return OrderResponseDto.of(order);
+        return OrderSimpleResponseDto.of(order);
     }
 
     //주문 내역 조회
     @Transactional(readOnly = true)
-    public Page<OrderResponseDto> findAll(int page, int size, Long userId) {
+    public List<OrderResponseDto> findAll(Long userId) {
+
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new ApplicationException(ErrorCode.NOT_FOUND_USER)
         );
 
-        int adjustedPage = (page > 0) ? page - 1 : 0;
-        PageRequest pageable = PageRequest.of(adjustedPage, size, Sort.by("orderAt").descending());
-        Page<Orders> orderPage = orderRepository.findAllByUserId(user.getId(), pageable);
-        return orderPage.map(OrderResponseDto::of);
+        //response body에 주문 메뉴, 메뉴 옵션을 반환하기 위한 로직
+        //특정 사용자의 모든 주문 조회
+        List<Orders> orders = orderRepository.findAllByUserId(user.getId());
+        //Orders -> OrderResponeDto 변환
+        List<OrderResponseDto> orderDtos = orders.stream().map(
+                order -> {
+                    //주문 아이템 조회
+                    List<OrderItem> menus = orderItemRepository.findAllByOrderId(order.getId());
+                    // 주문 아이템 DTO 리스트 생성
+                    List<OrderItemResponseDto> orderItemDtos = menus.stream().map(
+                            item -> {
+                                //주문 아이템 옵션 조회
+                                List<OrderItemOption> options = orderItemOptionRepository.findAllByOrderItemId(item.getId());
+
+                                // 주문 아이템 옵션 DTO 생성
+                                List<OrderItemOptionResponseDto> optionDtos = options.stream().map(
+                                        option -> {
+                                            MenuOption menuOption = menuOptionRepository.findById(option.getMenuOption().getId()).orElseThrow(
+                                                    () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU_OPTION)
+                                            );
+                                            return new OrderItemOptionResponseDto(
+                                                    menuOption.getId(),
+                                                    menuOption.getOptionName(),
+                                                    option.getQuantity()
+                                            );
+                                        }
+                                ).toList();
+
+                                // 주문 아이템 DTO 생성
+                                Menu menu = menuRepository.findById(item.getMenu().getId()).orElseThrow(
+                                        () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU)
+                                );
+                                return new OrderItemResponseDto(
+                                        menu.getId(),
+                                        menu.getMenuName(),
+                                        item.getQuantity(),
+                                        optionDtos
+                                );
+                            }
+                    ).toList();
+
+                    return OrderResponseDto.of(order, orderItemDtos);
+                }
+        ).toList();
+
+        return orderDtos;
     }
 
     //주문 수락/거절/배달중/배달완료 상태 변경
     @Transactional
-    public OrderResponseDto updateOrderStatus(
+    public OrderSimpleResponseDto updateOrderStatus(
             AuthUser authUser,
             Long storeId,
             Long orderId,
@@ -183,7 +228,7 @@ public class OrderService {
             customer.earnPoint(pointToEarn);
         }
 
-        return OrderResponseDto.of(order);
+        return OrderSimpleResponseDto.of(order);
     }
 
     //주문 취소
