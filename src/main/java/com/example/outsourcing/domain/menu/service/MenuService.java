@@ -33,25 +33,15 @@ public class MenuService {
     private final ImageRepository imageRepository;
 
     @Transactional
-    public MenuResponseDto saveMenu(AuthUser user, MenuSaveRequestDto requestDto) {
+    public MenuResponseDto saveMenu(MenuSaveRequestDto requestDto) {
         Store store = storeRepository.findById(requestDto.getStoreId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_STORE));
-
-        // 권한 검증
-        if (!store.getUser().getId().equals(user.getId())) {
-            throw new UnauthorizedUserException();
-        }
 
         Category category = categoryRepository.findById(requestDto.getCategoryId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_CATEGORY));
 
         Image image = imageRepository.findById(requestDto.getImageId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_IMAGE));
-
-        // 권한 검증 - 추후 AOP 분리
-        if (!store.getUser().getId().equals(user.getId())) {
-            throw new UnauthorizedUserException();
-        }
 
         Menu menu = MenuSaveRequestDto.toEntity(requestDto, store, category, image);
 
@@ -60,16 +50,9 @@ public class MenuService {
     }
 
     @Transactional
-    public MenuResponseDto updateMenu(Long menuId, AuthUser user, MenuUpdateRequestDto requestDto) {
+    public MenuResponseDto updateMenu(Long menuId, MenuUpdateRequestDto requestDto) {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_MENU));
-
-        Store store = menu.getStore();
-
-        // 권한 검증
-        if (!store.getUser().getId().equals(user.getId())) {
-            throw new UnauthorizedUserException();
-        };
 
         Optional<Category> category = categoryRepository.findById(requestDto.getCategoryId());
 
@@ -85,16 +68,9 @@ public class MenuService {
         return MenuResponseDto.of(menu);
     }
 
-    public void deleteMenu(AuthUser user, Long menuId) {
+    public void deleteMenu(Long menuId) {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_MENU));
-
-        Store store = menu.getStore();
-
-        // 권한 검증
-        if (!store.getUser().getId().equals(user.getId())) {
-            throw new UnauthorizedUserException();
-        };
 
         menuRepository.delete(menu);
     }

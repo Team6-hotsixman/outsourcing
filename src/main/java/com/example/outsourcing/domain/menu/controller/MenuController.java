@@ -20,21 +20,20 @@ public class MenuController {
     private final MenuService menuService;
 
     @PostMapping("/menus")
-    public ResponseEntity<MenuResponseDto> saveMenu(@Auth AuthUser user, @RequestBody MenuSaveRequestDto requestDto) {
-        return ResponseEntity.ok(menuService.saveMenu(user, requestDto));
+    public ResponseEntity<MenuResponseDto> saveMenu(@RequestBody MenuSaveRequestDto requestDto) {
+        return ResponseEntity.ok(menuService.saveMenu(requestDto));
     }
 
     @PatchMapping("/menus/{menuId}")
     public ResponseEntity<MenuResponseDto> updateMenu(
             @PathVariable Long menuId,
-            @Auth AuthUser user,
             @RequestBody MenuUpdateRequestDto requestDto) {
-        return ResponseEntity.ok(menuService.updateMenu(menuId, user, requestDto));
+        return ResponseEntity.ok(menuService.updateMenu(menuId, requestDto));
     }
 
     @DeleteMapping("/menus/{menuId}")
-    public ResponseEntity<Void> deleteMenu(@Auth AuthUser user, @PathVariable Long menuId) {
-        menuService.deleteMenu(user, menuId);
+    public ResponseEntity<Void> deleteMenu(@PathVariable Long menuId) {
+        menuService.deleteMenu(menuId);
         return ResponseEntity.noContent().build();
     }
 }
