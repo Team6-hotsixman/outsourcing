@@ -1,5 +1,7 @@
 package com.example.outsourcing.domain.common.service;
 
+import com.example.outsourcing.domain.common.exception.ApplicationException;
+import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.common.repository.ImageRepository;
 import com.example.outsourcing.domain.common.entity.Image;
 import lombok.RequiredArgsConstructor;
@@ -20,14 +22,7 @@ public class ImageService {
     private final ImageRepository imageRepository;
 
 
-    public Image save(MultipartFile image){
 
-        return new Image("good");
-    }
-
-    public Image getImageById(Long imageId) {
-        return imageRepository.findById(imageId).orElseThrow();
-    }
 
     private final S3Client s3Client;
 
@@ -36,7 +31,11 @@ public class ImageService {
 
     //S3에 파일 업로드
     public String uploadFile(MultipartFile file) {
-        String fileName = UUID.randomUUID() + "_" + file.getOriginalFilename(); // 고유한 파일명 생성
+
+        Image image = new Image();
+        image = imageRepository.save(image);
+
+        String fileName = image.getId() + "_" + file.getOriginalFilename(); // 고유한 파일명 생성
 
         try {
             s3Client.putObject(
@@ -47,24 +46,42 @@ public class ImageService {
                             .build(),
                     RequestBody.fromBytes(file.getBytes())
             );
+            String imagePath = getFileUrl(fileName);
+            image.setFilename(fileName);
+            image.setImagePath(imagePath);
+            imageRepository.save(image);
 
-            return "https://" + bucketName + ".s3.amazonaws.com/" + fileName;  // 저장된 파일 URL 반환
+            return imagePath;
         } catch (IOException e) {
             throw new RuntimeException("파일 업로드 실패", e);
         }
 
+
     }
 
-    //S3에서 파일 조회 URL 생성
+    public Image getImageById(Long imageId) {
+        return imageRepository.findById(imageId).orElseThrow();
+    }
+
+    /**
+     * S3 파일 URL 생성
+     */
     public String getFileUrl(String fileName) {
         return "https://" + bucketName + ".s3.amazonaws.com/" + fileName;
     }
 
     //S3에서 파일 삭제
     public void deleteFile(String fileName) {
+        Image image = imageRepository.findByFilename(fileName)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_IMAGE));
+
+
         s3Client.deleteObject(DeleteObjectRequest.builder()
                 .bucket(bucketName)
                 .key(fileName)
                 .build());
+
+        imageRepository.delete(image);
+
     }
 }

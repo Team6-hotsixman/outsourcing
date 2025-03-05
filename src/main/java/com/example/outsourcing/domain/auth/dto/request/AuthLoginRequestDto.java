@@ -14,8 +14,9 @@ public class AuthLoginRequestDto {
     @NotBlank
     private final String password;
 
+    private String userRole;
     @Builder
-    public AuthLoginRequestDto(String email, String password, String name) {
+    public AuthLoginRequestDto(String email, String password) {
         this.email = email;
         this.password = password;
     }
