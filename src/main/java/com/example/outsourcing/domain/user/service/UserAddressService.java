@@ -62,12 +62,15 @@ public class UserAddressService {
         // 좌표값을 가져올 수 없으면 잘못된 주소임
         kaKaoMapApiService.getLatLng(userAddressUpdateRequestDto.getNewAddress());
 
+        UserAddress userAddress = userAddressRepository.findByIdWithUser(userAddressId)
+                .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_ADDRESS));
+        if(!userAddress.getUser().getId().equals(authUser.getId())){
+            throw new ApplicationException(ErrorCode.Unauthorized_User);
+        }
+
         if(userAddressRepository.existsByUserIdAndAddress(authUser.getId(), userAddressUpdateRequestDto.getNewAddress())){
             throw new ApplicationException(ErrorCode.DUPLICATE_ADDRESS);
         }
-
-        UserAddress userAddress = userAddressRepository.findById(userAddressId)
-                .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_ADDRESS));
 
         userAddress.updateAddress(userAddressUpdateRequestDto.getNewAddress());
 
