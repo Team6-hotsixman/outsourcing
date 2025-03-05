@@ -32,7 +32,7 @@ public class OwnerAspect {
         Long userId = (Long) request.getAttribute("userId");
         UserResponseDto userResponseDto = userService.getUser(userId);
         if (userResponseDto.getUserRole() != UserRole.OWNER) {
-            throw new ApplicationException(ErrorCode.NOT_FOUND_USER);
+            throw new ApplicationException(ErrorCode.Unauthorized_User);
         }
         String url = request.getRequestURI();
         StopWatch stopWatch = new StopWatch();

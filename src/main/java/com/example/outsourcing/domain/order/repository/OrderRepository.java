@@ -37,4 +37,46 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
             "where DATE(o.orderAt) = DATE(:date) " +
             "group by o.store.storeName")
     List<StatisticsCountResponseDto> getCountOrdersByStoreAndDate(@Param("date") LocalDate date);
+
+    @Query("SELECT new com.example.outsourcing.domain.statistics.dto.response.StatisticsCountResponseDto(o.store.storeName, count(o)) " +
+            "FROM Orders o " +
+            "WHERE function('date_format', o.orderAt, '%Y-%m-%d') BETWEEN :startDate AND :endDate " +
+            "AND o.store.id = :storeId " +
+            "AND o.orderStatus = 'COMPLETED' " +
+            "GROUP BY o.store.id")
+    StatisticsCountResponseDto findCountOrdersByMonth(
+            @Param("storeId") Long storeId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+    @Query("SELECT new com.example.outsourcing.domain.statistics.dto.response.StatisticsCountResponseDto(o.store.storeName, count(o)) " +
+            "FROM Orders o " +
+            "WHERE function('date_format', o.orderAt, '%Y-%m-%d') = :localDate " +
+            "AND o.store.id = :storeId " +
+            "AND o.orderStatus = 'COMPLETED' " +
+            "GROUP BY o.store.id")
+    StatisticsCountResponseDto findCountOrdersByDay(@Param("storeId") Long storeId, @Param("localDate") LocalDate localDate);
+
+
+    @Query("SELECT new com.example.outsourcing.domain.statistics.dto.response.StatisticsPriceResponseDto(o.store.storeName, sum(o.totalPriceAmount)) " +
+            "FROM Orders o " +
+            "WHERE function('date_format', o.orderAt, '%Y-%m-%d') BETWEEN :startDate AND :endDate " +
+            "AND o.store.id = :storeId " +
+            "AND o.orderStatus = 'COMPLETED' " +
+            "GROUP BY o.store.id")
+    StatisticsPriceResponseDto findTotalRevenueByMonth(
+            @Param("storeId") Long storeId,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+    @Query("SELECT new com.example.outsourcing.domain.statistics.dto.response.StatisticsPriceResponseDto(o.store.storeName, sum(o.totalPriceAmount)) " +
+            "FROM Orders o " +
+            "WHERE function('date_format', o.orderAt, '%Y-%m-%d') = :localDate " +
+            "AND o.store.id = :storeId " +
+            "AND o.orderStatus = 'COMPLETED' " +
+            "GROUP BY o.store.id")
+    StatisticsPriceResponseDto findTotalRevenueByDay(@Param("storeId") Long storeId, @Param("localDate") LocalDate localDate);
 }
+

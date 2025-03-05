@@ -58,7 +58,10 @@ public enum ErrorCode {
 
     ORDER_STATUS_ALREADY_SAME("이미 해당 상태와 같습니다.", HttpStatus.BAD_REQUEST),
 
-    CANT_CANCEL_AFTER_COOKING("주문 수락 이후에는 취소할 수 없습니다. 가게로 연락하세요", HttpStatus.NOT_ACCEPTABLE)
+    CANT_CANCEL_AFTER_COOKING("주문 수락 이후에는 취소할 수 없습니다. 가게로 연락하세요", HttpStatus.NOT_ACCEPTABLE),
+
+    // 통계
+    INVALID_DATE_FORMAT("유효하지 않은 날짜 형식입니다.", HttpStatus.BAD_REQUEST),
     ;
 
     private final String message;
