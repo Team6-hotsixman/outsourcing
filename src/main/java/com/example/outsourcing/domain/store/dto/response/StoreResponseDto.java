@@ -88,4 +88,26 @@ public class StoreResponseDto {
                 0
                 );
     }
+    public static StoreResponseDto of(StoreResponseForNativeQuery storeResponse) {
+        return new StoreResponseDto(
+                storeResponse.getId(),
+                storeResponse.getUserId(),
+                storeResponse.getImageId(),
+                storeResponse.getCategoryName(),
+                storeResponse.getStoreName(),
+                storeResponse.getStoreStatus(),
+                storeResponse.getStoreNotice(),
+                storeResponse.getAddress(),
+                null,
+                storeResponse.getMinOrderPrice(),
+                storeResponse.getOpenTime(),
+                storeResponse.getCloseTime(),
+                storeResponse.getCreatedAt(),
+                storeResponse.getModifiedAt(),
+                storeResponse.getDistance(),
+                storeResponse.getRate()
+        );
+    }
+
+
 }

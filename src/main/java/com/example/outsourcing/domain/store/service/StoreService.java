@@ -1,46 +1,32 @@
 package com.example.outsourcing.domain.store.service;
 
 
-import com.example.outsourcing.domain.category.dto.response.CategoryResponse;
-import com.example.outsourcing.domain.category.entity.Category;
-import com.example.outsourcing.domain.common.entity.Image;
 import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
-import com.example.outsourcing.domain.common.exception.StoreLimitExceededException;
 import com.example.outsourcing.domain.common.exception.NotFoundStoreException;
-import com.example.outsourcing.domain.common.exception.StoreStatusAlreadySameException;
 import com.example.outsourcing.domain.common.service.KaKaoMapApiService;
-import com.example.outsourcing.domain.common.service.ImageService;
 import com.example.outsourcing.domain.menu.entity.Menu;
 import com.example.outsourcing.domain.menu.service.MenuService;
 import com.example.outsourcing.domain.common.service.SearchKeywordRankingService;
-import com.example.outsourcing.domain.store.dto.request.StoreDeleteRequestDto;
-import com.example.outsourcing.domain.store.dto.request.StoreSaveRequestDto;
-import com.example.outsourcing.domain.store.dto.request.StoreStatusUpdateRequestDto;
-import com.example.outsourcing.domain.store.dto.request.StoreUpdateRequestDto;
+import com.example.outsourcing.domain.order.enums.OrderStatus;
 import com.example.outsourcing.domain.store.dto.response.*;
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.store.enums.OrderBy;
 import com.example.outsourcing.domain.store.enums.StoreStatus;
 import com.example.outsourcing.domain.store.repository.StoreRepository;
-import com.example.outsourcing.domain.category.service.CategoryService;
-import com.example.outsourcing.domain.user.entity.User;
 import com.example.outsourcing.domain.user.entity.UserAddress;
 import com.example.outsourcing.domain.user.enums.AddressStatus;
 import com.example.outsourcing.domain.user.repository.UserAddressRepository;
-import com.example.outsourcing.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StopWatch;
 
 import java.util.List;
 
-import java.util.List;
-import java.util.Optional;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StoreService {
@@ -71,18 +57,25 @@ public class StoreService {
         //사용자의 기본 배송지 좌표
         Point point = kaKaoMapApiService.getPoint(address.getAddress());
 
-        List<StoreResponseDto> storesByArea = List.of();
 
         if(searchKeyword == null || searchKeyword.isEmpty()){
-            storesByArea = storeRepository.findStoresByArea(point, page, orderBy);
-        } else {
-            storesByArea = storeRepository.findStoresBySearch(point, searchKeyword, page, orderBy);
-            if(!storesByArea.isEmpty()) {
-                searchKeywordRankingService.increaseCount(searchKeyword);
-            }
+            //거리만 조건으로 쿼리 수행
+            return storeRepository.findStoresByArea(point, page, orderBy, OrderStatus.COMPLETED, StoreStatus.OPEN);
         }
 
-        return storesByArea;
+        List<StoreResponseForNativeQuery> stores = List.of();
+
+        if(orderBy != OrderBy.RATE) {
+            stores = storeRepository.searchOrderByDistance(point, searchKeyword, OrderStatus.COMPLETED.name(), StoreStatus.OPEN.name(), page.getOffset(), page.getPageSize());
+        } else {
+            stores = storeRepository.searchOrderByRate(point, searchKeyword, OrderStatus.COMPLETED.name(), StoreStatus.OPEN.name(), page.getOffset(), page.getPageSize());
+        }
+
+        if(!stores.isEmpty()){
+            searchKeywordRankingService.increaseCount(searchKeyword);
+        }
+
+        return stores.stream().map(StoreResponseDto::of).toList();
     }
 
     @Transactional(readOnly = true)
@@ -93,6 +86,26 @@ public class StoreService {
 
         Point point = kaKaoMapApiService.getPoint(address.getAddress());
 
-        return storeRepository.findStoresByCategory(point, categoryId, page, orderBy);
+        return storeRepository.findStoresByCategory(point, categoryId, page, orderBy, OrderStatus.COMPLETED, StoreStatus.OPEN);
+    }
+
+    @Transactional(readOnly = true)
+    public List<StoreResponseDto> findNearStore(int top, Point location) {
+        log.info("findNearStore");
+        long time = System.currentTimeMillis();
+        List<StoreResponseDto> topNearStores = storeRepository.findTopNearStores(top, location, OrderStatus.COMPLETED, StoreStatus.OPEN);
+        long end = System.currentTimeMillis();
+        log.info("findNearStore: " + (end - time));
+        return topNearStores;
+    }
+
+    @Transactional(readOnly = true)
+    public List<StoreResponseDto> findTopSellerStores(int top, Point location) {
+        log.info("findTopSellerStores");
+        long time = System.currentTimeMillis();
+        List<StoreResponseDto> topSellerStores = storeRepository.findTopSellerStores(top, location, OrderStatus.COMPLETED, StoreStatus.OPEN);
+        long end = System.currentTimeMillis();
+        log.info("findTopSellerStores: " + (end - time));
+        return topSellerStores;
     }
 }
