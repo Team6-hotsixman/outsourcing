@@ -49,6 +49,7 @@ public class User extends BaseEntity {
             String email,
             String password,
             String name,
+            Integer point,
             UserRole userRole,
             UserStatus userStatus,
             LocalDateTime createdAt,
@@ -57,6 +58,7 @@ public class User extends BaseEntity {
         this.email = email;
         this.password = password;
         this.name = name;
+        this.point = point;
         this.userRole = userRole;
         this.userStatus = userStatus;
         this.createdAt = createdAt;

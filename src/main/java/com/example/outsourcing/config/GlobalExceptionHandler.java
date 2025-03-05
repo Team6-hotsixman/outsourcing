@@ -38,6 +38,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(InvalidRequestException.class)
     public ResponseEntity<Map<String, Object>> invalidRequestExceptionException(InvalidRequestException ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
+        log.error("error : ", ex);
         return getErrorResponse(status, ex.getMessage());
     }
 
