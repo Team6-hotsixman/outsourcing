@@ -9,5 +9,5 @@ public class StatisticsCountResponseDto {
 
     private final String storeName;
 
-    private final Integer orderCount;
+    private final Long orderCount;
 }
