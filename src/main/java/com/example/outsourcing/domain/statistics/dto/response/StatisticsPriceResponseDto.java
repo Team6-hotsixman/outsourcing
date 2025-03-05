@@ -9,5 +9,5 @@ public class StatisticsPriceResponseDto {
 
     private final String storeName;
 
-    private final Integer totalPrice;
+    private final Long totalPrice;
 }

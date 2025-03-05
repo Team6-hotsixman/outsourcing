@@ -29,7 +29,7 @@ public class AdminAspect {
         Long userId = (Long) request.getAttribute("userId");
         UserResponseDto userResponseDto = userService.getUser(userId);
         if (userResponseDto.getUserRole() != UserRole.ADMIN) {
-            throw new ApplicationException(ErrorCode.NOT_FOUND_USER);
+            throw new ApplicationException(ErrorCode.Unauthorized_User);
         }
         String url = request.getRequestURI();
         StopWatch stopWatch = new StopWatch();
