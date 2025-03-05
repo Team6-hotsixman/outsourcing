@@ -11,6 +11,8 @@ import java.time.LocalDate;
 
 public interface OrderRepository extends JpaRepository<Orders, Long> {
 
+    Page<Orders> findAllByUserId(Long userId, Pageable pageable);
+
     @Query("select o.store.storeName , sum (o.totalPriceAmount) from Orders o " +
             "where Date(o.orderAt) = DATE(:date)" +
             "group by o.store.storeName")
@@ -32,6 +34,4 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
             "where DATE(o.orderAt) = DATE(:date) " +
             "group by o.store.storeName")
     Page<Orders> countOrdersByStoreAndDay(@Param("date") LocalDate date, Pageable pageable);
-
-    Page<Orders> findAllByUserId(Long userId, Pageable pageable);
 }
