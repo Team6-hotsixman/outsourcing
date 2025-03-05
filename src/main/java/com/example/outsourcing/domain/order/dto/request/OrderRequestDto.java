@@ -26,13 +26,12 @@ public class OrderRequestDto {
             Store store,
             User user
             ) {
-        return Orders.builder()
-                .totalPriceAmount(totalPriceAmount)
-                .usedPoint(usedPoint)
-                .orderAt(orderAt)
-                .orderStatus(orderStatus)
-                .store(store)
-                .user(user)
-                .build();
+        return new Orders(
+                totalPriceAmount,
+                usedPoint,
+                orderAt,
+                orderStatus,
+                store,
+                user);
     }
 }
