@@ -36,9 +36,6 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
     @Query("select count(o) from Orders o " +
             "where DATE(o.orderAt) = DATE(:date) " +
             "group by o.store.storeName")
-<<<<<<< HEAD
-    Page<Orders> countOrdersByStoreAndDay(@Param("date") LocalDate date, Pageable pageable);
-=======
     List<StatisticsCountResponseDto> getCountOrdersByStoreAndDate(@Param("date") LocalDate date);
 
     @Query("SELECT new com.example.outsourcing.domain.statistics.dto.response.StatisticsCountResponseDto(o.store.storeName, count(o)) " +
@@ -81,6 +78,4 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
             "AND o.orderStatus = 'COMPLETED' " +
             "GROUP BY o.store.id")
     StatisticsPriceResponseDto findTotalRevenueByDay(@Param("storeId") Long storeId, @Param("localDate") LocalDate localDate);
->>>>>>> dev
 }
-

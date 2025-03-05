@@ -32,6 +32,7 @@ import com.example.outsourcing.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -41,13 +42,9 @@ import java.util.List;
 public class OrderService {
 
     private final OrderRepository orderRepository;
-    //todo 이후 UserService를 통해 접근할 수 있도록 수정 예정
     private final UserRepository userRepository;
-    //todo 이후 StoreService를 통해 접근할 수 있도록 수정 예정
     private final StoreRepository storeRepository;
-    //todo 이후 MenuService를 통해 접근할 수 있도록 수정 예정
     private final MenuRepository menuRepository;
-    //todo 이후 MenuOptionService를 통해 접근할 수 있도록 수정 예정
     private final MenuOptionRepository menuOptionRepository;
     private final OrderItemRepository orderItemRepository;
     private final OrderItemOptionRepository orderItemOptionRepository;
@@ -62,6 +59,7 @@ public class OrderService {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new ApplicationException(ErrorCode.NOT_FOUND_USER)
         );
+
         Store store = storeRepository.findById(storeId).orElseThrow(
                 () -> new ApplicationException(ErrorCode.NOT_FOUND_STORE)
         );
@@ -143,48 +141,8 @@ public class OrderService {
         //특정 사용자의 모든 주문 조회
         List<Orders> orders = orderRepository.findAllByUserId(user.getId());
         //Orders -> OrderResponeDto 변환
-        List<OrderResponseDto> orderDtos = orders.stream().map(
-                order -> {
-                    //주문 아이템 조회
-                    List<OrderItem> menus = orderItemRepository.findAllByOrderId(order.getId());
-                    // 주문 아이템 DTO 리스트 생성
-                    List<OrderItemResponseDto> orderItemDtos = menus.stream().map(
-                            item -> {
-                                //주문 아이템 옵션 조회
-                                List<OrderItemOption> options = orderItemOptionRepository.findAllByOrderItemId(item.getId());
-
-                                // 주문 아이템 옵션 DTO 생성
-                                List<OrderItemOptionResponseDto> optionDtos = options.stream().map(
-                                        option -> {
-                                            MenuOption menuOption = menuOptionRepository.findById(option.getMenuOption().getId()).orElseThrow(
-                                                    () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU_OPTION)
-                                            );
-                                            return new OrderItemOptionResponseDto(
-                                                    menuOption.getId(),
-                                                    menuOption.getOptionName(),
-                                                    option.getQuantity()
-                                            );
-                                        }
-                                ).toList();
-
-                                // 주문 아이템 DTO 생성
-                                Menu menu = menuRepository.findById(item.getMenu().getId()).orElseThrow(
-                                        () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU)
-                                );
-                                return new OrderItemResponseDto(
-                                        menu.getId(),
-                                        menu.getMenuName(),
-                                        item.getQuantity(),
-                                        optionDtos
-                                );
-                            }
-                    ).toList();
-
-                    return OrderResponseDto.of(order, orderItemDtos);
-                }
-        ).toList();
-
-        return orderDtos;
+        return orders.stream().map(
+                this::getOrderItemstoResponseDto).toList();
     }
 
     //주문 단건 조회
@@ -203,42 +161,7 @@ public class OrderService {
             throw new ApplicationException(ErrorCode.MISMATCHED_ORDER_WITH_USER);
         }
 
-        //주문 아이템 조회
-        List<OrderItem> menus = orderItemRepository.findAllByOrderId(order.getId());
-        // 주문 아이템 DTO 리스트 생성
-        List<OrderItemResponseDto> orderItemDtos = menus.stream().map(
-                item -> {
-                    //주문 아이템 옵션 조회
-                    List<OrderItemOption> options = orderItemOptionRepository.findAllByOrderItemId(item.getId());
-
-                    // 주문 아이템 옵션 DTO 생성
-                    List<OrderItemOptionResponseDto> optionDtos = options.stream().map(
-                            option -> {
-                                MenuOption menuOption = menuOptionRepository.findById(option.getMenuOption().getId()).orElseThrow(
-                                        () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU_OPTION)
-                                );
-                                return new OrderItemOptionResponseDto(
-                                        menuOption.getId(),
-                                        menuOption.getOptionName(),
-                                        option.getQuantity()
-                                );
-                            }
-                    ).toList();
-
-                    // 주문 아이템 DTO 생성
-                    Menu menu = menuRepository.findById(item.getMenu().getId()).orElseThrow(
-                            () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU)
-                    );
-                    return new OrderItemResponseDto(
-                            menu.getId(),
-                            menu.getMenuName(),
-                            item.getQuantity(),
-                            optionDtos
-                    );
-                }
-        ).toList();
-
-        return OrderResponseDto.of(order, orderItemDtos);
+        return getOrderItemstoResponseDto(order);
     }
 
     //주문 수락/거절/배달중/배달완료 상태 변경
@@ -250,6 +173,7 @@ public class OrderService {
             OrderStatusRequestDto requestDto
     ) {
         User user = User.fromAuthUser(authUser);
+
         Store store = storeRepository.findById(storeId).orElseThrow(
                 () -> new ApplicationException(ErrorCode.NOT_FOUND_STORE)
         );
@@ -335,4 +259,44 @@ public class OrderService {
         return orderRepository.findTotalRevenueByDay(storeId, localDate);
     }
     // store 통계 끝
+
+    //order 내에 있는 menus 및 menuOptions를 orderResponseDto 타입으로 반환
+    private OrderResponseDto getOrderItemstoResponseDto(Orders order) {
+        //주문 아이템 조회
+        List<OrderItem> menus = orderItemRepository.findAllByOrderId(order.getId());
+        // 주문 아이템 DTO 리스트 생성
+        List<OrderItemResponseDto> orderItemDtos = menus.stream().map(
+                item -> {
+                    //주문 아이템 옵션 조회
+                    List<OrderItemOption> options = orderItemOptionRepository.findAllByOrderItemId(item.getId());
+
+                    // 주문 아이템 옵션 DTO 생성
+                    List<OrderItemOptionResponseDto> optionDtos = options.stream().map(
+                            option -> {
+                                MenuOption menuOption = menuOptionRepository.findById(option.getMenuOption().getId()).orElseThrow(
+                                        () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU_OPTION)
+                                );
+                                return new OrderItemOptionResponseDto(
+                                        menuOption.getId(),
+                                        menuOption.getOptionName(),
+                                        option.getQuantity()
+                                );
+                            }
+                    ).toList();
+
+                    // 주문 아이템 DTO 생성
+                    Menu menu = menuRepository.findById(item.getMenu().getId()).orElseThrow(
+                            () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU)
+                    );
+                    return new OrderItemResponseDto(
+                            menu.getId(),
+                            menu.getMenuName(),
+                            item.getQuantity(),
+                            optionDtos
+                    );
+                }
+        ).toList();
+
+        return OrderResponseDto.of(order, orderItemDtos);
+    }
 }
