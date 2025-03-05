@@ -8,16 +8,13 @@ import com.example.outsourcing.domain.statistics.dto.response.StatisticsCountRes
 import com.example.outsourcing.domain.statistics.dto.response.StatisticsPriceResponseDto;
 import com.example.outsourcing.domain.statistics.service.StatisticsService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -26,39 +23,21 @@ public class StatisticsController {
     private final StatisticsService statisticsService;
 
     // 관리자 통계 start
-    @GetMapping("/admin/statistics/price/month")
-    public ResponseEntity<List<StatisticsPriceResponseDto>> getTotalPriceByStoreAndMonth(
-            @Auth AuthUser user,
-            @RequestParam int year,
-            @RequestParam int month
-            ) {
-        return ResponseEntity.ok(statisticsService.getTotalPriceByStoreAndMonth(user, year, month));
+
+    @Admin
+    @GetMapping("/statistics/orders")
+    public ResponseEntity<List<StatisticsCountResponseDto>> getCountOrders(
+            @RequestParam String date) {
+        return ResponseEntity.ok(statisticsService.getCountOrders(date));
     }
 
-    @GetMapping("/admin/statistics/price/date")
-    public ResponseEntity<List<StatisticsPriceResponseDto>> getTotalPriceByStoreAndDate(
-            @Auth AuthUser user,
-            @RequestParam LocalDate date
-    ) {
-        return ResponseEntity.ok(statisticsService.getTotalPriceByStoreAndDate(user, date));
+    @Admin
+    @GetMapping("/statistics/price")
+    public ResponseEntity<List<StatisticsPriceResponseDto>> getTotalPrice(
+            @RequestParam String date) {
+        return ResponseEntity.ok(statisticsService.getTotalPrice(date));
     }
 
-    @GetMapping("/admin/statistics/orders/date")
-    public ResponseEntity<List<StatisticsCountResponseDto>> getCountOrdersByStoreAndDate(
-            @Auth AuthUser user,
-            @RequestParam LocalDate date
-    ) {
-        return ResponseEntity.ok(statisticsService.getCountOrdersByStoreAndDate(user, date));
-    }
-
-    @GetMapping("/admin/statistics/orders/month")
-    public ResponseEntity<List<StatisticsCountResponseDto>> getCountOrdersByStoreAndMonth(
-            @Auth AuthUser user,
-            @RequestParam int year,
-            @RequestParam int month
-    ) {
-        return ResponseEntity.ok(statisticsService.getCountOrdersByStoreAndMonth(user, year, month));
-    }
     // 관리자 통계 end
 
     // 가게 통계 start

@@ -260,6 +260,28 @@ public class OrderService {
     }
     // store 통계 끝
 
+    // 관리자 통계 start
+    @Transactional(readOnly = true)
+    public List<StatisticsPriceResponseDto> getTotalPriceByStoreAndMonth(LocalDate startDate, LocalDate endDate) {
+        return orderRepository.getTotalPriceByStoreAndMonth(startDate, endDate);
+    }
+
+    @Transactional(readOnly = true)
+    public List<StatisticsPriceResponseDto> getTotalPriceByStoreAndDate(LocalDate date) {
+        return orderRepository.getTotalPriceByStoreAndDate(date);
+    }
+
+    @Transactional(readOnly = true)
+    public List<StatisticsCountResponseDto> getCountOrdersByStoreAndDate(LocalDate date) {
+        return orderRepository.getCountOrdersByStoreAndDate(date);
+    }
+
+    @Transactional(readOnly = true)
+    public List<StatisticsCountResponseDto> getCountOrdersByStoreAndMonth(LocalDate startDate, LocalDate endDate) {
+        return orderRepository.getCountOrdersByStoreAndMonth(startDate, endDate);
+    }
+    // 관리자 통계 end
+
     //order 내에 있는 menus 및 menuOptions를 orderResponseDto 타입으로 반환
     private OrderResponseDto getOrderItemstoResponseDto(Orders order) {
         //주문 아이템 조회

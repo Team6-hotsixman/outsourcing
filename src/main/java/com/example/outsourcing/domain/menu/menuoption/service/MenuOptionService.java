@@ -28,14 +28,9 @@ public class MenuOptionService {
     private final ImageRepository imageRepository;
 
     @Transactional
-    public MenuOptionResponseDto saveMenuOption(User user, MenuOptionSaveRequestDto requestDto) {
+    public MenuOptionResponseDto saveMenuOption(MenuOptionSaveRequestDto requestDto) {
         Menu menu = menuRepository.findById(requestDto.getMenuId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_MENU));
-
-        // 권한 검증 - 추후 AOP 분리
-        if (menu.getStore().getUser().getId().equals(user.getId())) {
-            throw new UnauthorizedUserException();
-        }
 
         Image image = imageRepository.findById(requestDto.getImageId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_IMAGE));
@@ -60,14 +55,9 @@ public class MenuOptionService {
     }
 
     @Transactional
-    public MenuOptionResponseDto updateMenuOption(Long optionId, User user, MenuOptionUpdateRequestDto requestDto) {
+    public MenuOptionResponseDto updateMenuOption(Long optionId, MenuOptionUpdateRequestDto requestDto) {
         MenuOption menuOption = menuOptionRepository.findById(optionId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_MENU_OPTION));
-
-        // 권한 검증 - 추후 AOP 분리
-        if (menuOption.getMenu().getStore().getUser().getId().equals(user.getId())) {
-            throw new UnauthorizedUserException();
-        }
 
         Image image = imageRepository.findById(requestDto.getImageId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_IMAGE));
@@ -78,14 +68,9 @@ public class MenuOptionService {
     }
 
     @Transactional
-    public void deleteMenuOption(Long optionId, User user) {
+    public void deleteMenuOption(Long optionId) {
         MenuOption menuOption = menuOptionRepository.findById(optionId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_MENU_OPTION));
-
-        // 권한 검증 - 추후 AOP 분리
-        if (menuOption.getMenu().getStore().getUser().getId().equals(user.getId())) {
-            throw new UnauthorizedUserException();
-        }
 
         menuOptionRepository.delete(menuOption);
     }
