@@ -4,14 +4,19 @@ import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.menu.entity.Menu;
+import com.example.outsourcing.domain.menu.menuoption.entity.MenuOption;
+import com.example.outsourcing.domain.menu.menuoption.repository.MenuOptionRepository;
 import com.example.outsourcing.domain.menu.repository.MenuRepository;
+import com.example.outsourcing.domain.order.dto.request.OrderItemOptionRequestDto;
 import com.example.outsourcing.domain.order.dto.request.OrderItemRequestDto;
 import com.example.outsourcing.domain.order.dto.request.OrderRequestDto;
 import com.example.outsourcing.domain.order.dto.response.OrderResponseDto;
 import com.example.outsourcing.domain.order.dto.request.OrderStatusRequestDto;
 import com.example.outsourcing.domain.order.entity.OrderItem;
+import com.example.outsourcing.domain.order.entity.OrderItemOption;
 import com.example.outsourcing.domain.order.entity.Orders;
 import com.example.outsourcing.domain.order.enums.OrderStatus;
+import com.example.outsourcing.domain.order.repository.OrderItemOptionRepository;
 import com.example.outsourcing.domain.order.repository.OrderItemRepository;
 import com.example.outsourcing.domain.order.repository.OrderRepository;
 import com.example.outsourcing.domain.store.entity.Store;
@@ -38,7 +43,10 @@ public class OrderService {
     private final StoreRepository storeRepository;
     //todo 이후 MenuService를 통해 접근할 수 있도록 수정 예정
     private final MenuRepository menuRepository;
+    //todo 이후 MenuOptionService를 통해 접근할 수 있도록 수정 예정
+    private final MenuOptionRepository menuOptionRepository;
     private final OrderItemRepository orderItemRepository;
+    private final OrderItemOptionRepository orderItemOptionRepository;
 
     //주문 생성
     @Transactional
@@ -61,11 +69,21 @@ public class OrderService {
 
         //주문 금액 계산
         Integer totalPriceAmount = 0;
-        for (OrderItemRequestDto orderItem : requestDto.getOrderItems()) {
-            Menu menu = menuRepository.findById(orderItem.getMenuId()).orElseThrow(
+        //for 반복문을 통해 menu 조회
+        for (OrderItemRequestDto itemRequestDto : requestDto.getOrderItems()) {
+            Menu menu = menuRepository.findById(itemRequestDto.getMenuId()).orElseThrow(
                     () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU)
             );
-            totalPriceAmount += (menu.getPrice() * orderItem.getQuantity());
+            //for 반복문을 통해 menuOption 조회
+            for (OrderItemOptionRequestDto optionRequestDto : itemRequestDto.getOptions()) {
+                MenuOption menuOption = menuOptionRepository.findById(optionRequestDto.getMenuOptionId()).orElseThrow(
+                        () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU_OPTION)
+                );
+                //menuOption 총 금액
+                totalPriceAmount += (menuOption.getPrice() * optionRequestDto.getQuantity());
+            }
+            //menu + menuOption 총 금액
+            totalPriceAmount += (menu.getPrice() * itemRequestDto.getQuantity());
         }
 
         //최소 주문 금액 확인
@@ -77,7 +95,7 @@ public class OrderService {
         user.subtractPoint(requestDto.getUsedPoint());
         totalPriceAmount -= requestDto.getUsedPoint();
 
-        //주문 생성
+        //주문 생성 및 저장
         Orders order = OrderRequestDto.toEntity(
                 totalPriceAmount,
                 requestDto.getUsedPoint(),
@@ -86,17 +104,24 @@ public class OrderService {
                 store,
                 user
         );
-
-        //주문 저장
         orderRepository.save(order);
 
-        //주문 아이템 저장
+        //주문 아이템 생성 및 저장
         for (OrderItemRequestDto itemRequestDto : requestDto.getOrderItems()) {
             Menu menu = menuRepository.findById(itemRequestDto.getMenuId()).orElseThrow(
                     () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU)
             );
             OrderItem orderItem = OrderItemRequestDto.toEntity(itemRequestDto.getQuantity(), order, menu);
             orderItemRepository.save(orderItem);
+
+            //주문 아이템 옵션 생성 및 저장
+            for (OrderItemOptionRequestDto optionRequestDto : itemRequestDto.getOptions()) {
+                MenuOption menuOption = menuOptionRepository.findById(optionRequestDto.getMenuOptionId()).orElseThrow(
+                        () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU_OPTION)
+                );
+                OrderItemOption orderItemOption = OrderItemOptionRequestDto.toEntity(optionRequestDto.getQuantity(), orderItem, menuOption);
+                orderItemOptionRepository.save(orderItemOption);
+            }
         }
 
         return OrderResponseDto.of(order);
