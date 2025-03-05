@@ -23,11 +23,19 @@ public class UserService {
     @Transactional(readOnly = true)
     public UserResponseDto getUser(long userId) {
         User user = userRepository.findByIdOrElseThrow(userId);
+
+        if(user.getUserStatus() == UserStatus.DELETE) {
+            throw new ApplicationException(ErrorCode.USER_STATUS_DELETE);
+        }
         return new UserResponseDto(user);
     }
 
     public UserResponseDto passwordUpdate(Long userId, UserUpdateRequestDto requestDto) {
         User user = userRepository.findByIdOrElseThrow(userId);
+
+        if(user.getUserStatus() == UserStatus.DELETE) {
+            throw new ApplicationException(ErrorCode.USER_STATUS_DELETE);
+        }
 
         if (passwordEncoder.matches(requestDto.getNewPassword(), user.getPassword())) {
             throw new ApplicationException(ErrorCode.DUPLICATE_PASSWORD);

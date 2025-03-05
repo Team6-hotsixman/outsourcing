@@ -5,9 +5,11 @@ import lombok.Getter;
 @Getter
 public class AuthSingupResponseDto {
 
-    private final String bearerToken;
+    private final String accessToken;
+    private final String refreshToken;
 
-    public AuthSingupResponseDto(String bearerToken) {
-        this.bearerToken = bearerToken;
+    public AuthSingupResponseDto(String accessToken, String refreshToken) {
+        this.accessToken = accessToken;
+        this.refreshToken = refreshToken;
     }
 }

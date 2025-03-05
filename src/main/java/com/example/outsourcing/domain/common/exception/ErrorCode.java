@@ -45,6 +45,8 @@ public enum ErrorCode {
 
     AUTH_EXCEPTION("@AUTH와 AUTHUSER는 같이 사용되어야 합니다.",HttpStatus.INTERNAL_SERVER_ERROR),
 
+    INVALID_REFRESH_TOKEN("Refresh Token이 올바르지 않거나 만료되었습니다.",HttpStatus.BAD_REQUEST),
+
     // 주문 에러
     LESS_THAN_MIN_ORDER_PRICE("최소 주문 금액 이상으로 주문 가능합니다.", HttpStatus.BAD_REQUEST),
 
