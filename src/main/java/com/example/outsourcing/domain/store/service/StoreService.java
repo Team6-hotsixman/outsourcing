@@ -12,12 +12,12 @@ import com.example.outsourcing.domain.order.enums.OrderStatus;
 import com.example.outsourcing.domain.store.dto.response.*;
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.store.enums.OrderBy;
+import com.example.outsourcing.domain.store.enums.StoreStatus;
 import com.example.outsourcing.domain.store.repository.StoreRepository;
 import com.example.outsourcing.domain.user.entity.UserAddress;
 import com.example.outsourcing.domain.user.enums.AddressStatus;
 import com.example.outsourcing.domain.user.repository.UserAddressRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.locationtech.jts.geom.*;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -25,7 +25,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Slf4j
 @Service
 @RequiredArgsConstructor
 public class StoreService {
@@ -94,21 +93,13 @@ public class StoreService {
 
     @Transactional(readOnly = true)
     public List<StoreResponseDto> findNearStore(int top, Point location) {
-        log.info("findNearStore");
-        long time = System.currentTimeMillis();
         List<StoreResponseDto> topNearStores = storeRepository.findTopNearStores(top, location, OrderStatus.COMPLETED, StoreStatus.OPEN);
-        long end = System.currentTimeMillis();
-        log.info("findNearStore: " + (end - time));
         return topNearStores;
     }
 
     @Transactional(readOnly = true)
     public List<StoreResponseDto> findTopSellerStores(int top, Point location) {
-        log.info("findTopSellerStores");
-        long time = System.currentTimeMillis();
         List<StoreResponseDto> topSellerStores = storeRepository.findTopSellerStores(top, location, OrderStatus.COMPLETED, StoreStatus.OPEN);
-        long end = System.currentTimeMillis();
-        log.info("findTopSellerStores: " + (end - time));
         return topSellerStores;
     }
 }
