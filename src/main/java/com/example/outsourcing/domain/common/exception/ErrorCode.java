@@ -31,6 +31,20 @@ public enum ErrorCode {
 
     Unauthorized_User("해당 권한이 없습니다", HttpStatus.UNAUTHORIZED),
 
+
+    //유저 에러
+    DUPLICATE_EMAIL("이미존재하는 이메일입니다.", HttpStatus.BAD_REQUEST),
+
+    PASSWORD_ARGUMENT_NOT_VALID("비밀번호가 틀렸습니다.",HttpStatus.BAD_REQUEST),
+
+    DUPLICATE_PASSWORD("새 비밀번호는 기존 비밀번호와 같을 수 없습니다.",HttpStatus.BAD_REQUEST),
+
+    MISS_MATCH_PASSWORD("기존 비밀번호와 일치하지 않습니다.",HttpStatus.BAD_REQUEST),
+
+    USER_STATUS_DELETE("이미 탈퇴한 회원입니다.",HttpStatus.BAD_REQUEST),
+
+    AUTH_EXCEPTION("@AUTH와 AUTHUSER는 같이 사용되어야 합니다.",HttpStatus.INTERNAL_SERVER_ERROR),
+
     // 주문 에러
     LESS_THAN_MIN_ORDER_PRICE("최소 주문 금액 이상으로 주문 가능합니다.", HttpStatus.BAD_REQUEST),
 
