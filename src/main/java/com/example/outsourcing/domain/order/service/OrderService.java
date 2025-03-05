@@ -29,6 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -214,4 +215,27 @@ public class OrderService {
         return orderRepository.findTotalRevenueByDay(storeId, localDate);
     }
     // store 통계 끝
+
+    // 관리자 통계 start
+    @Transactional(readOnly = true)
+    public List<StatisticsPriceResponseDto> getTotalPriceByStoreAndMonth(LocalDate startDate, LocalDate endDate) {
+        return orderRepository.getTotalPriceByStoreAndMonth(startDate, endDate);
+    }
+
+    @Transactional(readOnly = true)
+    public List<StatisticsPriceResponseDto> getTotalPriceByStoreAndDate(LocalDate date) {
+        return orderRepository.getTotalPriceByStoreAndDate(date);
+    }
+
+    @Transactional(readOnly = true)
+    public List<StatisticsCountResponseDto> getCountOrdersByStoreAndDate(LocalDate date) {
+        return orderRepository.getCountOrdersByStoreAndDate(date);
+    }
+
+    @Transactional(readOnly = true)
+    public List<StatisticsCountResponseDto> getCountOrdersByStoreAndMonth(LocalDate startDate, LocalDate endDate) {
+        return orderRepository.getCountOrdersByStoreAndMonth(startDate, endDate);
+    }
+    // 관리자 통계 end
+
 }

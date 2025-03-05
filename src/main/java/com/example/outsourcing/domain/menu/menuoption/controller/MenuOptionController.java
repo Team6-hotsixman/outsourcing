@@ -1,5 +1,6 @@
 package com.example.outsourcing.domain.menu.menuoption.controller;
 
+import com.example.outsourcing.domain.common.annotation.Owner;
 import com.example.outsourcing.domain.menu.menuoption.dto.request.MenuOptionSaveRequestDto;
 import com.example.outsourcing.domain.menu.menuoption.dto.request.MenuOptionUpdateRequestDto;
 import com.example.outsourcing.domain.menu.menuoption.dto.response.MenuOptionResponseDto;
@@ -13,15 +14,15 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@Owner
 public class MenuOptionController {
 
     private final MenuOptionService menuOptionService;
 
     @PostMapping("/options")
     public ResponseEntity<MenuOptionResponseDto> saveMenuOption(
-            User user,
             @RequestBody MenuOptionSaveRequestDto requestDto) {
-        return ResponseEntity.ok(menuOptionService.saveMenuOption(user, requestDto));
+        return ResponseEntity.ok(menuOptionService.saveMenuOption(requestDto));
     }
 
     @GetMapping("/options")
@@ -31,15 +32,14 @@ public class MenuOptionController {
 
     @PatchMapping("/options/{optionId}")
     public ResponseEntity<MenuOptionResponseDto> updateMenuOption(
-            User user,
             @PathVariable Long optionId,
             @RequestBody MenuOptionUpdateRequestDto requestDto) {
-        return ResponseEntity.ok(menuOptionService.updateMenuOption(optionId, user, requestDto));
+        return ResponseEntity.ok(menuOptionService.updateMenuOption(optionId, requestDto));
     }
 
     @DeleteMapping("/options/{optionId}")
-    public ResponseEntity<Void> deleteMenuOption(User user, @PathVariable Long optionId) {
-        menuOptionService.deleteMenuOption(optionId, user);
+    public ResponseEntity<Void> deleteMenuOption(@PathVariable Long optionId) {
+        menuOptionService.deleteMenuOption(optionId);
         return ResponseEntity.noContent().build();
     }
 }

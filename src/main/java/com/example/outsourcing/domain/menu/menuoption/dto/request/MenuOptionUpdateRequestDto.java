@@ -20,7 +20,7 @@ public class MenuOptionUpdateRequestDto {
 
     private final boolean isAvailable;
 
-    public static MenuOption of(MenuOptionSaveRequestDto requestDto, Menu menu, Image image) {
+    public static MenuOption of(MenuOptionUpdateRequestDto requestDto, Menu menu, Image image) {
         return MenuOption.builder()
                 .optionName(requestDto.getOptionName())
                 .price(requestDto.getPrice())
