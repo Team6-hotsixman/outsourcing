@@ -33,10 +33,11 @@ public class StoreService {
     private final MenuService menuService;
 
     private final KaKaoMapApiService kaKaoMapApiService;
+
     private final UserAddressRepository userAddressRepository;
+
     private final SearchKeywordRankingService searchKeywordRankingService;
 
-    /* hyen ho start */
     public StoreResponseDto getStoreAndMenu(Long storeId) {
         Store store = storeRepository.findById(storeId).orElseThrow(NotFoundStoreException::new);
 
@@ -48,7 +49,6 @@ public class StoreService {
     public Store getStore(Long storeId) {
         return storeRepository.findById(storeId).orElseThrow(NotFoundStoreException::new);
     }
-    /* hyen ho end */
 
     @Transactional(readOnly = true)
     public List<StoreResponseDto> searchStore(long userId, String searchKeyword, Pageable page, OrderBy orderBy) {

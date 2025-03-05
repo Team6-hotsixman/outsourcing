@@ -28,10 +28,12 @@ public class AdminAspect {
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         Long userId = (Long) request.getAttribute("userId");
         UserResponseDto userResponseDto = userService.getUser(userId);
+        // 유저 권한 검증
         if (userResponseDto.getUserRole() != UserRole.ADMIN) {
             throw new ApplicationException(ErrorCode.Unauthorized_User);
         }
         String url = request.getRequestURI();
+        // 성능 체크를 위한 스톱워치 기능
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 

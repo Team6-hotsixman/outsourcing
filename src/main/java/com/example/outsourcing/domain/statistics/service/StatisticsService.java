@@ -25,7 +25,6 @@ public class StatisticsService {
 
     private final StoreService storeService;
 
-    // 관리자 통계 start
     @Transactional(readOnly = true)
     public List<StatisticsPriceResponseDto> getTotalPrice(String date) {
         if (date.length() == 7) {
@@ -57,9 +56,6 @@ public class StatisticsService {
 
         throw new ApplicationException(ErrorCode.INVALID_DATE_FORMAT);
     }
-
-    // 관리자 통계 end
-    // 가게 단일 통계 start
 
     @Transactional(readOnly = true)
     public StatisticsCountResponseDto getCountOrdersByStore(String date, Long storeId, AuthUser authUser) {
@@ -101,5 +97,4 @@ public class StatisticsService {
 
         throw new ApplicationException(ErrorCode.INVALID_DATE_FORMAT);
     }
-    // 가게 단일 통계 end
 }
