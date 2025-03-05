@@ -117,7 +117,6 @@ public class AuthService {
         User user = userRepository.findById(storedToken.getUserId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_USER));
 
-        // ✅ 새로운 Refresh Token 생성 후 업데이트
         String newAccessToken = jwtUtil.createAccessToken(user.getId(), user.getEmail(), user.getUserRole());
         String newRefreshToken = jwtUtil.createRefreshToken(user.getId());
 

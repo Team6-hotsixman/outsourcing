@@ -16,24 +16,17 @@ public class ImageUploadController {
 
     private final ImageService imageService;
 
-    /**
-     * 이미지 업로드 API
-     */
     @PostMapping("/upload")
     public ResponseEntity<?> uploadImage(@RequestParam("file") MultipartFile file) {
         String imageUrl = imageService.uploadFile(file);
         return ResponseEntity.ok(imageUrl);
     }
 
-    /**
-     * ID로 이미지 조회 API
-     */
     @GetMapping("/{id}")
     public ResponseEntity<?> getImage(@PathVariable Long id) {
         return ResponseEntity.ok(imageService.getImageById(id));
     }
-
-    //파일 삭제
+    s
     @DeleteMapping("/delete")
     public ResponseEntity<String> deleteFile(@RequestParam("fileName") String fileName) {
         imageService.deleteFile(fileName);
