@@ -5,7 +5,6 @@ import lombok.Getter;
 
 @Getter
 public class FavoriteRequestDto {
-
     private final Long storeId;
 
     @Builder

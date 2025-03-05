@@ -16,6 +16,7 @@ import java.util.List;
 public class FavoriteController {
     private final FavoriteService favoriteService;
 
+    // 즐겨찾기 기능 (토글형)
     @PostMapping("/{storeId}/favorits")
     public ResponseEntity<Void> toggleFavorites(@PathVariable Long storeId) {
         User authUser = User.builder()
@@ -27,6 +28,7 @@ public class FavoriteController {
         return ResponseEntity.ok().build();
     }
 
+    // 즐겨찾기한 가게 리스트 반환
     @GetMapping("/favorits")
     public ResponseEntity<List<StoreListResponseDto>> getFavorites() {
         User authUser = User.builder()

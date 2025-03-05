@@ -1,30 +1,21 @@
 package com.example.outsourcing.domain.store.controller;
 
-import com.example.outsourcing.domain.store.dto.request.StoreDeleteRequestDto;
-import com.example.outsourcing.domain.store.dto.request.StoreSaveRequestDto;
-import com.example.outsourcing.domain.store.dto.request.StoreStatusUpdateRequestDto;
-import com.example.outsourcing.domain.store.dto.request.StoreUpdateRequestDto;
-import com.example.outsourcing.domain.store.dto.response.*;
+import com.example.outsourcing.domain.store.dto.response.StoreResponseDto;
 import com.example.outsourcing.domain.store.enums.OrderBy;
 import com.example.outsourcing.domain.store.service.StoreService;
-import com.example.outsourcing.domain.user.entity.User;
-import com.example.outsourcing.domain.user.enums.UserRole;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.util.ArrayList;
 import java.util.List;
-import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
 public class StoreController {
-    /* hyen ho start */
     private final StoreService storeService;
-
 
     @GetMapping("/stores/{storeId}")
     public ResponseEntity<StoreResponseDto> getStore(
@@ -33,7 +24,6 @@ public class StoreController {
         return ResponseEntity.ok(storeService.getStoreAndMenu(storeId));
     }
 
-     /* hyen ho end */
     @GetMapping("/stores")
     public ResponseEntity<List<StoreResponseDto>> searchStore(@RequestParam(name = "searchKeyword", required = false) String searchKeyword,
                                                               @RequestParam(required = false, defaultValue = "10") int size,

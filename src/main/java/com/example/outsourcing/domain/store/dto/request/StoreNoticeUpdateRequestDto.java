@@ -1,6 +1,5 @@
 package com.example.outsourcing.domain.store.dto.request;
 
-import com.example.outsourcing.domain.store.enums.StoreStatus;
 import lombok.Builder;
 import lombok.Getter;
 
