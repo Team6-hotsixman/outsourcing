@@ -1,6 +1,7 @@
 package com.example.outsourcing.domain.order.controller;
 
 import com.example.outsourcing.domain.common.annotation.Auth;
+import com.example.outsourcing.domain.common.annotation.Owner;
 import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.order.dto.request.OrderRequestDto;
 import com.example.outsourcing.domain.order.dto.response.OrderSimpleResponseDto;
@@ -9,6 +10,8 @@ import com.example.outsourcing.domain.order.dto.request.OrderStatusRequestDto;
 import com.example.outsourcing.domain.order.service.OrderService;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,13 +24,13 @@ public class OrderController {
     private final OrderService orderService;
 
     @PostMapping("/orders")
-    public OrderSimpleResponseDto placeOrder(
+    public ResponseEntity<OrderSimpleResponseDto> placeOrder(
             HttpServletRequest httpServletRequest,
             @RequestParam Long storeId,
             @Validated @RequestBody OrderRequestDto requestDto
             ) {
         Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userID")));
-        return orderService.placeOrder(userId, storeId, requestDto);
+        return new ResponseEntity<>(orderService.placeOrder(userId, storeId, requestDto), HttpStatus.CREATED);
     }
 
     @GetMapping("/orders")
@@ -47,6 +50,7 @@ public class OrderController {
         return orderService.findOne(orderId, userId);
     }
 
+    @Owner
     @PutMapping("/orders/status")
     public OrderSimpleResponseDto updateOrderStatus(
             @Auth AuthUser authUser,

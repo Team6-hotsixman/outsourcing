@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-
 public class User extends BaseEntity {
 
     @Id

@@ -42,7 +42,7 @@ public class OwnerStoreService {
 
     @Transactional
     public StoreSaveResponseDto saveStore(AuthUser authUser, StoreSaveRequestDto dto) {
-        CategoryResponse categoryResponse = categoryService.getCategoryById(dto.getCategoryId());
+        CategoryResponse categoryResponse = categoryService.getCategory(dto.getCategoryId());
         Image image = imageService.getImageById(dto.getImageId());
         User user = User.fromAuthUser(authUser);
         Point point = kaKaoMapApiService.getPoint(dto.getAddress());
@@ -84,7 +84,7 @@ public class OwnerStoreService {
             store.updateImage(newImage);
         }
         if (requestDto.getCategoryId() != null) {
-            CategoryResponse categoryResponse = categoryService.getCategoryById(requestDto.getCategoryId());
+            CategoryResponse categoryResponse = categoryService.getCategory(requestDto.getCategoryId());
             store.updateCategory(new Category(categoryResponse));
         }
         if (requestDto.getStoreName() != null && !requestDto.getStoreName().isBlank()) {

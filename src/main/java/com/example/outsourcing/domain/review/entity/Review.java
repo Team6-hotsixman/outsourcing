@@ -2,6 +2,7 @@ package com.example.outsourcing.domain.review.entity;
 
 import com.example.outsourcing.domain.common.entity.BaseEntity;
 import com.example.outsourcing.domain.order.entity.Orders;
+import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -36,17 +37,22 @@ public class Review extends BaseEntity {
     @JoinColumn(name = "order_id")
     private Orders order;
 
+    @ManyToOne
+    @JoinColumn(name = "store_id")
+    private Store store;
+
     @BatchSize(size = 100)
     @OneToMany(mappedBy = "review", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReviewImage> images = new ArrayList<>();
 
 
     @Builder
-    private Review(String content, int rate, User user, Orders order) {
+    private Review(String content, int rate, User user, Orders order, Store store) {
         this.content = content;
         this.rate = rate;
         this.user = user;
         this.order = order;
+        this.store = store;
     }
 
     public void updateContent(String contents) {
