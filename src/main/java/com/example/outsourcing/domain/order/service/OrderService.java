@@ -192,12 +192,12 @@ public class OrderService {
         }
 
         // 현재 상태와 같으면 예외처리
-        if (order.getOrderStatus().equals(requestDto.getOrderStatus())) {
+        if (order.getOrderStatus().equals(OrderStatus.valueOf(requestDto.getOrderStatus()))) {
             throw new ApplicationException(ErrorCode.ORDER_STATUS_ALREADY_SAME);
         }
 
         //Status 변경
-        order.updateOrderStatus(requestDto.getOrderStatus());
+        order.updateOrderStatus(OrderStatus.valueOf(requestDto.getOrderStatus()));
 
         //주문 배달 완료 시 주문 고객 포인트 적립
         if (order.getOrderStatus().equals(OrderStatus.COMPLETED)) {

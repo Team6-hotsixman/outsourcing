@@ -16,6 +16,8 @@ public enum ErrorCode {
     NOT_FOUND_MENU_OPTION("없는 메뉴 옵션 입니다.", HttpStatus.NOT_FOUND),
     NOT_FOUND_REVIEW("없는 리뷰 입니다.", HttpStatus.NOT_FOUND),
     NOT_FOUND_ORDER("없는 주문 입니다.", HttpStatus.NOT_FOUND),
+    NOT_FOUND_COUPON("없는 쿠폰 입니다.", HttpStatus.NOT_FOUND),
+    NOT_FOUND_USER_COUPON("없는 쿠폰 입니다.", HttpStatus.NOT_FOUND),
 
 
     //카테고리 에러
@@ -61,6 +63,10 @@ public enum ErrorCode {
     ORDER_STATUS_ALREADY_SAME("이미 해당 상태와 같습니다.", HttpStatus.BAD_REQUEST),
 
     CANT_CANCEL_AFTER_COOKING("주문 수락 이후에는 취소할 수 없습니다. 가게로 연락하세요", HttpStatus.NOT_ACCEPTABLE),
+
+    // 쿠폰 에러
+    EMPTY_COUPON_LIST("보유중인 쿠폰이 없습니다.", HttpStatus.NOT_FOUND),
+    MISMATCHED_COUPON_WITH_USER("보유하고 있지 않은 쿠폰입니다.", HttpStatus.BAD_REQUEST),
 
     // 통계
     INVALID_DATE_FORMAT("유효하지 않은 날짜 형식입니다.", HttpStatus.BAD_REQUEST),

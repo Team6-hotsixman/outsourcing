@@ -8,5 +8,5 @@ import lombok.Getter;
 public class OrderStatusRequestDto {
 
     @NotNull
-    public OrderStatus orderStatus;
+    public String orderStatus;
 }
