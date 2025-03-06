@@ -8,6 +8,7 @@ import com.example.outsourcing.domain.auth.dto.response.AuthLoginResponseDto;
 import com.example.outsourcing.domain.auth.dto.response.AuthSingupResponseDto;
 import com.example.outsourcing.domain.auth.entity.AuthRefreshToken;
 import com.example.outsourcing.domain.auth.repository.RefreshTokenRepository;
+import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.common.jwt.JwtUtil;
@@ -86,10 +87,9 @@ public class AuthService {
             throw new ApplicationException(ErrorCode.PASSWORD_ARGUMENT_NOT_VALID);
         }
 
-        String accessToken = jwtUtil.createAccessToken(user.getId(), user.getEmail(), user.getUserRole());
         String refreshToken = jwtUtil.createRefreshToken(user.getId());
+        String accessToken = jwtUtil.createAccessToken(user.getId(), user.getEmail(), user.getUserRole());
 
-        // ✅ 기존 Refresh Token 삭제 후 새로운 Refresh Token 저장
         refreshTokenRepository.findByUserId(user.getId()).ifPresent(refreshTokenRepository::delete);
         refreshTokenRepository.save(new AuthRefreshToken(user.getId(), refreshToken));
 
@@ -97,8 +97,8 @@ public class AuthService {
     }
 
     @Transactional
-    public void logout(Long userId) {
-        refreshTokenRepository.deleteByUserId(userId);
+    public void logout(AuthUser authUser) {
+        refreshTokenRepository.deleteByUserId(authUser.getId());
     }
 
     @Transactional
@@ -117,7 +117,6 @@ public class AuthService {
         User user = userRepository.findById(storedToken.getUserId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_USER));
 
-        // ✅ 새로운 Refresh Token 생성 후 업데이트
         String newAccessToken = jwtUtil.createAccessToken(user.getId(), user.getEmail(), user.getUserRole());
         String newRefreshToken = jwtUtil.createRefreshToken(user.getId());
 

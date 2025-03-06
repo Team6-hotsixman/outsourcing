@@ -7,22 +7,21 @@ import com.example.outsourcing.domain.category.entity.Category;
 import com.example.outsourcing.domain.category.service.CategoryService;
 import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.common.entity.Image;
-import com.example.outsourcing.domain.common.exception.NotFoundStoreException;
-import com.example.outsourcing.domain.common.exception.StoreLimitExceededException;
-import com.example.outsourcing.domain.common.exception.StoreStatusAlreadySameException;
-import com.example.outsourcing.domain.common.exception.UnauthorizedStoreOwnerException;
+import com.example.outsourcing.domain.common.exception.*;
 import com.example.outsourcing.domain.common.service.ImageService;
 import com.example.outsourcing.domain.common.service.KaKaoMapApiService;
 import com.example.outsourcing.domain.store.dto.request.StoreDeleteRequestDto;
 import com.example.outsourcing.domain.store.dto.request.StoreSaveRequestDto;
 import com.example.outsourcing.domain.store.dto.request.StoreStatusUpdateRequestDto;
 import com.example.outsourcing.domain.store.dto.request.StoreUpdateRequestDto;
-import com.example.outsourcing.domain.store.dto.response.*;
+import com.example.outsourcing.domain.store.dto.response.SaveStoreResponseDto;
+import com.example.outsourcing.domain.store.dto.response.StoreNoticeResponseDto;
+import com.example.outsourcing.domain.store.dto.response.StoreStatusResponseDto;
+import com.example.outsourcing.domain.store.dto.response.UpdateStoreResponseDto;
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.store.enums.StoreStatus;
 import com.example.outsourcing.domain.store.repository.StoreRepository;
 import com.example.outsourcing.domain.user.entity.User;
-import com.example.outsourcing.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
@@ -41,13 +40,14 @@ public class OwnerStoreService {
 
     private final PasswordEncoder passwordEncoder;
 
-    /* hyen ho start */
     @Transactional
     public SaveStoreResponseDto saveStore(AuthUser authUser, StoreSaveRequestDto dto) {
         CategoryResponse categoryResponse = categoryService.getCategoryById(dto.getCategoryId());
         Image image = imageService.getImageById(dto.getImageId());
         User user = User.fromAuthUser(authUser);
         Point point = kaKaoMapApiService.getPoint(dto.getAddress());
+
+        // 한 사장님이 최대 3개의 가게만 운영 가능하도록 제한
         if (storeRepository.countStoresByUserId(user.getId()) >= 3) {
             throw new StoreLimitExceededException();
         }
@@ -142,7 +142,6 @@ public class OwnerStoreService {
         return new StoreNoticeResponseDto(store.getStoreNotice());
     }
 
-
     @Transactional
     public void deleteStore(AuthUser authUser, Long storeId, StoreDeleteRequestDto requestDto) {
         Store store = storeRepository.findById(storeId).orElseThrow(NotFoundStoreException::new);
@@ -153,11 +152,9 @@ public class OwnerStoreService {
             throw new UnauthorizedStoreOwnerException();
         }
         // 현재 사용자 비번 확인
-//        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
-//            // 예외처리는 아직 미구현 되있음 수정 예정
-//            throw new AuthException("잘못된 비밀번호입니다.");
-//        }
+        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
+            throw new ApplicationException(ErrorCode.MISS_MATCH_PASSWORD);
+        }
         store.shutDownStore();
     }
-    /* hyen ho end */
 }

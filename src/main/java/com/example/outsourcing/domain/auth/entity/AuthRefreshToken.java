@@ -18,8 +18,8 @@ public class AuthRefreshToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long userId;  // 사용자의 ID
-    private String refreshToken; // Refresh Token
+    private Long userId;
+    private String refreshToken;
 
     @Builder
     public AuthRefreshToken(Long userId, String refreshToken) {

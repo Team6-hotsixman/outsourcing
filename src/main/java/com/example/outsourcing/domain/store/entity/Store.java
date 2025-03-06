@@ -1,18 +1,16 @@
 package com.example.outsourcing.domain.store.entity;
 
+import com.example.outsourcing.domain.category.entity.Category;
 import com.example.outsourcing.domain.common.entity.BaseEntity;
 import com.example.outsourcing.domain.common.entity.Image;
-import com.example.outsourcing.domain.user.entity.User;
-import com.example.outsourcing.domain.category.entity.Category;
 import com.example.outsourcing.domain.store.enums.StoreStatus;
-import org.locationtech.jts.geom.Point;
-
+import com.example.outsourcing.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.SQLRestriction;
-
+import org.locationtech.jts.geom.Point;
 
 import java.time.LocalTime;
 

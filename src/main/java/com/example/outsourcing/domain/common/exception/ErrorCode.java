@@ -17,13 +17,13 @@ public enum ErrorCode {
     NOT_FOUND_REVIEW("없는 리뷰 입니다.", HttpStatus.NOT_FOUND),
     NOT_FOUND_ORDER("없는 주문 입니다.", HttpStatus.NOT_FOUND),
 
+
     //카테고리 에러
     DUPLICATE_CATEGORY("이미 존재하는 카테고리입니다.", HttpStatus.BAD_REQUEST),
 
     STORE_LIMIT_EXCEEDED("한 사장님은 최대 3개까지만 가게를 생성할 수 있습니다.", HttpStatus.BAD_REQUEST),
 
     METHOD_ARGUMENT_NOT_VALID("입력값이 올바르지 않습니다", HttpStatus.BAD_REQUEST),
-    NOT_FOUND_DEFAULT_ADDRESS("기본 배송지를 설정해주세요.", HttpStatus.NOT_FOUND),
 
     UNAUTHORIZED_STORE_OWNER("가게 주인이 아닙니다.", HttpStatus.FORBIDDEN),
 
@@ -64,6 +64,12 @@ public enum ErrorCode {
 
     // 통계
     INVALID_DATE_FORMAT("유효하지 않은 날짜 형식입니다.", HttpStatus.BAD_REQUEST),
+
+    // 유저 주소 에러
+    INVALID_ADDRESS("잘못된 주소 입니다.", HttpStatus.BAD_REQUEST),
+    DUPLICATE_ADDRESS("이미 사용중인 주소 입니다.", HttpStatus.BAD_REQUEST),
+    NOT_FOUND_DEFAULT_ADDRESS("기본 주소를 설정해주세요.", HttpStatus.NOT_FOUND),
+    NOT_FOUND_ADDRESS("없는 주소 입니다.", HttpStatus.NOT_FOUND),
     ;
 
     private final String message;

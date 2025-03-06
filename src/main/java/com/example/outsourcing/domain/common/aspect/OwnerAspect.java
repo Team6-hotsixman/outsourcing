@@ -3,10 +3,8 @@ package com.example.outsourcing.domain.common.aspect;
 import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.user.dto.response.UserResponseDto;
-import com.example.outsourcing.domain.user.entity.User;
 import com.example.outsourcing.domain.user.enums.UserRole;
 import com.example.outsourcing.domain.user.service.UserService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,10 +29,12 @@ public class OwnerAspect {
     public Object logOwnerApiAccess(ProceedingJoinPoint joinPoint) throws Throwable {
         Long userId = (Long) request.getAttribute("userId");
         UserResponseDto userResponseDto = userService.getUser(userId);
+        // 유저 권한 검증
         if (userResponseDto.getUserRole() != UserRole.OWNER) {
             throw new ApplicationException(ErrorCode.Unauthorized_User);
         }
         String url = request.getRequestURI();
+        // 성능 체크를 위한 스톱워치 기능
         StopWatch stopWatch = new StopWatch();
         stopWatch.start();
 
