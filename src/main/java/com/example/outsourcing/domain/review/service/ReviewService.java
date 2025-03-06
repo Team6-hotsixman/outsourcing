@@ -51,8 +51,8 @@ public class ReviewService {
 
         for (MultipartFile image : images) {
             //수정필요
-            //Image save = imageService.save(image);
-            review.getImages().add(new ReviewImage(review, new Image()));
+            Image save = imageService.uploadFile(image);
+            review.getImages().add(new ReviewImage(review, save));
         }
 
         Review save = reviewRepository.save(review);
@@ -75,13 +75,20 @@ public class ReviewService {
         //수정할 이미지가 존재한다면
         if(images!= null && !images.isEmpty()){
             //리뷰의 이미지를 비우고 새로운 이미지로 채운다
-            review.getImages().clear();
+            List<ReviewImage> reviewImages = review.getImages();
+            while(!reviewImages.isEmpty()){
+                ReviewImage reviewImage = reviewImages.get(0);
+                reviewImage.delete();
+                imageService.deleteFile(reviewImage.getImage().getFilename());
+            }
+
+
             for(MultipartFile image : images){
                 //수정필요
-                //Image save = imageService.save(image);
-                long newId = 2L;
-                review.getImages().add(new ReviewImage(review, new Image()));
+                Image save = imageService.uploadFile(image);
+                review.getImages().add(new ReviewImage(review, save));
             }
+
         }
 
         if(request.getContent() != null){
@@ -101,6 +108,13 @@ public class ReviewService {
         if(review.getUser().getId() != userId){
             throw new ApplicationException(ErrorCode.Unauthorized_User);
         }
+
+        List<ReviewImage> reviewImages = review.getImages();
+        while(!reviewImages.isEmpty()){
+            ReviewImage reviewImage = reviewImages.get(0);
+            imageService.deleteFile(reviewImage.getImage().getFilename());
+        }
+
         reviewRepository.delete(review);
     }
 }

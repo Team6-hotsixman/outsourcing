@@ -52,6 +52,7 @@ public class Review extends BaseEntity {
         this.rate = rate;
         this.user = user;
         this.order = order;
+        this.store = store;
     }
 
     public void updateContent(String contents) {
