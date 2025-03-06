@@ -45,14 +45,8 @@ public class AuthController {
     }
 
     @DeleteMapping("/auth/logout")
-    public ResponseEntity<Void> logout(@Auth AuthUser authUser) {
-        log.info("Logout requested by user: {}", authUser);
-
-        if (authUser == null || authUser.getId() == null) {
-            throw new InvalidRequestException("로그아웃 요청 시 AuthUser 또는 userId가 null입니다.");
-        }
-
-        authService.logout(authUser.getId());
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<String> logout(@Auth AuthUser authUser) {
+        authService.logout(authUser);
+        return ResponseEntity.ok("로그아웃되었습니다.");
     }
 }
