@@ -36,7 +36,7 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
 
     // 가게 통계 시작
 
-    @Query("SELECT new com.example.outsourcing.domain.statistics.dto.response.StatisticsPriceResponseDto(o.store.storeName, sum(o.totalPriceAmount)) " +
+    @Query("SELECT new com.example.outsourcing.domain.statistics.dto.response.StatisticsCountResponseDto(o.store.storeName, sum(o.totalPriceAmount)) " +
             "FROM Orders o " +
             "WHERE o.orderAt BETWEEN :startDate AND :endDate " +
             "AND o.store.id = :storeId " +
