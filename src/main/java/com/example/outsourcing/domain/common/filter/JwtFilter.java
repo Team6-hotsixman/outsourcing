@@ -42,11 +42,11 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        //String jwt = jwtUtil.substringToken(bearerJwt);
+        String jwt = jwtUtil.substringToken(bearerJwt);
 
         try {
             // JWT 유효성 검사와 claims 추출
-            Claims claims = jwtUtil.extractClaims(bearerJwt);
+            Claims claims = jwtUtil.extractClaims(jwt);
             if (claims == null) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST, "잘못된 JWT 토큰입니다.");
                 return;

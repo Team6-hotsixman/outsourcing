@@ -20,21 +20,22 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/auth")
 public class AuthController {
 
     private final AuthService authService;
 
-    @PostMapping("/auth/signup")
+    @PostMapping("/signup")
     public AuthSingupResponseDto signup(@Valid @RequestBody AuthSignupRequestDto authSignupRequestDto) {
         return authService.signup(authSignupRequestDto);
     }
 
-    @PostMapping("/auth/login")
+    @PostMapping("/login")
     public AuthLoginResponseDto login(@Valid @RequestBody AuthLoginRequestDto authLoginRequestDto) {
         return authService.login(authLoginRequestDto);
     }
 
-    @PostMapping("/auth/refresh")
+    @PostMapping("/refresh")
     public ResponseEntity<AuthLoginResponseDto> refreshToken(@RequestHeader("Authorization") String refreshToken) {
         if (refreshToken.startsWith("Bearer ")) {
             refreshToken = refreshToken.substring(7);
@@ -44,7 +45,7 @@ public class AuthController {
         return ResponseEntity.ok(response);
     }
 
-    @DeleteMapping("/auth/logout")
+    @DeleteMapping("/logout")
     public ResponseEntity<String> logout(@Auth AuthUser authUser) {
         authService.logout(authUser);
         return ResponseEntity.ok("로그아웃되었습니다.");
