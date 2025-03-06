@@ -119,7 +119,17 @@ public class OrderService {
             );
 
             // 이미 사용된 쿠폰인지 검증
-            int discount = getDiscount(userCoupon, totalPriceAmount);
+            if (userCoupon.isUsed()) {
+                throw new ApplicationException(ErrorCode.USED_COUPON);
+            }
+            Coupon coupon = userCoupon.getCoupon();
+            if (totalPriceAmount < coupon.getMinOrderPrice()) {
+                throw new ApplicationException(ErrorCode.NOT_ENOUGH_ORDER_PRICE);
+            }
+
+            //할인 금액 계산
+            int discount = coupon.getDiscountType() == DiscountType.FIXED ? coupon.getDiscountValue() :
+                    (totalPriceAmount * coupon.getDiscountValue()) / 100;
 
             //쿠폰 사용 처리
             userCoupon.useCoupon();
@@ -157,21 +167,6 @@ public class OrderService {
         }
 
         return OrderSimpleResponseDto.of(order);
-    }
-
-    private static int getDiscount(UserCoupon userCoupon, Integer totalPriceAmount) {
-        if (userCoupon.isUsed()) {
-            throw new ApplicationException(ErrorCode.USED_COUPON);
-        }
-        Coupon coupon = userCoupon.getCoupon();
-        if (totalPriceAmount < coupon.getMinOrderPrice()) {
-            throw new ApplicationException(ErrorCode.NOT_ENOUGH_ORDER_PRICE);
-        }
-
-        //할인 금액 계산
-        int discount = coupon.getDiscountType() == DiscountType.FIXED ? coupon.getDiscountValue() :
-                (totalPriceAmount * coupon.getDiscountValue()) / 100;
-        return discount;
     }
 
     //주문 내역 조회
