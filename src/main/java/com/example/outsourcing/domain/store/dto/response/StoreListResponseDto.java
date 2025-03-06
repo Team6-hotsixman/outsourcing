@@ -11,7 +11,7 @@ import lombok.Getter;
 public class StoreListResponseDto {
     private final Long id;
 
-    private final Long imageId;
+    private final String imagePath;
 
     private final String categoryName;
 
@@ -22,9 +22,9 @@ public class StoreListResponseDto {
     private final Integer minOrderPrice;
 
     @Builder
-    public StoreListResponseDto(Long id, Long imageId, String categoryName, String storeName, StoreStatus storeStatus, Integer minOrderPrice) {
+    public StoreListResponseDto(Long id, String imagePath, String categoryName, String storeName, StoreStatus storeStatus, Integer minOrderPrice) {
         this.id = id;
-        this.imageId = imageId;
+        this.imagePath = imagePath;
         this.categoryName = categoryName;
         this.storeName = storeName;
         this.storeStatus = storeStatus;
@@ -33,7 +33,7 @@ public class StoreListResponseDto {
     public static StoreListResponseDto of(Store store) {
         return new StoreListResponseDto(
                 store.getId(),
-                store.getImage().getId(),
+                store.getImage().getImagePath(),
                 store.getCategory().getCategoryName(),
                 store.getStoreName(),
                 store.getStoreStatus(),

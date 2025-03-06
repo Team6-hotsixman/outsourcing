@@ -13,6 +13,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -25,18 +26,20 @@ public class OwnerStoreController {
     @PostMapping
     public ResponseEntity<StoreSaveResponseDto> saveStore(
             @Auth AuthUser authUser,
-            @RequestBody @Valid StoreSaveRequestDto requestDto
+            @RequestPart(value = "json") @Valid StoreSaveRequestDto requestDto,
+            @RequestPart(value = "file") MultipartFile file
     ) {
-        return ResponseEntity.ok(ownerStoreService.saveStore(authUser, requestDto));
+        return ResponseEntity.ok(ownerStoreService.saveStore(authUser, requestDto, file));
     }
 
     @PatchMapping("/{storeId}")
     public ResponseEntity<StoreUpdateResponseDto> updateStore(
             @Auth AuthUser authUser,
             @PathVariable Long storeId,
-            @RequestBody @Valid StoreUpdateRequestDto requestDto)
-    {
-        return ResponseEntity.ok(ownerStoreService.updateStore(storeId, authUser, requestDto));
+            @RequestPart(value = "json") @Valid StoreUpdateRequestDto requestDto,
+            @RequestPart(value = "file", required = false) MultipartFile file
+    ) {
+        return ResponseEntity.ok(ownerStoreService.updateStore(storeId, authUser, requestDto, file));
     }
 
     @PatchMapping("/{storeId}/status")

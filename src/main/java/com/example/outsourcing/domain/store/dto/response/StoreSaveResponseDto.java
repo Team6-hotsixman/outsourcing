@@ -15,7 +15,7 @@ public class StoreSaveResponseDto {
 
     private final Long userId;
 
-    private final Long imageId;
+    private final String imagePath;
 
     private final String categoryName;
 
@@ -41,7 +41,7 @@ public class StoreSaveResponseDto {
         return new StoreSaveResponseDto(
                 store.getId(),
                 store.getUser().getId(),
-                store.getImage().getId(),
+                store.getImage().getImagePath(),
                 store.getCategory().getCategoryName(),
                 store.getStoreName(),
                 store.getStoreStatus(),

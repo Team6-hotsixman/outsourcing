@@ -24,6 +24,7 @@ import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -41,9 +42,9 @@ public class OwnerStoreService {
     private final UserService userService;
 
     @Transactional
-    public StoreSaveResponseDto saveStore(AuthUser authUser, StoreSaveRequestDto dto) {
+    public StoreSaveResponseDto saveStore(AuthUser authUser, StoreSaveRequestDto dto, MultipartFile file) {
         CategoryResponse categoryResponse = categoryService.getCategoryById(dto.getCategoryId());
-        Image image = imageService.getImageById(dto.getImageId());
+        Image image = imageService.uploadFile(file);
         User user = User.fromAuthUser(authUser);
         Point point = kaKaoMapApiService.getPoint(dto.getAddress());
 
@@ -70,8 +71,9 @@ public class OwnerStoreService {
     }
 
     @Transactional
-    public StoreUpdateResponseDto updateStore(Long storeId, AuthUser authUser, StoreUpdateRequestDto requestDto) {
+    public StoreUpdateResponseDto updateStore(Long storeId, AuthUser authUser, StoreUpdateRequestDto requestDto, MultipartFile file) {
         Store store = storeRepository.findById(storeId).orElseThrow(NotFoundStoreException::new);
+
         User user = User.fromAuthUser(authUser);
 
         // 현재 사용자와 가게 주인과 비교
@@ -79,8 +81,9 @@ public class OwnerStoreService {
             throw new UnauthorizedStoreOwnerException();
         }
 
-        if (requestDto.getImageId() != null) {
-            Image newImage = imageService.getImageById(requestDto.getImageId());
+        if (file != null) {
+            Image newImage = imageService.uploadFile(file);
+            imageService.deleteFile(store.getImage().getFilename());
             store.updateImage(newImage);
         }
         if (requestDto.getCategoryId() != null) {

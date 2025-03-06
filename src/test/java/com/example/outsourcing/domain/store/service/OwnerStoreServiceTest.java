@@ -31,7 +31,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Optional;
@@ -79,13 +83,54 @@ class OwnerStoreServiceTest {
                 .openTime(LocalTime.of(12,0,0))
                 .closeTime(LocalTime.of(23,0,0))
                 .build();
+        MultipartFile file = new MultipartFile() {
+            @Override
+            public String getName() {
+                return null;
+            }
+
+            @Override
+            public String getOriginalFilename() {
+                return null;
+            }
+
+            @Override
+            public String getContentType() {
+                return null;
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
+
+            @Override
+            public long getSize() {
+                return 0;
+            }
+
+            @Override
+            public byte[] getBytes() throws IOException {
+                return new byte[0];
+            }
+
+            @Override
+            public InputStream getInputStream() throws IOException {
+                return null;
+            }
+
+            @Override
+            public void transferTo(File dest) throws IOException, IllegalStateException {
+
+            }
+        };
 
         given(categoryService.getCategoryById(anyLong())).willReturn(categoryResponse);
         given(imageService.getImageById(anyLong())).willReturn(image);
         given(kaKaoMapApiService.getPoint(anyString())).willReturn(point);
 
         // when
-        StoreSaveResponseDto result = ownerStoreService.saveStore(authUser, request);
+        StoreSaveResponseDto result = ownerStoreService.saveStore(authUser, request, file);
 
         // then
         assertNotNull(result);
@@ -142,7 +187,47 @@ class OwnerStoreServiceTest {
                 .openTime(LocalTime.of(12,0,0))
                 .closeTime(LocalTime.of(23,0,0))
                 .build();
+        MultipartFile file = new MultipartFile() {
+            @Override
+            public String getName() {
+                return null;
+            }
 
+            @Override
+            public String getOriginalFilename() {
+                return null;
+            }
+
+            @Override
+            public String getContentType() {
+                return null;
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return false;
+            }
+
+            @Override
+            public long getSize() {
+                return 0;
+            }
+
+            @Override
+            public byte[] getBytes() throws IOException {
+                return new byte[0];
+            }
+
+            @Override
+            public InputStream getInputStream() throws IOException {
+                return null;
+            }
+
+            @Override
+            public void transferTo(File dest) throws IOException, IllegalStateException {
+
+            }
+        };
         given(categoryService.getCategoryById(anyLong())).willReturn(categoryResponse);
         given(imageService.getImageById(anyLong())).willReturn(image);
         given(kaKaoMapApiService.getPoint(anyString())).willReturn(point);
@@ -150,7 +235,7 @@ class OwnerStoreServiceTest {
 
         // when & then
         ApplicationException exception = assertThrows(StoreLimitExceededException.class, () ->
-                ownerStoreService.saveStore(authUser, request)  // 실제 예외 발생 코드 실행
+                ownerStoreService.saveStore(authUser, request, file)  // 실제 예외 발생 코드 실행
         );
 
         assertEquals(ErrorCode.STORE_LIMIT_EXCEEDED, exception.getErrorCode());
