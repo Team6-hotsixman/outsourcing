@@ -15,7 +15,6 @@ import com.example.outsourcing.domain.user.repository.UserAddressRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.List;
 
@@ -78,7 +77,7 @@ public class UserAddressService {
     }
 
     @Transactional
-    public UserAddressResponse setDefaultUserAddress(AuthUser authUser, Long userAddressId) {
+    public UserAddressResponse updateUserAddressToDefault(AuthUser authUser, Long userAddressId) {
 
         UserAddress userAddress = userAddressRepository.findByIdWithUser(userAddressId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_ADDRESS));

@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 public class AdminCategoryService {
     private final CategoryRepository categoryRepository;
 
-    public CategoryResponse addCategory(CreateCategoryRequest createCategoryRequest) {
+    public CategoryResponse saveCategory(CreateCategoryRequest createCategoryRequest) {
         if(categoryRepository.existsByCategoryName(createCategoryRequest.getCategoryName())){
             throw new ApplicationException(ErrorCode.DUPLICATE_CATEGORY);
         }

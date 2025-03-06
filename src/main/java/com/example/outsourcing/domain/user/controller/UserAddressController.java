@@ -19,7 +19,7 @@ public class UserAddressController {
     private final UserAddressService userAddressService;
 
     @GetMapping
-    public ResponseEntity<List<UserAddressResponse>> getAllUserAddresses(@Auth AuthUser authUser) {
+    public ResponseEntity<List<UserAddressResponse>> getUserAddresses(@Auth AuthUser authUser) {
         List<UserAddressResponse> userAddresses = userAddressService.getUserAddresses(authUser);
         return ResponseEntity.ok(userAddresses);
     }
@@ -43,9 +43,9 @@ public class UserAddressController {
     }
 
     @PatchMapping("/{userAddressId}/default")
-    public ResponseEntity<UserAddressResponse> updateUserAddressDefault(@Auth AuthUser authUser,
-                                                                 @PathVariable Long userAddressId) {
-        UserAddressResponse userAddressResponse = userAddressService.setDefaultUserAddress(authUser, userAddressId);
+    public ResponseEntity<UserAddressResponse> updateUserAddressToDefault(@Auth AuthUser authUser,
+                                                                          @PathVariable Long userAddressId) {
+        UserAddressResponse userAddressResponse = userAddressService.updateUserAddressToDefault(authUser, userAddressId);
 
         return ResponseEntity.ok(userAddressResponse);
     }
