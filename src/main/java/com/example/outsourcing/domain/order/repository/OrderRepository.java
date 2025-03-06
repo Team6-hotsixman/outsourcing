@@ -14,7 +14,7 @@ import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Orders, Long> {
 
-    Page<Orders> findAllByUserId(Long userId, Pageable pageable);
+    List<Orders> findAllByUserId(Long id);
 
     // 관리자 통계 시작
     @Query("select o.store.storeName , sum (o.totalPriceAmount) from Orders o " +
@@ -93,4 +93,3 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
     // 가게 통계 끝
 
 }
-

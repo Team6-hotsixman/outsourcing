@@ -42,20 +42,23 @@ public class JwtUtil {
         return generateToken(userId, null, null, REFRESH_TOKEN_EXPIRATION, "refresh");
     }
 
-    private String generateToken(Long userId, String email, UserRole userRole, long expirationTime, String type) {
+    public String generateToken(Long userId, String email, UserRole userRole, long expirationTime, String type) {
         Date now = new Date();
+        log.info("userRole : '{}'",userRole );
         JwtBuilder builder = Jwts.builder()
                 .setSubject(String.valueOf(userId))
                 .setExpiration(new Date(now.getTime() + expirationTime))
                 .setIssuedAt(now)
-                .signWith(key, signatureAlgorithm);
+                .claim("type", type);
 
         if (email != null) builder.claim("email", email);
         if (userRole != null) builder.claim("userRole", userRole);
-        builder.claim("type", type); // "access" 또는 "refresh"
 
-        return BEARER_PREFIX + builder.compact();
+        log.info("userRole : '{}'", userRole); // null이 아닌 경우만 찍힘
+
+        return builder.signWith(key, signatureAlgorithm).compact();
     }
+
 
     public String substringToken(String tokenValue) {
         log.info("Received token: '{}'", tokenValue);
@@ -100,7 +103,13 @@ public class JwtUtil {
     }
 
     public boolean isRefreshToken(String token) {
-        return "refresh".equals(extractClaims(token).get("type", String.class));
+        Claims claims = extractClaims(token);
+
+        // 로그 추가해서 "type" 값 확인
+        String tokenType = claims.get("type", String.class);
+        log.info("Extracted token type: {}", tokenType);
+
+        return "refresh".equals(tokenType);
     }
 
     public boolean validateToken(String token) {
@@ -108,8 +117,10 @@ public class JwtUtil {
             Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token);
             return true;
         } catch (ExpiredJwtException e) {
+            log.error("Expired JWT token: {}", e.getMessage());
             throw new ServerException("토큰이 만료되었습니다.");
         } catch (JwtException e) {
+            log.error("Invalid JWT token: {}", e.getMessage());
             throw new ServerException("유효하지 않은 토큰입니다.");
         }
     }

@@ -5,11 +5,14 @@ import com.example.outsourcing.domain.order.entity.OrderItem;
 import com.example.outsourcing.domain.order.entity.Orders;
 import lombok.Getter;
 
+import java.util.List;
+
 @Getter
 public class OrderItemRequestDto {
 
     private Long menuId;
     private int quantity;
+    private List<OrderItemOptionRequestDto> options;
 
     public static OrderItem toEntity(int quantity, Orders order, Menu menu) {
         return OrderItem.builder()
