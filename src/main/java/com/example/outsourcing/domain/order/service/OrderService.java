@@ -36,6 +36,7 @@ import com.example.outsourcing.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -84,7 +85,7 @@ public class OrderService {
         }
 
         // 포인트와 쿠폰 중복 사용 불가
-        if (requestDto.getUsedPoint()!=null && requestDto.getUserCouponId()!=null) {
+        if (requestDto.getUsedPoint() != null && requestDto.getUserCouponId() != null) {
             throw new ApplicationException(ErrorCode.CANT_USE_BOTH_POINT_AND_COUPON);
         }
 
@@ -114,14 +115,14 @@ public class OrderService {
         }
 
         //포인트 사용 case
-        if (requestDto.getUsedPoint()!=null) {
+        if (requestDto.getUsedPoint() != null) {
             //포인트 확인 및 차감
             user.subtractPoint(requestDto.getUsedPoint());
             totalPriceAmount -= requestDto.getUsedPoint();
         }
 
         //쿠폰 사용 case
-        if (requestDto.getUserCouponId()!=null) {
+        if (requestDto.getUserCouponId() != null) {
             Coupon coupon = userCoupon.getCoupon();
             if (totalPriceAmount < coupon.getMinOrderPrice()) {
                 throw new ApplicationException(ErrorCode.NOT_ENOUGH_ORDER_PRICE);
@@ -226,7 +227,7 @@ public class OrderService {
             throw new ApplicationException(ErrorCode.MISMATCHED_ORDER_WITH_STORE);
         }
 
-        //가게 사장님만 주문 수락/거절 가능
+        //해당 주문의 가게 사장님만 주문 상태 변경 가능
         if (!order.getStore().getUser().getId().equals(user.getId())) {
             throw new ApplicationException(ErrorCode.UNAUTHORIZED_STORE_OWNER);
         }
@@ -234,6 +235,32 @@ public class OrderService {
         // 현재 상태와 같으면 예외처리
         if (order.getOrderStatus().equals(OrderStatus.valueOf(requestDto.getOrderStatus()))) {
             throw new ApplicationException(ErrorCode.ORDER_STATUS_ALREADY_SAME);
+        }
+
+        // 거절 및 완료된 주문은 상태를 변경할 수 없음
+        if (order.getOrderStatus() == OrderStatus.REJECTED
+                || order.getOrderStatus() == OrderStatus.COMPLETED
+        ) {
+            throw new ApplicationException(ErrorCode.CANT_UPDATE_ORDER_STATUS);
+        }
+
+        // OrderStatus : new -> cooking -> delivering -> completed 또는
+        // new -> rejected 로만 변경할 수 있도록 예외처리
+        if (
+                order.getOrderStatus() == OrderStatus.NEW
+                        && OrderStatus.valueOf(requestDto.getOrderStatus()) != OrderStatus.COOKING
+                        && OrderStatus.valueOf(requestDto.getOrderStatus()) != OrderStatus.REJECTED
+        ) {
+            throw new ApplicationException(ErrorCode.MISMATCHED_ORDER_STATUS);
+        }
+        if (order.getOrderStatus() == OrderStatus.COOKING
+                && OrderStatus.valueOf(requestDto.getOrderStatus()) != OrderStatus.DELIVERING
+        ) {
+            throw new ApplicationException(ErrorCode.MISMATCHED_ORDER_STATUS);
+        }
+        if (order.getOrderStatus() == OrderStatus.DELIVERING
+                && OrderStatus.valueOf(requestDto.getOrderStatus()) != OrderStatus.COMPLETED) {
+            throw new ApplicationException(ErrorCode.MISMATCHED_ORDER_STATUS);
         }
 
         //Status 변경

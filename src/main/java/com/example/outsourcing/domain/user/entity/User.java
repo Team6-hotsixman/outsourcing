@@ -70,6 +70,11 @@ public class User extends BaseEntity {
         this.id = userId;
     }
 
+    public User(Long userId, Integer point) {
+        this.id = userId;
+        this.point = point;
+    }
+
     public void getUser(UserResponseDto userResponseDto) {
         this.email = userResponseDto.getEmail();
         this.name = userResponseDto.getName();
