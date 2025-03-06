@@ -283,42 +283,24 @@ public class OrderService {
     }
 
     // store 통계 시작
-    public StatisticsCountResponseDto getCountOrdersByMonth(Long storeId, LocalDate startDate, LocalDate endDate) {
-        return orderRepository.findCountOrdersByMonth(storeId, startDate, endDate);
+    public StatisticsCountResponseDto getCountOrders(Long storeId, LocalDateTime startDate, LocalDateTime endDate) {
+        return orderRepository.findCountOrders(storeId, startDate, endDate);
     }
 
-    public StatisticsCountResponseDto getCountOrdersByDay(Long storeId, LocalDate localDate) {
-        return orderRepository.findCountOrdersByDay(storeId, localDate);
-    }
-
-    public StatisticsPriceResponseDto getTotalRevenueByMonth(Long storeId, LocalDate startDate, LocalDate endDate) {
-        return orderRepository.findTotalRevenueByMonth(storeId, startDate, endDate);
-    }
-
-    public StatisticsPriceResponseDto getTotalRevenueByDay(Long storeId, LocalDate localDate) {
-        return orderRepository.findTotalRevenueByDay(storeId, localDate);
+    public StatisticsPriceResponseDto getTotalRevenue(Long storeId, LocalDateTime startDate, LocalDateTime endDate) {
+        return orderRepository.findTotalRevenue(storeId, startDate, endDate);
     }
     // store 통계 끝
 
     // 관리자 통계 start
     @Transactional(readOnly = true)
-    public List<StatisticsPriceResponseDto> getTotalPriceByStoreAndMonth(LocalDate startDate, LocalDate endDate) {
-        return orderRepository.getTotalPriceByStoreAndMonth(startDate, endDate);
+    public List<StatisticsPriceResponseDto> getTotalPriceByStore(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        return orderRepository.getTotalPriceByStore(startDateTime, endDateTime);
     }
 
     @Transactional(readOnly = true)
-    public List<StatisticsPriceResponseDto> getTotalPriceByStoreAndDate(LocalDate date) {
-        return orderRepository.getTotalPriceByStoreAndDate(date);
-    }
-
-    @Transactional(readOnly = true)
-    public List<StatisticsCountResponseDto> getCountOrdersByStoreAndDate(LocalDate date) {
-        return orderRepository.getCountOrdersByStoreAndDate(date);
-    }
-
-    @Transactional(readOnly = true)
-    public List<StatisticsCountResponseDto> getCountOrdersByStoreAndMonth(LocalDate startDate, LocalDate endDate) {
-        return orderRepository.getCountOrdersByStoreAndMonth(startDate, endDate);
+    public List<StatisticsCountResponseDto> getCountOrdersByStore(LocalDateTime startDateTime, LocalDateTime endDateTime) {
+        return orderRepository.getCountOrdersByStore(startDateTime, endDateTime);
     }
     // 관리자 통계 end
 
