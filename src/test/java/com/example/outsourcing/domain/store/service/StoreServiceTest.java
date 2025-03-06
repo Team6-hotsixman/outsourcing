@@ -1,14 +1,23 @@
 package com.example.outsourcing.domain.store.service;
 
+import com.example.outsourcing.domain.category.dto.response.CategoryResponse;
 import com.example.outsourcing.domain.category.entity.Category;
+import com.example.outsourcing.domain.category.service.CategoryService;
 import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.common.entity.Image;
+import com.example.outsourcing.domain.common.exception.*;
+import com.example.outsourcing.domain.common.service.ImageService;
 import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.common.service.KaKaoMapApiService;
 import com.example.outsourcing.domain.common.service.SearchKeywordRankingService;
 import com.example.outsourcing.domain.menu.entity.Menu;
 import com.example.outsourcing.domain.menu.service.MenuService;
+import com.example.outsourcing.domain.store.dto.request.StoreNoticeUpdateRequestDto;
+import com.example.outsourcing.domain.store.dto.request.StoreSaveRequestDto;
+import com.example.outsourcing.domain.store.dto.request.StoreStatusUpdateRequestDto;
+import com.example.outsourcing.domain.store.dto.request.StoreUpdateRequestDto;
+import com.example.outsourcing.domain.store.dto.response.*;
 import com.example.outsourcing.domain.order.enums.OrderStatus;
 import com.example.outsourcing.domain.store.dto.response.StoreResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreResponseForNativeQuery;
@@ -20,6 +29,7 @@ import com.example.outsourcing.domain.user.entity.User;
 import com.example.outsourcing.domain.user.entity.UserAddress;
 import com.example.outsourcing.domain.user.enums.AddressStatus;
 import com.example.outsourcing.domain.user.enums.UserRole;
+import com.example.outsourcing.domain.user.enums.UserStatus;
 import com.example.outsourcing.domain.user.repository.UserAddressRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -32,16 +42,24 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class StoreServiceTest {

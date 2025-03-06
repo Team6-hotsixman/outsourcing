@@ -9,7 +9,7 @@ import java.time.LocalTime;
 public interface StoreResponseForNativeQuery {
         long getId();
         long getUserId();
-        long getImageId();
+        String getImagePath();
         String getCategoryName();
         String getStoreName();
         StoreStatus getStoreStatus();

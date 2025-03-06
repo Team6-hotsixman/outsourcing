@@ -7,8 +7,6 @@ import java.time.LocalTime;
 
 @Getter
 public class StoreUpdateRequestDto {
-    private final Long imageId;
-
     private final Long categoryId;
 
     private final String storeName;
@@ -21,14 +19,12 @@ public class StoreUpdateRequestDto {
 
     @Builder
     public StoreUpdateRequestDto(
-            Long imageId,
             Long categoryId,
             String storeName,
             Integer minOrderPrice,
             LocalTime openTime,
             LocalTime closeTime
     ) {
-        this.imageId = imageId;
         this.categoryId = categoryId;
         this.storeName = storeName;
         this.minOrderPrice = minOrderPrice;
