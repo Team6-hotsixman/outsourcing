@@ -2,6 +2,7 @@ package com.example.outsourcing.domain.coupon.dto.request;
 
 import com.example.outsourcing.domain.coupon.entity.Coupon;
 import com.example.outsourcing.domain.coupon.enums.DiscountType;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import org.springframework.format.annotation.DateTimeFormat;
 import java.time.LocalDate;
@@ -9,9 +10,13 @@ import java.time.LocalDate;
 @Getter
 public class CouponRequestDto {
 
+    @NotNull
     private String name;
+    @NotNull
     private String discountType;
+    @NotNull
     private int discountValue;
+    @NotNull
     private int minOrderPrice;
     @DateTimeFormat(pattern = "yyyy-MM-dd")
     private LocalDate validFrom;

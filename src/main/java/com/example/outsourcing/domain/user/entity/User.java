@@ -65,6 +65,16 @@ public class User extends BaseEntity {
         this.modifiedAt = modifiedAt;
     }
 
+    //order test 전용 생성자
+    public User(Long userId) {
+        this.id = userId;
+    }
+
+    public User(Long userId, Integer point) {
+        this.id = userId;
+        this.point = point;
+    }
+
     public void getUser(UserResponseDto userResponseDto) {
         this.email = userResponseDto.getEmail();
         this.name = userResponseDto.getName();

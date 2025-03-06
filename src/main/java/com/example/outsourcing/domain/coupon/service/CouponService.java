@@ -5,6 +5,7 @@ import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.coupon.dto.request.CouponRequestDto;
 import com.example.outsourcing.domain.coupon.dto.response.CouponResponseDto;
 import com.example.outsourcing.domain.coupon.entity.Coupon;
+import com.example.outsourcing.domain.coupon.enums.DiscountType;
 import com.example.outsourcing.domain.coupon.repository.CouponRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,17 @@ public class CouponService {
 
     @Transactional
     public CouponResponseDto create(CouponRequestDto requestDto) {
+
+        // 할인 유형에 따라 discountValue 검증
+        if (requestDto.getDiscountType().equals(String.valueOf(DiscountType.FIXED))) {
+            if (requestDto.getDiscountValue() <= 0) {
+                throw new IllegalArgumentException("정액 할인 금액은 0보다 커야 합니다.");
+            }
+        } else if (requestDto.getDiscountType().equals(String.valueOf(DiscountType.RATE))) {
+            if (requestDto.getDiscountValue() <= 0 || requestDto.getDiscountValue() > 100) {
+                throw new IllegalArgumentException("정률 할인 비율은 0보다 크고 100 이하이어야 합니다.");
+            }
+        }
 
         // 쿠폰 생성 및 저장
         Coupon coupon = CouponRequestDto.toEntity(requestDto);
