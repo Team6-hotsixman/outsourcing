@@ -5,38 +5,34 @@ import com.example.outsourcing.domain.order.enums.OrderStatus;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.Getter;
+
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
-public class OrderResponseDto {
+public class OrderSimpleResponseDto {
 
     private final Long id;
-    private final List<OrderItemResponseDto> orderItems;
     private final Integer totalPriceAmount;
     private final LocalDateTime orderAt;
 
     @Enumerated(EnumType.STRING)
     private final OrderStatus orderStatus;
 
-    public OrderResponseDto(
+    public OrderSimpleResponseDto(
             Long id,
-            List<OrderItemResponseDto> orderItems,
             Integer totalPriceAmount,
             LocalDateTime orderAt,
             OrderStatus orderStatus
     ) {
         this.id = id;
-        this.orderItems = orderItems;
         this.totalPriceAmount = totalPriceAmount;
         this.orderAt = orderAt;
         this.orderStatus = orderStatus;
     }
 
-    public static OrderResponseDto of(Orders order, List<OrderItemResponseDto> orderItems) {
-        return new OrderResponseDto(
+    public static OrderSimpleResponseDto of(Orders order) {
+        return new OrderSimpleResponseDto(
                 order.getId(),
-                orderItems,
                 order.getTotalPriceAmount(),
                 order.getOrderAt(),
                 order.getOrderStatus()
