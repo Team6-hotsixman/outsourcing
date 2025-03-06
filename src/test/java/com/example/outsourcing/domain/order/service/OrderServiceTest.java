@@ -4,9 +4,17 @@ import com.example.outsourcing.domain.common.annotation.Auth;
 import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
+import com.example.outsourcing.domain.coupon.entity.Coupon;
+import com.example.outsourcing.domain.coupon.entity.UserCoupon;
+import com.example.outsourcing.domain.coupon.enums.DiscountType;
 import com.example.outsourcing.domain.coupon.repository.UserCouponRepository;
+import com.example.outsourcing.domain.menu.entity.Menu;
+import com.example.outsourcing.domain.menu.menuoption.entity.MenuOption;
 import com.example.outsourcing.domain.menu.menuoption.repository.MenuOptionRepository;
 import com.example.outsourcing.domain.menu.repository.MenuRepository;
+import com.example.outsourcing.domain.order.dto.request.OrderItemOptionRequestDto;
+import com.example.outsourcing.domain.order.dto.request.OrderItemRequestDto;
+import com.example.outsourcing.domain.order.dto.request.OrderRequestDto;
 import com.example.outsourcing.domain.order.dto.request.OrderStatusRequestDto;
 import com.example.outsourcing.domain.order.dto.response.OrderSimpleResponseDto;
 import com.example.outsourcing.domain.order.entity.Orders;
@@ -15,6 +23,7 @@ import com.example.outsourcing.domain.order.repository.OrderItemOptionRepository
 import com.example.outsourcing.domain.order.repository.OrderItemRepository;
 import com.example.outsourcing.domain.order.repository.OrderRepository;
 import com.example.outsourcing.domain.store.entity.Store;
+import com.example.outsourcing.domain.store.enums.StoreStatus;
 import com.example.outsourcing.domain.store.repository.StoreRepository;
 import com.example.outsourcing.domain.user.entity.User;
 import com.example.outsourcing.domain.user.enums.UserRole;
@@ -28,6 +37,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -57,10 +68,47 @@ class OrderServiceTest {
     @InjectMocks
     private OrderService orderService;
 
-    @Test
-    void 주문_생성_성공() {
-
-    }
+//    @Test
+//    void 정상적으로_주문을_생성할_수_있다() {
+//        // given
+//        AuthUser authUser = new AuthUser(1L, "email", UserRole.OWNER);
+//        User owner = User.fromAuthUser(authUser);
+//        Long userId = 1L;
+//        Long storeId = 1L;
+//        List<OrderItemOptionRequestDto> options1 = List.of(
+//                new OrderItemOptionRequestDto(1L, 1),
+//                new OrderItemOptionRequestDto(2L, 2)
+//        );
+//        List<OrderItemOptionRequestDto> options2 = List.of(
+//                new OrderItemOptionRequestDto(1L, 1),
+//                new OrderItemOptionRequestDto(2L, 2)
+//        );
+//        List<OrderItemRequestDto> orderItems = List.of(
+//                new OrderItemRequestDto(1L, 1, options1),
+//                new OrderItemRequestDto(2L, 2, options2)
+//        );
+//        OrderRequestDto requestDto = new OrderRequestDto(orderItems, 0, null);
+//
+//        User user = new User(userId, 500); // 초기 포인트 500
+//        Store store = new Store(StoreStatus.OPEN, owner, 20000);
+//        UserCoupon userCoupon = new UserCoupon(couponId, user, new Coupon("Test Coupon", DiscountType.FIXED, 3000, 15000), false);
+//        Menu menu1 = new Menu();
+//        ReflectionTestUtils.setField(menu1, "id", 1L);
+//        ReflectionTestUtils.setField(menu1, "price", 10000);
+//        Menu menu2 = new Menu();
+//        ReflectionTestUtils.setField(menu2, "id", 2L);
+//        ReflectionTestUtils.setField(menu2, "price", 10000);
+//        MenuOption menuOption1 = new MenuOption();
+//        ReflectionTestUtils.setField(menuOption1, "id", 1L);
+//        ReflectionTestUtils.setField(menuOption1, "price", 1000);
+//        MenuOption menuOption2 = new MenuOption();
+//        ReflectionTestUtils.setField(menuOption1, "id", 1L);
+//        ReflectionTestUtils.setField(menuOption1, "price", 1000);
+//
+//        // when
+//
+//        // then
+//    }
 
     @Test
     void findAll() {
