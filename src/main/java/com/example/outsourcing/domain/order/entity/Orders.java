@@ -19,6 +19,8 @@ public class Orders {
     private Long id;
     private Integer totalPriceAmount;
     private Integer usedPoint;
+
+    @Temporal(value=TemporalType.TIMESTAMP)
     @Column(updatable = false)
     private LocalDateTime orderAt;
 

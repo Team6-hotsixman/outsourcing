@@ -14,11 +14,11 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@Owner
 public class MenuOptionController {
 
     private final MenuOptionService menuOptionService;
 
+    @Owner
     @PostMapping("/options")
     public ResponseEntity<MenuOptionResponseDto> saveMenuOption(
             @RequestBody MenuOptionSaveRequestDto requestDto) {
@@ -30,6 +30,7 @@ public class MenuOptionController {
         return ResponseEntity.ok(menuOptionService.getMenuOptions());
     }
 
+    @Owner
     @PatchMapping("/options/{optionId}")
     public ResponseEntity<MenuOptionResponseDto> updateMenuOption(
             @PathVariable Long optionId,
@@ -37,6 +38,7 @@ public class MenuOptionController {
         return ResponseEntity.ok(menuOptionService.updateMenuOption(optionId, requestDto));
     }
 
+    @Owner
     @DeleteMapping("/options/{optionId}")
     public ResponseEntity<Void> deleteMenuOption(@PathVariable Long optionId) {
         menuOptionService.deleteMenuOption(optionId);

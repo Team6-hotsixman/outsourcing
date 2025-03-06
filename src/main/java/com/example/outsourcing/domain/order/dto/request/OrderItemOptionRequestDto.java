@@ -1,15 +1,13 @@
 package com.example.outsourcing.domain.order.dto.request;
 
-import com.example.outsourcing.domain.menu.entity.Menu;
 import com.example.outsourcing.domain.menu.menuoption.entity.MenuOption;
 import com.example.outsourcing.domain.order.entity.OrderItem;
 import com.example.outsourcing.domain.order.entity.OrderItemOption;
-import com.example.outsourcing.domain.order.entity.Orders;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 
-import java.util.List;
-
 @Getter
+@AllArgsConstructor
 public class OrderItemOptionRequestDto {
 
     private Long menuOptionId;

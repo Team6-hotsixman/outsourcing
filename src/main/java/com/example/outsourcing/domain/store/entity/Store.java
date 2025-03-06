@@ -85,6 +85,13 @@ public class Store extends BaseEntity {
         this.location = location;
     }
 
+    // order test 용 생성자
+    public Store(StoreStatus storeStatus, User user, Integer minOrderPrice) {
+        this.storeStatus = storeStatus;
+        this.user = user;
+        this.minOrderPrice = minOrderPrice;
+    }
+
     public void updateImage(Image image) {
         this.image = image;
     }
