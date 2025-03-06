@@ -14,7 +14,6 @@ import com.example.outsourcing.domain.user.enums.AddressStatus;
 import com.example.outsourcing.domain.user.enums.UserRole;
 import com.example.outsourcing.domain.user.repository.UserAddressRepository;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestTemplate;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -239,7 +238,7 @@ class UserAddressServiceTest {
         given(userAddressRepository.findByIdWithUser(anyLong())).willReturn(Optional.of(address));
         given(userAddressRepository.findByUserIdAndAddressStatus(anyLong(), any(AddressStatus.class))).willReturn(Optional.of(defaultAddress));
         //when
-        UserAddressResponse userAddressResponse = userAddressService.setDefaultUserAddress(authUser, addressId);
+        UserAddressResponse userAddressResponse = userAddressService.updateUserAddressToDefault(authUser, addressId);
         //then
 
         assertTrue(userAddressResponse.isDefault());
@@ -258,7 +257,7 @@ class UserAddressServiceTest {
         given(userAddressRepository.findByIdWithUser(anyLong())).willReturn(Optional.of(address));
         //when &bthen
         assertThrows(ApplicationException.class,
-                ()-> userAddressService.setDefaultUserAddress(authUser, addressId),
+                ()-> userAddressService.updateUserAddressToDefault(authUser, addressId),
                 ErrorCode.Unauthorized_User.getMessage());
     }
 
@@ -274,7 +273,7 @@ class UserAddressServiceTest {
         given(userAddressRepository.findByIdWithUser(anyLong())).willReturn(Optional.of(address));
         given(userAddressRepository.findByUserIdAndAddressStatus(anyLong(), any(AddressStatus.class))).willReturn(Optional.empty());
         //when
-        UserAddressResponse userAddressResponse = userAddressService.setDefaultUserAddress(authUser, addressId);
+        UserAddressResponse userAddressResponse = userAddressService.updateUserAddressToDefault(authUser, addressId);
         //then
         assertTrue(userAddressResponse.isDefault());
     }
