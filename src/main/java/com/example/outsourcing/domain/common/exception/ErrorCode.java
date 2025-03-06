@@ -17,6 +17,7 @@ public enum ErrorCode {
     NOT_FOUND_REVIEW("없는 리뷰 입니다.", HttpStatus.NOT_FOUND),
     NOT_FOUND_ORDER("없는 주문 입니다.", HttpStatus.NOT_FOUND),
 
+
     //카테고리 에러
     DUPLICATE_CATEGORY("이미 존재하는 카테고리입니다.", HttpStatus.BAD_REQUEST),
 
@@ -55,7 +56,7 @@ public enum ErrorCode {
 
     MISMATCHED_ORDER_WITH_STORE("해당 가게에서 주문하지 않았습니다.", HttpStatus.BAD_REQUEST),
 
-    MISMATCHED_ORDER_WITH_USER("주문을 요청한 고객만 주문 취소 가능합니다.", HttpStatus.UNAUTHORIZED),
+    MISMATCHED_ORDER_WITH_USER("주문을 요청한 고객이 아닙니다.", HttpStatus.UNAUTHORIZED),
 
     ORDER_STATUS_ALREADY_SAME("이미 해당 상태와 같습니다.", HttpStatus.BAD_REQUEST),
 
