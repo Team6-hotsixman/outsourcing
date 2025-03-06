@@ -44,6 +44,8 @@ dependencies {
 
     implementation 'org.hibernate.orm:hibernate-spatial:6.4.4.Final'
     implementation 'org.locationtech.jts:jts-core:1.18.2'
+    //Repository 테스트 용
+    testRuntimeOnly 'com.h2database:h2'
 }
 
 tasks.named('test') {
