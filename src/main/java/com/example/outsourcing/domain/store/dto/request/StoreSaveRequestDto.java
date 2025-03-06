@@ -8,8 +8,6 @@ import java.time.LocalTime;
 
 @Getter
 public class StoreSaveRequestDto {
-    private final Long imageId;
-
     private final Long categoryId;
 
     private final String storeName;
@@ -28,7 +26,6 @@ public class StoreSaveRequestDto {
 
     @Builder
     public StoreSaveRequestDto(
-            Long imageId,
             Long categoryId,
             String storeName,
             StoreStatus storeStatus,
@@ -38,7 +35,6 @@ public class StoreSaveRequestDto {
             LocalTime openTime,
             LocalTime closeTime
     ) {
-        this.imageId = imageId;
         this.categoryId = categoryId;
         this.storeName = storeName;
         this.storeStatus = storeStatus;

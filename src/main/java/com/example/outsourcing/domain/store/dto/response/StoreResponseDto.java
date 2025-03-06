@@ -20,7 +20,7 @@ public class StoreResponseDto {
 
     private final Long userId;
 
-    private final Long imageId;
+    private final String imagePath;
 
     private final String categoryName;
 
@@ -51,7 +51,7 @@ public class StoreResponseDto {
     public StoreResponseDto(Store store, double distance, double rate) {
         this.id = store.getId();
         this.userId = store.getUser().getId();
-        this.imageId = store.getImage().getId();
+        this.imagePath = store.getImage().getImagePath();
         this.categoryName = store.getCategory().getCategoryName();
         this.storeName = store.getStoreName();
         this.storeStatus = store.getStoreStatus();
@@ -71,7 +71,7 @@ public class StoreResponseDto {
         return new StoreResponseDto(
                 store.getId(),
                 store.getUser().getId(),
-                store.getImage().getId(),
+                store.getImage().getImagePath(),
                 store.getCategory().getCategoryName(),
                 store.getStoreName(),
                 store.getStoreStatus(),
@@ -93,7 +93,7 @@ public class StoreResponseDto {
         return new StoreResponseDto(
                 storeResponse.getId(),
                 storeResponse.getUserId(),
-                storeResponse.getImageId(),
+                storeResponse.getImagePath(),
                 storeResponse.getCategoryName(),
                 storeResponse.getStoreName(),
                 storeResponse.getStoreStatus(),
