@@ -8,9 +8,7 @@ import com.example.outsourcing.domain.home.dto.HomeResponse;
 import com.example.outsourcing.domain.store.dto.response.StoreResponseDto;
 import com.example.outsourcing.domain.store.service.StoreService;
 import com.example.outsourcing.domain.user.dto.response.UserAddressResponse;
-import com.example.outsourcing.domain.user.dto.response.UserResponseDto;
 import com.example.outsourcing.domain.user.service.UserAddressService;
-import com.example.outsourcing.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
@@ -31,7 +29,7 @@ public class HomeService {
         Point point = kaKaoMapApiService.getPoint(defaultUserAddress.getAddress());
 
         List<String> top10SearchKeyword = searchKeywordRankingService.getTop10SearchKeyword();
-        List<CategoryResponse> allCategories = categoryService.getAllCategories();
+        List<CategoryResponse> allCategories = categoryService.getCategories();
         List<StoreResponseDto> nearStore = storeService.findNearStore(5, point);
         List<StoreResponseDto> topSellerStores = storeService.findTopSellerStores(5, point);
 

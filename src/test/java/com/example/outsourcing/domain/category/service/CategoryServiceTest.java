@@ -6,7 +6,6 @@ import com.example.outsourcing.domain.category.repository.CategoryRepository;
 import com.example.outsourcing.domain.common.exception.ApplicationException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.locationtech.jts.geom.Point;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -35,7 +34,7 @@ class CategoryServiceTest {
         List<Category> categories = List.of(c1, c2);
         given(categoryRepository.findAll()).willReturn(categories);
         //when
-        List<CategoryResponse> allCategories = categoryService.getAllCategories();
+        List<CategoryResponse> allCategories = categoryService.getCategories();
         //then
         assertEquals(categories.size(), allCategories.size());
         assertEquals(categories.get(0).getId(), allCategories.get(0).getId());
@@ -46,7 +45,7 @@ class CategoryServiceTest {
         List<Category> categories = List.of();
         given(categoryRepository.findAll()).willReturn(categories);
         //when
-        List<CategoryResponse> allCategories = categoryService.getAllCategories();
+        List<CategoryResponse> allCategories = categoryService.getCategories();
         //then
         assertEquals(0, allCategories.size());
     }
@@ -58,7 +57,7 @@ class CategoryServiceTest {
         Category c1 = createCategory(categoryId, "1");
         given(categoryRepository.findById(anyLong())).willReturn(Optional.of(c1));
         //when
-        CategoryResponse categoryResponse = categoryService.getCategoryById(categoryId);
+        CategoryResponse categoryResponse = categoryService.getCategory(categoryId);
         //then
         assertEquals(categoryId, categoryResponse.getId());
     }
@@ -68,7 +67,7 @@ class CategoryServiceTest {
         //given
         given(categoryRepository.findById(anyLong())).willReturn(Optional.empty());
         //when & then
-        assertThrows(ApplicationException.class, ()->categoryService.getCategoryById(anyLong()),"없는 카테고리 입니다.");
+        assertThrows(ApplicationException.class, ()->categoryService.getCategory(anyLong()),"없는 카테고리 입니다.");
     }
 
 

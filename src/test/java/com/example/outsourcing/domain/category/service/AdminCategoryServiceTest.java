@@ -38,7 +38,7 @@ class AdminCategoryServiceTest {
         given(categoryRepository.existsByCategoryName(anyString())).willReturn(false);
         given(categoryRepository.save(any(Category.class))).willReturn(category);
         //when
-        CategoryResponse categoryResponse = adminCategoryService.addCategory(createCategoryRequest);
+        CategoryResponse categoryResponse = adminCategoryService.saveCategory(createCategoryRequest);
         //then
 
         assertEquals(categoryId, categoryResponse.getId());
@@ -54,7 +54,7 @@ class AdminCategoryServiceTest {
 
         //when & then
         assertThrows(ApplicationException.class,
-                () -> adminCategoryService.addCategory(createCategoryRequest),
+                () -> adminCategoryService.saveCategory(createCategoryRequest),
                 "이미 존재하는 카테고리입니다.");
     }
 
