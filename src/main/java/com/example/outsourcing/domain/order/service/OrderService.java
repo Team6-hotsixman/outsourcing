@@ -177,12 +177,12 @@ public class OrderService {
                 () -> new ApplicationException(ErrorCode.NOT_FOUND_USER)
         );
 
-        //response body에 주문 메뉴, 메뉴 옵션을 반환하기 위한 로직
+        //response body 에 주문 메뉴, 메뉴 옵션을 반환하기 위한 로직
         //특정 사용자의 모든 주문 조회
         List<Orders> orders = orderRepository.findAllByUserId(user.getId());
-        //Orders -> OrderResponeDto 변환
+        //Orders -> OrderResponseDto 변환
         return orders.stream().map(
-                this::getOrderItemstoResponseDto).toList();
+                this::getOrderItems).toList();
     }
 
     //주문 단건 조회
@@ -201,7 +201,7 @@ public class OrderService {
             throw new ApplicationException(ErrorCode.MISMATCHED_ORDER_WITH_USER);
         }
 
-        return getOrderItemstoResponseDto(order);
+        return getOrderItems(order);
     }
 
     //주문 수락/거절/배달중/배달완료 상태 변경
@@ -322,8 +322,8 @@ public class OrderService {
     }
     // 관리자 통계 end
 
-    //order 내에 있는 menus 및 menuOptions를 orderResponseDto 타입으로 반환
-    private OrderResponseDto getOrderItemstoResponseDto(Orders order) {
+    //order 내에 있는 menus 및 menuOptions 를 orderResponseDto 타입으로 반환
+    private OrderResponseDto getOrderItems(Orders order) {
         //주문 아이템 조회
         List<OrderItem> menus = orderItemRepository.findAllByOrderId(order.getId());
         // 주문 아이템 DTO 리스트 생성
