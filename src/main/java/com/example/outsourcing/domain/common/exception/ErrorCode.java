@@ -67,6 +67,9 @@ public enum ErrorCode {
     // 쿠폰 에러
     EMPTY_COUPON_LIST("보유중인 쿠폰이 없습니다.", HttpStatus.NOT_FOUND),
     MISMATCHED_COUPON_WITH_USER("보유하고 있지 않은 쿠폰입니다.", HttpStatus.BAD_REQUEST),
+    USED_COUPON("이미 사용된 쿠폰입니다.", HttpStatus.BAD_REQUEST),
+    CANT_USE_BOTH_POINT_AND_COUPON("포인트와 쿠폰은 중복 사용이 불가능 합니다.", HttpStatus.BAD_REQUEST),
+    NOT_ENOUGH_ORDER_PRICE("쿠폰을 사용하기 위한 최소 주문 금액을 충족시켜주세요.", HttpStatus.NOT_ACCEPTABLE),
 
     // 통계
     INVALID_DATE_FORMAT("유효하지 않은 날짜 형식입니다.", HttpStatus.BAD_REQUEST),

@@ -22,7 +22,7 @@ public class Coupon {
     private DiscountType discountType;
 
     private int discountValue; // 할인 금액 또는 비율
-    private int minOrderPrice;
+    private int minOrderPrice; // 쿠폰을 사용하기 위한 최소 주문 금액
     private LocalDate validFrom; // 쿠폰 유효 기간 시작일
     private LocalDate validUntil; // 쿠폰 유효 기간 만료일
 

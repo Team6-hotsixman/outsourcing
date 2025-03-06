@@ -32,4 +32,8 @@ public class UserCoupon {
         this.used = used;
         this.issuedAt = issuedAt;
     }
+
+    public void useCoupon() {
+        this.used = true;
+    }
 }

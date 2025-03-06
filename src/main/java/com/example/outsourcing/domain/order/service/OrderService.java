@@ -3,6 +3,10 @@ package com.example.outsourcing.domain.order.service;
 import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
+import com.example.outsourcing.domain.coupon.entity.Coupon;
+import com.example.outsourcing.domain.coupon.entity.UserCoupon;
+import com.example.outsourcing.domain.coupon.enums.DiscountType;
+import com.example.outsourcing.domain.coupon.repository.UserCouponRepository;
 import com.example.outsourcing.domain.menu.entity.Menu;
 import com.example.outsourcing.domain.menu.menuoption.entity.MenuOption;
 import com.example.outsourcing.domain.menu.menuoption.repository.MenuOptionRepository;
@@ -32,7 +36,6 @@ import com.example.outsourcing.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -48,6 +51,7 @@ public class OrderService {
     private final MenuOptionRepository menuOptionRepository;
     private final OrderItemRepository orderItemRepository;
     private final OrderItemOptionRepository orderItemOptionRepository;
+    private final UserCouponRepository userCouponRepository;
 
     //주문 생성
     @Transactional
@@ -69,8 +73,24 @@ public class OrderService {
             throw new ApplicationException(ErrorCode.NOT_OPENED_STORE);
         }
 
+        // 사용하려는 쿠폰 가져오기
+        UserCoupon userCoupon = userCouponRepository.findById(requestDto.getUserCouponId()).orElseThrow(
+                () -> new ApplicationException(ErrorCode.NOT_FOUND_USER_COUPON)
+        );
+
+        // 이미 사용된 쿠폰인지 검증
+        if (userCoupon.isUsed()) {
+            throw new ApplicationException(ErrorCode.USED_COUPON);
+        }
+
+        // 포인트와 쿠폰 중복 사용 불가
+        if (requestDto.getUsedPoint()!=null && requestDto.getUserCouponId()!=null) {
+            throw new ApplicationException(ErrorCode.CANT_USE_BOTH_POINT_AND_COUPON);
+        }
+
         //주문 금액 계산
         Integer totalPriceAmount = 0;
+
         //for 반복문을 통해 menu 조회
         for (OrderItemRequestDto itemRequestDto : requestDto.getOrderItems()) {
             Menu menu = menuRepository.findById(itemRequestDto.getMenuId()).orElseThrow(
@@ -93,9 +113,29 @@ public class OrderService {
             throw new ApplicationException(ErrorCode.LESS_THAN_MIN_ORDER_PRICE);
         }
 
-        //포인트 확인 및 차감
-        user.subtractPoint(requestDto.getUsedPoint());
-        totalPriceAmount -= requestDto.getUsedPoint();
+        //포인트 사용 case
+        if (requestDto.getUsedPoint()!=null) {
+            //포인트 확인 및 차감
+            user.subtractPoint(requestDto.getUsedPoint());
+            totalPriceAmount -= requestDto.getUsedPoint();
+        }
+
+        //쿠폰 사용 case
+        if (requestDto.getUserCouponId()!=null) {
+            Coupon coupon = userCoupon.getCoupon();
+            if (totalPriceAmount < coupon.getMinOrderPrice()) {
+                throw new ApplicationException(ErrorCode.NOT_ENOUGH_ORDER_PRICE);
+            }
+
+            //할인 금액 계산
+            int discount = coupon.getDiscountType() == DiscountType.FIXED ? coupon.getDiscountValue() :
+                    (totalPriceAmount * coupon.getDiscountValue()) / 100;
+
+            //쿠폰 사용 처리
+            userCoupon.useCoupon();
+            userCouponRepository.save(userCoupon);
+            totalPriceAmount -= discount;
+        }
 
         //주문 생성 및 저장
         Orders order = OrderRequestDto.toEntity(
