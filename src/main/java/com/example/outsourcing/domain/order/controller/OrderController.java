@@ -29,7 +29,7 @@ public class OrderController {
             @RequestParam Long storeId,
             @Validated @RequestBody OrderRequestDto requestDto
             ) {
-        Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userID")));
+        Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userId")));
         return new ResponseEntity<>(orderService.placeOrder(userId, storeId, requestDto), HttpStatus.CREATED);
     }
 
@@ -37,7 +37,7 @@ public class OrderController {
     public List<OrderResponseDto> getOrders(
             HttpServletRequest httpServletRequest
     ) {
-        Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userID")));
+        Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userId")));
         return orderService.findAll(userId);
     }
 
@@ -46,7 +46,7 @@ public class OrderController {
             @PathVariable Long orderId,
             HttpServletRequest httpServletRequest
     ) {
-        Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userID")));
+        Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userId")));
         return orderService.findOne(orderId, userId);
     }
 
@@ -67,7 +67,7 @@ public class OrderController {
             @RequestParam Long storeId,
             @RequestParam Long orderId
     ) {
-        Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userID")));
+        Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userId")));
         orderService.cancelOrder(userId, orderId, storeId);
     }
 }
