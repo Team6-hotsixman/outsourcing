@@ -1,29 +1,34 @@
 package com.example.outsourcing.domain.store.service;
 
 
-import com.example.outsourcing.domain.auth.config.PasswordEncoder;
 import com.example.outsourcing.domain.category.dto.response.CategoryResponse;
 import com.example.outsourcing.domain.category.entity.Category;
 import com.example.outsourcing.domain.category.service.CategoryService;
 import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.common.entity.Image;
-import com.example.outsourcing.domain.common.exception.*;
+import com.example.outsourcing.domain.common.exception.NotFoundStoreException;
+import com.example.outsourcing.domain.common.exception.StoreLimitExceededException;
+import com.example.outsourcing.domain.common.exception.StoreStatusAlreadySameException;
+import com.example.outsourcing.domain.common.exception.UnauthorizedStoreOwnerException;
 import com.example.outsourcing.domain.common.service.ImageService;
 import com.example.outsourcing.domain.common.service.KaKaoMapApiService;
-import com.example.outsourcing.domain.store.dto.request.*;
-import com.example.outsourcing.domain.store.dto.response.StoreSaveResponseDto;
+import com.example.outsourcing.domain.store.dto.request.StoreNoticeUpdateRequestDto;
+import com.example.outsourcing.domain.store.dto.request.StoreSaveRequestDto;
+import com.example.outsourcing.domain.store.dto.request.StoreStatusUpdateRequestDto;
+import com.example.outsourcing.domain.store.dto.request.StoreUpdateRequestDto;
 import com.example.outsourcing.domain.store.dto.response.StoreNoticeResponseDto;
+import com.example.outsourcing.domain.store.dto.response.StoreSaveResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreStatusResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreUpdateResponseDto;
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.store.enums.StoreStatus;
 import com.example.outsourcing.domain.store.repository.StoreRepository;
 import com.example.outsourcing.domain.user.entity.User;
-import com.example.outsourcing.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -36,14 +41,10 @@ public class OwnerStoreService {
 
     private final ImageService imageService;
 
-    private final PasswordEncoder passwordEncoder;
-
-    private final UserService userService;
-
     @Transactional
-    public StoreSaveResponseDto saveStore(AuthUser authUser, StoreSaveRequestDto dto) {
+    public StoreSaveResponseDto saveStore(AuthUser authUser, StoreSaveRequestDto dto, MultipartFile file) {
         CategoryResponse categoryResponse = categoryService.getCategory(dto.getCategoryId());
-        Image image = imageService.getImageById(dto.getImageId());
+        Image image = imageService.uploadFile(file);
         User user = User.fromAuthUser(authUser);
         Point point = kaKaoMapApiService.getPoint(dto.getAddress());
 
@@ -70,8 +71,9 @@ public class OwnerStoreService {
     }
 
     @Transactional
-    public StoreUpdateResponseDto updateStore(Long storeId, AuthUser authUser, StoreUpdateRequestDto requestDto) {
+    public StoreUpdateResponseDto updateStore(Long storeId, AuthUser authUser, StoreUpdateRequestDto requestDto, MultipartFile file) {
         Store store = storeRepository.findById(storeId).orElseThrow(NotFoundStoreException::new);
+
         User user = User.fromAuthUser(authUser);
 
         // 현재 사용자와 가게 주인과 비교
@@ -79,8 +81,9 @@ public class OwnerStoreService {
             throw new UnauthorizedStoreOwnerException();
         }
 
-        if (requestDto.getImageId() != null) {
-            Image newImage = imageService.getImageById(requestDto.getImageId());
+        if (file != null) {
+            Image newImage = imageService.uploadFile(file);
+            imageService.deleteFile(store.getImage().getFilename());
             store.updateImage(newImage);
         }
         if (requestDto.getCategoryId() != null) {
