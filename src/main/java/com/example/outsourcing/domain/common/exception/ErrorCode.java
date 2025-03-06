@@ -79,6 +79,10 @@ public enum ErrorCode {
     DUPLICATE_ADDRESS("이미 사용중인 주소 입니다.", HttpStatus.BAD_REQUEST),
     NOT_FOUND_DEFAULT_ADDRESS("기본 주소를 설정해주세요.", HttpStatus.NOT_FOUND),
     NOT_FOUND_ADDRESS("없는 주소 입니다.", HttpStatus.NOT_FOUND),
+
+    //리뷰 에러
+    DUPLICATE_REVIEW("이미 리뷰를 작성했습니다.", HttpStatus.BAD_REQUEST),
+    REVIEW_ONLY_FOR_COMPLETED_ORDER("주문이 완료된 경우에만 리뷰를 작성할 수 있습니다.", HttpStatus.BAD_REQUEST)
     ;
 
     private final String message;

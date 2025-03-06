@@ -18,6 +18,8 @@ import com.example.outsourcing.domain.review.entity.ReviewImage;
 import com.example.outsourcing.domain.review.repository.ReviewRepository;
 import com.example.outsourcing.domain.store.service.StoreService;
 import com.example.outsourcing.domain.user.entity.User;
+import com.example.outsourcing.domain.user.enums.UserRole;
+import com.example.outsourcing.domain.user.enums.UserStatus;
 import com.example.outsourcing.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -39,10 +42,21 @@ public class ReviewService {
     public ReviewResponse saveReview(long orderId, AuthUser authUser, ReviewCreateRequest request, List<MultipartFile> images) {
         User user = userRepository.findById(authUser.getId()).orElseThrow(()->new ApplicationException(ErrorCode.NOT_FOUND_USER));
         Orders orders = orderRepository.findById(orderId).orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_ORDER));
+        //완료된 주문만 리뷰를 달수있음
         if(orders.getOrderStatus() != OrderStatus.COMPLETED){
             //수정필요 : 메시지 합의
-            throw new ApplicationException(ErrorCode.METHOD_ARGUMENT_NOT_VALID);
+            throw new ApplicationException(ErrorCode.REVIEW_ONLY_FOR_COMPLETED_ORDER);
         }
+        if(!Objects.equals(user.getId(), orders.getUser().getId()) //주문 당사자가 아니거나
+                && !Objects.equals(user.getId(), orders.getStore().getUser().getId())) { //해당 가게의 사장이 아닌경우 예외 던짐
+            throw new ApplicationException(ErrorCode.Unauthorized_User);
+        }
+        //사용자는 주문당 하나의 리뷰만 달수있다.
+        if(user.getUserRole() == UserRole.USER &&
+                reviewRepository.existsByUserIdAndOrderId(user.getId(), orderId)) {
+            throw new ApplicationException(ErrorCode.DUPLICATE_REVIEW);
+        }
+
         Review review = Review.builder()
                 .order(orders)
                 .user(user)
