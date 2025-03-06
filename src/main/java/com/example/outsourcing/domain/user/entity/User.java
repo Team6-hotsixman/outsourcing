@@ -37,6 +37,8 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
 
+    private Long kakaoId;
+
     private LocalDateTime createdAt;
 
     private LocalDateTime modifiedAt;

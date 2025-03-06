@@ -45,7 +45,7 @@ dependencies {
     implementation 'org.hibernate.orm:hibernate-spatial:6.4.4.Final'
     implementation 'org.locationtech.jts:jts-core:1.18.2'
 
-    
+    implementation 'org.springframework.boot:spring-boot-starter-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
 }
 
