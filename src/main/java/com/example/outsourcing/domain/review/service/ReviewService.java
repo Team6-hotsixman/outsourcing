@@ -5,15 +5,18 @@ import com.example.outsourcing.domain.common.entity.Image;
 import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.common.service.ImageService;
+import com.example.outsourcing.domain.menu.service.MenuService;
 import com.example.outsourcing.domain.order.entity.Orders;
 import com.example.outsourcing.domain.order.enums.OrderStatus;
 import com.example.outsourcing.domain.order.repository.OrderRepository;
+import com.example.outsourcing.domain.order.service.OrderService;
 import com.example.outsourcing.domain.review.dto.request.ReviewCreateRequest;
 import com.example.outsourcing.domain.review.dto.request.ReviewUpdateRequest;
 import com.example.outsourcing.domain.review.dto.response.ReviewResponse;
 import com.example.outsourcing.domain.review.entity.Review;
 import com.example.outsourcing.domain.review.entity.ReviewImage;
 import com.example.outsourcing.domain.review.repository.ReviewRepository;
+import com.example.outsourcing.domain.store.service.StoreService;
 import com.example.outsourcing.domain.user.entity.User;
 import com.example.outsourcing.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -29,7 +32,6 @@ import java.util.List;
 public class ReviewService {
     private final OrderRepository orderRepository;
     private final UserRepository userRepository;
-
     private final ReviewRepository reviewRepository;
     private final ImageService imageService;
 
@@ -39,7 +41,7 @@ public class ReviewService {
         Orders orders = orderRepository.findById(orderId).orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_ORDER));
         if(orders.getOrderStatus() != OrderStatus.COMPLETED){
             //수정필요 : 메시지 합의
-            new ApplicationException(ErrorCode.METHOD_ARGUMENT_NOT_VALID);
+            throw new ApplicationException(ErrorCode.METHOD_ARGUMENT_NOT_VALID);
         }
         Review review = Review.builder()
                 .order(orders)
@@ -112,6 +114,7 @@ public class ReviewService {
         List<ReviewImage> reviewImages = review.getImages();
         while(!reviewImages.isEmpty()){
             ReviewImage reviewImage = reviewImages.get(0);
+            reviewImage.delete();
             imageService.deleteFile(reviewImage.getImage().getFilename());
         }
 
