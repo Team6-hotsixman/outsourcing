@@ -65,8 +65,9 @@ public class User extends BaseEntity {
         this.modifiedAt = modifiedAt;
     }
 
+    //order test 전용 생성자
     public User(Long userId) {
-        super();
+        this.id = userId;
     }
 
     public void getUser(UserResponseDto userResponseDto) {

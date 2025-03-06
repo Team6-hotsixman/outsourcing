@@ -62,7 +62,7 @@ public enum ErrorCode {
 
     ORDER_STATUS_ALREADY_SAME("이미 해당 상태와 같습니다.", HttpStatus.BAD_REQUEST),
 
-    CANT_CANCEL_AFTER_COOKING("주문 수락 이후에는 취소할 수 없습니다. 가게로 연락하세요", HttpStatus.NOT_ACCEPTABLE),
+    CANT_CANCEL_AFTER_COOKING("주문 수락 이후에는 취소할 수 없습니다. 가게로 연락하세요.", HttpStatus.NOT_ACCEPTABLE),
 
     // 쿠폰 에러
     EMPTY_COUPON_LIST("보유중인 쿠폰이 없습니다.", HttpStatus.NOT_FOUND),

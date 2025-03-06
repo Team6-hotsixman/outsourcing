@@ -85,9 +85,6 @@ public class Store extends BaseEntity {
         this.location = location;
     }
 
-    public Store(Long storeId) {
-    }
-
     public void updateImage(Image image) {
         this.image = image;
     }
