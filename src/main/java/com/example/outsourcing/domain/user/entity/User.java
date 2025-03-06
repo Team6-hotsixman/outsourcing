@@ -65,6 +65,10 @@ public class User extends BaseEntity {
         this.modifiedAt = modifiedAt;
     }
 
+    public User(Long userId) {
+        super();
+    }
+
     public void getUser(UserResponseDto userResponseDto) {
         this.email = userResponseDto.getEmail();
         this.name = userResponseDto.getName();

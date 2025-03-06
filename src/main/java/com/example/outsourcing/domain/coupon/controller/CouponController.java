@@ -7,6 +7,7 @@ import com.example.outsourcing.domain.coupon.service.CouponService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -18,7 +19,9 @@ public class CouponController {
 
     @Admin
     @PostMapping("/coupons")
-    public ResponseEntity<CouponResponseDto> create(@RequestBody CouponRequestDto requestDto) {
+    public ResponseEntity<CouponResponseDto> create(
+            @Validated @RequestBody CouponRequestDto requestDto
+    ) {
         return new ResponseEntity<>(couponService.create(requestDto), HttpStatus.CREATED);
     }
 
