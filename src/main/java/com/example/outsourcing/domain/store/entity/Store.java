@@ -20,6 +20,7 @@ import java.time.LocalTime;
 @Getter
 @SQLRestriction("store_status != 'SHUTDOWN'")
 @NoArgsConstructor
+@Table(name = "store")
 public class Store extends BaseEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -85,6 +86,10 @@ public class Store extends BaseEntity {
         this.openTime = openTime;
         this.closeTime = closeTime;
         this.location = location;
+    }
+
+    public Store(Long storeId) {
+        super();
     }
 
     public void updateImage(Image image) {
