@@ -38,6 +38,7 @@ public class StoreService {
 
     private final SearchKeywordRankingService searchKeywordRankingService;
 
+    @Transactional(readOnly = true)
     public StoreResponseDto getStoreAndMenu(Long storeId) {
         Store store = storeRepository.findById(storeId).orElseThrow(NotFoundStoreException::new);
 
@@ -46,6 +47,7 @@ public class StoreService {
         return StoreResponseDto.of(store, menus);
     }
 
+    @Transactional(readOnly = true)
     public Store getStore(Long storeId) {
         return storeRepository.findById(storeId).orElseThrow(NotFoundStoreException::new);
     }
