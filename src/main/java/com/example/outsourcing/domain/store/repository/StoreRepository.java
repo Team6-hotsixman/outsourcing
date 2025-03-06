@@ -36,14 +36,11 @@ public interface StoreRepository extends JpaRepository<Store, Long>, StoreReposi
             "              from store s " +
             "             inner join category c  " +
             "                     on c.id=s.category_id  " +
-            "              left join orders o " +
-            "                     on o.store_id=s.id  " +
             "              left join review r " +
-            "                     on r.order_id=o.id  " +
+            "                     on r.store_id=s.id  " +
             "             where ( " +
             "                        s.store_status != 'SHUTDOWN' " +
             "                   )           " +
-            "               and o.order_status = :orderStatus " +
             "               and s.store_status = :storeStatus  " +
             "               and s.store_name like concat(:keyword, '%')   " +
             "               and st_contains(st_buffer(:location, 4000), s.location)  " +
@@ -70,14 +67,11 @@ public interface StoreRepository extends JpaRepository<Store, Long>, StoreReposi
             "              from store s " +
             "             inner join category c  " +
             "                     on c.id=s.category_id  " +
-            "              left join orders o " +
-            "                     on o.store_id=s.id  " +
             "              left join review r " +
-            "                     on r.order_id=o.id  " +
+            "                     on r.store_id=s.id  " +
             "             where ( " +
             "                     s.store_status != 'SHUTDOWN' " +
             "                   )           " +
-            "               and o.order_status = :orderStatus " +
             "               and s.store_status = :storeStatus  " +
             "               and exists( select 1 from menu where store_id = s.id and menu_name like concat(:keyword, '%')) " +
             "               and st_contains(st_buffer(:location, 4000), s.location)  " +
@@ -110,14 +104,11 @@ public interface StoreRepository extends JpaRepository<Store, Long>, StoreReposi
             "              from store s " +
             "             inner join category c  " +
             "                     on c.id=s.category_id  " +
-            "              left join orders o " +
-            "                     on o.store_id=s.id  " +
             "              left join review r " +
-            "                     on r.order_id=o.id  " +
+            "                     on r.store_id=s.id  " +
             "             where ( " +
             "                        s.store_status != 'SHUTDOWN' " +
             "                   )           " +
-            "               and o.order_status = :orderStatus " +
             "               and s.store_status = :storeStatus  " +
             "               and s.store_name like concat(:keyword, '%')   " +
             "               and st_contains(st_buffer(:location, 4000), s.location)  " +
@@ -144,21 +135,18 @@ public interface StoreRepository extends JpaRepository<Store, Long>, StoreReposi
             "              from store s " +
             "             inner join category c  " +
             "                     on c.id=s.category_id  " +
-            "              left join orders o " +
-            "                     on o.store_id=s.id  " +
             "              left join review r " +
-            "                     on r.order_id=o.id  " +
+            "                     on r.store_id = s.id  " +
             "             where ( " +
             "                     s.store_status != 'SHUTDOWN' " +
             "                   )           " +
-            "               and o.order_status = :orderStatus " +
             "               and s.store_status = :storeStatus  " +
             "               and exists( select 1 from menu where store_id = s.id and menu_name like concat(:keyword, '%')) " +
             "               and st_contains(st_buffer(:location, 4000), s.location)  " +
             "             group by s.id  " +
             "     ) total " +
             "group by total.id " +
-            "order by total.rate " +
+            "order by total.rate desc " +
             "limit :offset, :limit ",
             nativeQuery = true)
     List<StoreResponseForNativeQuery> searchOrderByRate(Point location, String keyword, String orderStatus, String storeStatus, long offset, int limit);

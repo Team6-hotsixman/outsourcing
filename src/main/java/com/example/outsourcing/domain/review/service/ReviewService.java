@@ -23,7 +23,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -35,7 +34,7 @@ public class ReviewService {
     private final ImageService imageService;
 
     @Transactional
-    public ReviewResponse save(long orderId, AuthUser authUser, ReviewCreateRequest request, List<MultipartFile> images) {
+    public ReviewResponse saveReview(long orderId, AuthUser authUser, ReviewCreateRequest request, List<MultipartFile> images) {
         User user = userRepository.findById(authUser.getId()).orElseThrow(()->new ApplicationException(ErrorCode.NOT_FOUND_USER));
         Orders orders = orderRepository.findById(orderId).orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_ORDER));
         if(orders.getOrderStatus() != OrderStatus.COMPLETED){
@@ -47,6 +46,7 @@ public class ReviewService {
                 .user(user)
                 .content(request.getContent())
                 .rate(request.getRate())
+                .store(orders.getStore())
                 .build();
 
         for (MultipartFile image : images) {
@@ -60,7 +60,7 @@ public class ReviewService {
         return ReviewResponse.of(save);
     }
 
-    public List<ReviewResponse> getReviewsByStoreId(long storeId,int start, int end, LocalDateTime last) {
+    public List<ReviewResponse> getReviews(long storeId, int start, int end, LocalDateTime last) {
         List<Review> reviewsByStoreId = reviewRepository.findReviewsByStoreId(storeId, start, end, last);
         return reviewsByStoreId.stream().map(ReviewResponse::of).toList();
     }
