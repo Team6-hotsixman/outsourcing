@@ -56,7 +56,6 @@ public class ImageService {
             throw new RuntimeException("파일 업로드 실패", e);
         }
 
-
     }
 
     public Image getImageById(Long imageId) {
@@ -74,7 +73,6 @@ public class ImageService {
     public void deleteFile(String fileName) {
         Image image = imageRepository.findByFilename(fileName)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_IMAGE));
-
 
         s3Client.deleteObject(DeleteObjectRequest.builder()
                 .bucket(bucketName)
