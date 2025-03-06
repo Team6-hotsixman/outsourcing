@@ -85,7 +85,7 @@ class OwnerStoreServiceTest {
                 .build();
         MultipartFile file = mock(MultipartFile.class);
 
-        given(categoryService.getCategoryById(anyLong())).willReturn(categoryResponse);
+        given(categoryService.getCategory(anyLong())).willReturn(categoryResponse);
         given(imageService.uploadFile(any())).willReturn(image);
         given(kaKaoMapApiService.getPoint(anyString())).willReturn(point);
 
@@ -112,7 +112,7 @@ class OwnerStoreServiceTest {
                     .build();
         MultipartFile file = mock(MultipartFile.class);
 
-            given(categoryService.getCategoryById(anyLong())).willThrow(new ApplicationException(ErrorCode.NOT_FOUND_CATEGORY));
+            given(categoryService.getCategory(anyLong())).willThrow(new ApplicationException(ErrorCode.NOT_FOUND_CATEGORY));
 
         // when & then
         ApplicationException exception = assertThrows(ApplicationException.class, () -> {
@@ -138,7 +138,7 @@ class OwnerStoreServiceTest {
                 .build();
         MultipartFile file = mock(MultipartFile.class);
 
-        given(categoryService.getCategoryById(anyLong())).willReturn(categoryResponse);
+        given(categoryService.getCategory(anyLong())).willReturn(categoryResponse);
         given(imageService.uploadFile(any())).willThrow(new RuntimeException("파일 업로드 실패"));
 
 
@@ -168,7 +168,7 @@ class OwnerStoreServiceTest {
                 .build();
         MultipartFile file = mock(MultipartFile.class);
 
-        given(categoryService.getCategoryById(anyLong())).willReturn(categoryResponse);
+        given(categoryService.getCategory(anyLong())).willReturn(categoryResponse);
         given(imageService.uploadFile(any())).willReturn(image);
         given(kaKaoMapApiService.getPoint(anyString())).willThrow(new ApplicationException(ErrorCode.INVALID_ADDRESS));
 
@@ -199,7 +199,7 @@ class OwnerStoreServiceTest {
                 .build();
         MultipartFile file = mock(MultipartFile.class);
 
-        given(categoryService.getCategoryById(anyLong())).willReturn(categoryResponse);
+        given(categoryService.getCategory(anyLong())).willReturn(categoryResponse);
         given(imageService.uploadFile(any())).willReturn(image);
         given(kaKaoMapApiService.getPoint(anyString())).willReturn(point);
         given(storeRepository.countStoresByUserId(anyLong())).willReturn(3L);
@@ -251,7 +251,7 @@ class OwnerStoreServiceTest {
 
         given(storeRepository.findById(anyLong())).willReturn(Optional.of(store));
         given(imageService.uploadFile(any())).willReturn(image);
-        given(categoryService.getCategoryById(anyLong())).willReturn(categoryResponse);
+        given(categoryService.getCategory(anyLong())).willReturn(categoryResponse);
 
         // when
         StoreUpdateResponseDto result = ownerStoreService.updateStore(storeId, authUser, request, file);

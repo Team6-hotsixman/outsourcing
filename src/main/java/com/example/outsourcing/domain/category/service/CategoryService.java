@@ -15,7 +15,7 @@ import java.util.List;
 public class CategoryService {
     private final CategoryRepository categoryRepository;
 
-    public List<CategoryResponse> getAllCategories() {
+    public List<CategoryResponse> getCategories() {
         List<Category> categories = categoryRepository.findAll();
 
         return categories.stream()
@@ -23,7 +23,7 @@ public class CategoryService {
                 .toList();
     }
 
-    public CategoryResponse getCategoryById(Long categoryId) {
+    public CategoryResponse getCategory(Long categoryId) {
         Category category = categoryRepository.findById(categoryId).orElseThrow(()->new ApplicationException(ErrorCode.NOT_FOUND_CATEGORY));
 
         return CategoryResponse.of(category);

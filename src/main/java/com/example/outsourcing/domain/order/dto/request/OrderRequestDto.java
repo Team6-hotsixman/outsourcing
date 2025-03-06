@@ -17,6 +17,7 @@ public class OrderRequestDto {
     @NotNull
     private List<OrderItemRequestDto> orderItems;
     private Integer usedPoint;
+    private Long userCouponId;
 
     public static Orders toEntity(
             Integer totalPriceAmount,

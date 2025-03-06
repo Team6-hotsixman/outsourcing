@@ -3,6 +3,10 @@ package com.example.outsourcing.domain.order.service;
 import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
+import com.example.outsourcing.domain.coupon.entity.Coupon;
+import com.example.outsourcing.domain.coupon.entity.UserCoupon;
+import com.example.outsourcing.domain.coupon.enums.DiscountType;
+import com.example.outsourcing.domain.coupon.repository.UserCouponRepository;
 import com.example.outsourcing.domain.menu.entity.Menu;
 import com.example.outsourcing.domain.menu.menuoption.entity.MenuOption;
 import com.example.outsourcing.domain.menu.menuoption.repository.MenuOptionRepository;
@@ -32,7 +36,6 @@ import com.example.outsourcing.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -48,6 +51,7 @@ public class OrderService {
     private final MenuOptionRepository menuOptionRepository;
     private final OrderItemRepository orderItemRepository;
     private final OrderItemOptionRepository orderItemOptionRepository;
+    private final UserCouponRepository userCouponRepository;
 
     //주문 생성
     @Transactional
@@ -69,8 +73,24 @@ public class OrderService {
             throw new ApplicationException(ErrorCode.NOT_OPENED_STORE);
         }
 
+        // 사용하려는 쿠폰 가져오기
+        UserCoupon userCoupon = userCouponRepository.findById(requestDto.getUserCouponId()).orElseThrow(
+                () -> new ApplicationException(ErrorCode.NOT_FOUND_USER_COUPON)
+        );
+
+        // 이미 사용된 쿠폰인지 검증
+        if (userCoupon.isUsed()) {
+            throw new ApplicationException(ErrorCode.USED_COUPON);
+        }
+
+        // 포인트와 쿠폰 중복 사용 불가
+        if (requestDto.getUsedPoint()!=null && requestDto.getUserCouponId()!=null) {
+            throw new ApplicationException(ErrorCode.CANT_USE_BOTH_POINT_AND_COUPON);
+        }
+
         //주문 금액 계산
         Integer totalPriceAmount = 0;
+
         //for 반복문을 통해 menu 조회
         for (OrderItemRequestDto itemRequestDto : requestDto.getOrderItems()) {
             Menu menu = menuRepository.findById(itemRequestDto.getMenuId()).orElseThrow(
@@ -93,9 +113,29 @@ public class OrderService {
             throw new ApplicationException(ErrorCode.LESS_THAN_MIN_ORDER_PRICE);
         }
 
-        //포인트 확인 및 차감
-        user.subtractPoint(requestDto.getUsedPoint());
-        totalPriceAmount -= requestDto.getUsedPoint();
+        //포인트 사용 case
+        if (requestDto.getUsedPoint()!=null) {
+            //포인트 확인 및 차감
+            user.subtractPoint(requestDto.getUsedPoint());
+            totalPriceAmount -= requestDto.getUsedPoint();
+        }
+
+        //쿠폰 사용 case
+        if (requestDto.getUserCouponId()!=null) {
+            Coupon coupon = userCoupon.getCoupon();
+            if (totalPriceAmount < coupon.getMinOrderPrice()) {
+                throw new ApplicationException(ErrorCode.NOT_ENOUGH_ORDER_PRICE);
+            }
+
+            //할인 금액 계산
+            int discount = coupon.getDiscountType() == DiscountType.FIXED ? coupon.getDiscountValue() :
+                    (totalPriceAmount * coupon.getDiscountValue()) / 100;
+
+            //쿠폰 사용 처리
+            userCoupon.useCoupon();
+            userCouponRepository.save(userCoupon);
+            totalPriceAmount -= discount;
+        }
 
         //주문 생성 및 저장
         Orders order = OrderRequestDto.toEntity(
@@ -137,12 +177,12 @@ public class OrderService {
                 () -> new ApplicationException(ErrorCode.NOT_FOUND_USER)
         );
 
-        //response body에 주문 메뉴, 메뉴 옵션을 반환하기 위한 로직
+        //response body 에 주문 메뉴, 메뉴 옵션을 반환하기 위한 로직
         //특정 사용자의 모든 주문 조회
         List<Orders> orders = orderRepository.findAllByUserId(user.getId());
-        //Orders -> OrderResponeDto 변환
+        //Orders -> OrderResponseDto 변환
         return orders.stream().map(
-                this::getOrderItemstoResponseDto).toList();
+                this::getOrderItems).toList();
     }
 
     //주문 단건 조회
@@ -161,7 +201,7 @@ public class OrderService {
             throw new ApplicationException(ErrorCode.MISMATCHED_ORDER_WITH_USER);
         }
 
-        return getOrderItemstoResponseDto(order);
+        return getOrderItems(order);
     }
 
     //주문 수락/거절/배달중/배달완료 상태 변경
@@ -192,12 +232,12 @@ public class OrderService {
         }
 
         // 현재 상태와 같으면 예외처리
-        if (order.getOrderStatus().equals(requestDto.getOrderStatus())) {
+        if (order.getOrderStatus().equals(OrderStatus.valueOf(requestDto.getOrderStatus()))) {
             throw new ApplicationException(ErrorCode.ORDER_STATUS_ALREADY_SAME);
         }
 
         //Status 변경
-        order.updateOrderStatus(requestDto.getOrderStatus());
+        order.updateOrderStatus(OrderStatus.valueOf(requestDto.getOrderStatus()));
 
         //주문 배달 완료 시 주문 고객 포인트 적립
         if (order.getOrderStatus().equals(OrderStatus.COMPLETED)) {
@@ -282,8 +322,8 @@ public class OrderService {
     }
     // 관리자 통계 end
 
-    //order 내에 있는 menus 및 menuOptions를 orderResponseDto 타입으로 반환
-    private OrderResponseDto getOrderItemstoResponseDto(Orders order) {
+    //order 내에 있는 menus 및 menuOptions 를 orderResponseDto 타입으로 반환
+    private OrderResponseDto getOrderItems(Orders order) {
         //주문 아이템 조회
         List<OrderItem> menus = orderItemRepository.findAllByOrderId(order.getId());
         // 주문 아이템 DTO 리스트 생성
