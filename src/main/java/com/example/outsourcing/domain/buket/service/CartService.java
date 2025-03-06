@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -19,7 +20,7 @@ public class CartService {
         String key = "cart:"+userId;
         String hashKey = createHashKey(addMenuRequest);
         redisTemplate.opsForHash().increment(key, hashKey, addMenuRequest.getQuantity());
-
+        redisTemplate.expire(key, 3, TimeUnit.DAYS);
         return getCart(userId);
     }
 
