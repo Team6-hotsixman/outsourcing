@@ -74,16 +74,6 @@ public class OrderService {
             throw new ApplicationException(ErrorCode.NOT_OPENED_STORE);
         }
 
-        // 사용하려는 쿠폰 가져오기
-        UserCoupon userCoupon = userCouponRepository.findById(requestDto.getUserCouponId()).orElseThrow(
-                () -> new ApplicationException(ErrorCode.NOT_FOUND_USER_COUPON)
-        );
-
-        // 이미 사용된 쿠폰인지 검증
-        if (userCoupon.isUsed()) {
-            throw new ApplicationException(ErrorCode.USED_COUPON);
-        }
-
         // 포인트와 쿠폰 중복 사용 불가
         if (requestDto.getUsedPoint() != null && requestDto.getUserCouponId() != null) {
             throw new ApplicationException(ErrorCode.CANT_USE_BOTH_POINT_AND_COUPON);
@@ -123,14 +113,13 @@ public class OrderService {
 
         //쿠폰 사용 case
         if (requestDto.getUserCouponId() != null) {
-            Coupon coupon = userCoupon.getCoupon();
-            if (totalPriceAmount < coupon.getMinOrderPrice()) {
-                throw new ApplicationException(ErrorCode.NOT_ENOUGH_ORDER_PRICE);
-            }
+            // 사용하려는 쿠폰 가져오기
+            UserCoupon userCoupon = userCouponRepository.findById(requestDto.getUserCouponId()).orElseThrow(
+                    () -> new ApplicationException(ErrorCode.NOT_FOUND_USER_COUPON)
+            );
 
-            //할인 금액 계산
-            int discount = coupon.getDiscountType() == DiscountType.FIXED ? coupon.getDiscountValue() :
-                    (totalPriceAmount * coupon.getDiscountValue()) / 100;
+            // 이미 사용된 쿠폰인지 검증
+            int discount = getDiscount(userCoupon, totalPriceAmount);
 
             //쿠폰 사용 처리
             userCoupon.useCoupon();
@@ -168,6 +157,21 @@ public class OrderService {
         }
 
         return OrderSimpleResponseDto.of(order);
+    }
+
+    private static int getDiscount(UserCoupon userCoupon, Integer totalPriceAmount) {
+        if (userCoupon.isUsed()) {
+            throw new ApplicationException(ErrorCode.USED_COUPON);
+        }
+        Coupon coupon = userCoupon.getCoupon();
+        if (totalPriceAmount < coupon.getMinOrderPrice()) {
+            throw new ApplicationException(ErrorCode.NOT_ENOUGH_ORDER_PRICE);
+        }
+
+        //할인 금액 계산
+        int discount = coupon.getDiscountType() == DiscountType.FIXED ? coupon.getDiscountValue() :
+                (totalPriceAmount * coupon.getDiscountValue()) / 100;
+        return discount;
     }
 
     //주문 내역 조회
