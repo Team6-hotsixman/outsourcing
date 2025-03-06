@@ -10,7 +10,7 @@ import java.time.LocalTime;
 
 @Getter
 @AllArgsConstructor
-public class UpdateStoreResponseDto {
+public class StoreUpdateResponseDto {
     private final Long id;
 
     private final Long userId;
@@ -37,8 +37,8 @@ public class UpdateStoreResponseDto {
 
     private final LocalDateTime modifiedAt;
 
-    public static UpdateStoreResponseDto of(Store store) {
-        return new UpdateStoreResponseDto(
+    public static StoreUpdateResponseDto of(Store store) {
+        return new StoreUpdateResponseDto(
                 store.getId(),
                 store.getUser().getId(),
                 store.getImage().getId(),

@@ -10,18 +10,16 @@ import com.example.outsourcing.domain.common.entity.Image;
 import com.example.outsourcing.domain.common.exception.*;
 import com.example.outsourcing.domain.common.service.ImageService;
 import com.example.outsourcing.domain.common.service.KaKaoMapApiService;
-import com.example.outsourcing.domain.store.dto.request.StoreDeleteRequestDto;
-import com.example.outsourcing.domain.store.dto.request.StoreSaveRequestDto;
-import com.example.outsourcing.domain.store.dto.request.StoreStatusUpdateRequestDto;
-import com.example.outsourcing.domain.store.dto.request.StoreUpdateRequestDto;
-import com.example.outsourcing.domain.store.dto.response.SaveStoreResponseDto;
+import com.example.outsourcing.domain.store.dto.request.*;
+import com.example.outsourcing.domain.store.dto.response.StoreSaveResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreNoticeResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreStatusResponseDto;
-import com.example.outsourcing.domain.store.dto.response.UpdateStoreResponseDto;
+import com.example.outsourcing.domain.store.dto.response.StoreUpdateResponseDto;
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.store.enums.StoreStatus;
 import com.example.outsourcing.domain.store.repository.StoreRepository;
 import com.example.outsourcing.domain.user.entity.User;
+import com.example.outsourcing.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
@@ -40,9 +38,11 @@ public class OwnerStoreService {
 
     private final PasswordEncoder passwordEncoder;
 
+    private final UserService userService;
+
     @Transactional
-    public SaveStoreResponseDto saveStore(AuthUser authUser, StoreSaveRequestDto dto) {
-        CategoryResponse categoryResponse = categoryService.getCategory(dto.getCategoryId());
+    public StoreSaveResponseDto saveStore(AuthUser authUser, StoreSaveRequestDto dto) {
+        CategoryResponse categoryResponse = categoryService.getCategoryById(dto.getCategoryId());
         Image image = imageService.getImageById(dto.getImageId());
         User user = User.fromAuthUser(authUser);
         Point point = kaKaoMapApiService.getPoint(dto.getAddress());
@@ -66,17 +66,17 @@ public class OwnerStoreService {
                 .location(point)
                 .build();
         storeRepository.save(store);
-        return SaveStoreResponseDto.of(store);
+        return StoreSaveResponseDto.of(store);
     }
 
     @Transactional
-    public UpdateStoreResponseDto updateStore(Long storeId, AuthUser authUser, StoreUpdateRequestDto requestDto) {
+    public StoreUpdateResponseDto updateStore(Long storeId, AuthUser authUser, StoreUpdateRequestDto requestDto) {
         Store store = storeRepository.findById(storeId).orElseThrow(NotFoundStoreException::new);
         User user = User.fromAuthUser(authUser);
 
         // 현재 사용자와 가게 주인과 비교
-         if (!store.getUser().getId().equals(user.getId())) {
-              throw new UnauthorizedStoreOwnerException();
+        if (!store.getUser().getId().equals(user.getId())) {
+            throw new UnauthorizedStoreOwnerException();
         }
 
         if (requestDto.getImageId() != null) {
@@ -84,7 +84,7 @@ public class OwnerStoreService {
             store.updateImage(newImage);
         }
         if (requestDto.getCategoryId() != null) {
-            CategoryResponse categoryResponse = categoryService.getCategory(requestDto.getCategoryId());
+            CategoryResponse categoryResponse = categoryService.getCategoryById(requestDto.getCategoryId());
             store.updateCategory(new Category(categoryResponse));
         }
         if (requestDto.getStoreName() != null && !requestDto.getStoreName().isBlank()) {
@@ -100,7 +100,7 @@ public class OwnerStoreService {
             store.updateCloseTime(requestDto.getCloseTime());
         }
 
-        return UpdateStoreResponseDto.of(store);
+        return StoreUpdateResponseDto.of(store);
     }
 
     @Transactional
@@ -109,9 +109,9 @@ public class OwnerStoreService {
         User user = User.fromAuthUser(authUser);
 
         // 현재 사용자와 가게 주인과 비교
-         if (!store.getUser().getId().equals(user.getId())) {
-         throw new UnauthorizedStoreOwnerException();
-         }
+        if (!store.getUser().getId().equals(user.getId())) {
+            throw new UnauthorizedStoreOwnerException();
+        }
 
         // 현재 상태와 같으면 예외처리
         if (store.getStoreStatus().equals(requestDto.getStoreStatus())) {
@@ -129,7 +129,7 @@ public class OwnerStoreService {
     }
 
     @Transactional
-    public StoreNoticeResponseDto updateStoreNotice(AuthUser authUser, Long storeId, StoreNoticeResponseDto requestDto) {
+    public StoreNoticeResponseDto updateStoreNotice(AuthUser authUser, Long storeId, StoreNoticeUpdateRequestDto requestDto) {
         Store store = storeRepository.findById(storeId).orElseThrow(NotFoundStoreException::new);
         User user = User.fromAuthUser(authUser);
 
@@ -143,17 +143,12 @@ public class OwnerStoreService {
     }
 
     @Transactional
-    public void deleteStore(AuthUser authUser, Long storeId, StoreDeleteRequestDto requestDto) {
+    public void deleteStore(AuthUser authUser, Long storeId) {
         Store store = storeRepository.findById(storeId).orElseThrow(NotFoundStoreException::new);
         User user = User.fromAuthUser(authUser);
-
         // 현재 사용자와 가게 주인과 비교
         if (!store.getUser().getId().equals(user.getId())) {
             throw new UnauthorizedStoreOwnerException();
-        }
-        // 현재 사용자 비번 확인
-        if (!passwordEncoder.matches(requestDto.getPassword(), user.getPassword())) {
-            throw new ApplicationException(ErrorCode.MISS_MATCH_PASSWORD);
         }
         store.shutDownStore();
     }

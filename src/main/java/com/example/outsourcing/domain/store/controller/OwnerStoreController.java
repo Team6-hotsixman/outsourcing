@@ -3,14 +3,11 @@ package com.example.outsourcing.domain.store.controller;
 import com.example.outsourcing.domain.common.annotation.Auth;
 import com.example.outsourcing.domain.common.annotation.Owner;
 import com.example.outsourcing.domain.common.dto.AuthUser;
-import com.example.outsourcing.domain.store.dto.request.StoreDeleteRequestDto;
-import com.example.outsourcing.domain.store.dto.request.StoreSaveRequestDto;
-import com.example.outsourcing.domain.store.dto.request.StoreStatusUpdateRequestDto;
-import com.example.outsourcing.domain.store.dto.request.StoreUpdateRequestDto;
-import com.example.outsourcing.domain.store.dto.response.SaveStoreResponseDto;
+import com.example.outsourcing.domain.store.dto.request.*;
+import com.example.outsourcing.domain.store.dto.response.StoreSaveResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreNoticeResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreStatusResponseDto;
-import com.example.outsourcing.domain.store.dto.response.UpdateStoreResponseDto;
+import com.example.outsourcing.domain.store.dto.response.StoreUpdateResponseDto;
 import com.example.outsourcing.domain.store.service.OwnerStoreService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +23,7 @@ public class OwnerStoreController {
     private final OwnerStoreService ownerStoreService;
 
     @PostMapping
-    public ResponseEntity<SaveStoreResponseDto> saveStore(
+    public ResponseEntity<StoreSaveResponseDto> saveStore(
             @Auth AuthUser authUser,
             @RequestBody @Valid StoreSaveRequestDto requestDto
     ) {
@@ -34,7 +31,7 @@ public class OwnerStoreController {
     }
 
     @PatchMapping("/{storeId}")
-    public ResponseEntity<UpdateStoreResponseDto> updateStore(
+    public ResponseEntity<StoreUpdateResponseDto> updateStore(
             @Auth AuthUser authUser,
             @PathVariable Long storeId,
             @RequestBody @Valid StoreUpdateRequestDto requestDto)
@@ -55,7 +52,7 @@ public class OwnerStoreController {
     public ResponseEntity<StoreNoticeResponseDto> updateStoreStatus(
             @Auth AuthUser authUser,
             @PathVariable Long storeId,
-            @RequestBody @Valid StoreNoticeResponseDto requestDto
+            @RequestBody @Valid StoreNoticeUpdateRequestDto requestDto
     ) {
         return ResponseEntity.ok(ownerStoreService.updateStoreNotice(authUser, storeId, requestDto));
     }
@@ -63,10 +60,9 @@ public class OwnerStoreController {
     @DeleteMapping("/{storeId}")
     public ResponseEntity<Void> deleteStore(
             @Auth AuthUser authUser,
-            @PathVariable Long storeId,
-            @RequestBody @Valid StoreDeleteRequestDto requestDto
+            @PathVariable Long storeId
     ) {
-        ownerStoreService.deleteStore(authUser, storeId, requestDto);
+        ownerStoreService.deleteStore(authUser, storeId);
         return ResponseEntity.ok().build();
     }
 }
