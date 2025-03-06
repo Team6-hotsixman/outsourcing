@@ -64,7 +64,7 @@ class OwnerStoreServiceTest {
     public void store_등록_성공() {
         // given
         CategoryResponse categoryResponse = new CategoryResponse(1L, "PIZZA");
-        Image image = new Image(1L, "qwer1234");
+        Image image = new Image(1L, "image1","qwer1234");
         AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
         GeometryFactory factory = new GeometryFactory();
         Point point = factory.createPoint(new Coordinate(37.5665, 126.9780));
@@ -127,7 +127,7 @@ class OwnerStoreServiceTest {
     public void 사용자가_가게_개수_제한_3개_초과_시_예외_발생() {
         // given
         CategoryResponse categoryResponse = new CategoryResponse(1L, "PIZZA");
-        Image image = new Image(1L, "qwer1234");
+        Image image = new Image(1L, "image1","qwer1234");
         AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
         GeometryFactory factory = new GeometryFactory();
         Point point = factory.createPoint(new Coordinate(37.5665, 126.9780));
@@ -162,7 +162,7 @@ class OwnerStoreServiceTest {
         Long storeId = 1L;
         AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
         User user = User.fromAuthUser(authUser);
-        Image image = new Image("qwer1234");
+        Image image = new Image(1L, "image1","qwer1234");
         ReflectionTestUtils.setField(image, "id", 1L);
         Category category = Category.builder().categoryName("PIZZA").build();
         ReflectionTestUtils.setField(category, "id", 1L);
@@ -237,7 +237,7 @@ class OwnerStoreServiceTest {
         // given
         Long storeId = 1L;
         AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
-        Image image = new Image("qwer1234");
+        Image image = new Image(1L, "image1","qwer1234");
         ReflectionTestUtils.setField(image, "id", 1L);
         Category category = Category.builder().categoryName("PIZZA").build();
         ReflectionTestUtils.setField(category, "id", 1L);
@@ -307,7 +307,7 @@ class OwnerStoreServiceTest {
         // given
         Long storeId = 1L;
         AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
-        Image image = new Image("qwer1234");
+        Image image = new Image(1L, "image1","qwer1234");
         ReflectionTestUtils.setField(image, "id", 1L);
         Category category = Category.builder().categoryName("PIZZA").build();
         ReflectionTestUtils.setField(category, "id", 1L);
@@ -355,7 +355,7 @@ class OwnerStoreServiceTest {
         Long storeId = 1L;
         AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
         User user = User.fromAuthUser(authUser);
-        Image image = new Image("qwer1234");
+        Image image = new Image(1L, "image1","qwer1234");
         ReflectionTestUtils.setField(image, "id", 1L);
         Category category = Category.builder().categoryName("PIZZA").build();
         ReflectionTestUtils.setField(category, "id", 1L);
@@ -392,7 +392,7 @@ class OwnerStoreServiceTest {
         Long storeId = 1L;
         AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
         User user = User.fromAuthUser(authUser);
-        Image image = new Image("qwer1234");
+        Image image = new Image(1L, "image1","qwer1234");
         ReflectionTestUtils.setField(image, "id", 1L);
         Category category = Category.builder().categoryName("PIZZA").build();
         ReflectionTestUtils.setField(category, "id", 1L);
@@ -431,7 +431,7 @@ class OwnerStoreServiceTest {
         Long storeId = 1L;
         AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
         User user = User.fromAuthUser(authUser);
-        Image image = new Image("qwer1234");
+        Image image = new Image(1L, "image1","qwer1234");
         ReflectionTestUtils.setField(image, "id", 1L);
         Category category = Category.builder().categoryName("PIZZA").build();
         ReflectionTestUtils.setField(category, "id", 1L);
@@ -470,7 +470,7 @@ class OwnerStoreServiceTest {
         Long storeId = 1L;
         AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
         User user = User.fromAuthUser(authUser);
-        Image image = new Image("qwer1234");
+        Image image = new Image(1L, "image1","qwer1234");
         ReflectionTestUtils.setField(image, "id", 1L);
         Category category = Category.builder().categoryName("PIZZA").build();
         ReflectionTestUtils.setField(category, "id", 1L);
@@ -524,7 +524,7 @@ class OwnerStoreServiceTest {
         // given
         Long storeId = 1L;
         AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
-        Image image = new Image("qwer1234");
+        Image image = new Image(1L, "image1","qwer1234");
         ReflectionTestUtils.setField(image, "id", 1L);
         Category category = Category.builder().categoryName("PIZZA").build();
         ReflectionTestUtils.setField(category, "id", 1L);
@@ -573,7 +573,7 @@ class OwnerStoreServiceTest {
         AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
         User user = User.fromAuthUser(authUser);
         ReflectionTestUtils.setField(user, "password", "password");
-        Image image = new Image("qwer1234");
+        Image image = new Image(1L, "image1","qwer1234");
         ReflectionTestUtils.setField(image, "id", 1L);
         Category category = Category.builder().categoryName("PIZZA").build();
         ReflectionTestUtils.setField(category, "id", 1L);
@@ -622,7 +622,7 @@ class OwnerStoreServiceTest {
         // given
         Long storeId = 1L;
         AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
-        Image image = new Image("qwer1234");
+        Image image = new Image(1L, "image1","qwer1234");
         ReflectionTestUtils.setField(image, "id", 1L);
         Category category = Category.builder().categoryName("PIZZA").build();
         ReflectionTestUtils.setField(category, "id", 1L);
