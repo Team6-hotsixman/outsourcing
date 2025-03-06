@@ -1,25 +1,29 @@
 package com.example.outsourcing.domain.store.service;
 
 
-import com.example.outsourcing.domain.auth.config.PasswordEncoder;
 import com.example.outsourcing.domain.category.dto.response.CategoryResponse;
 import com.example.outsourcing.domain.category.entity.Category;
 import com.example.outsourcing.domain.category.service.CategoryService;
 import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.common.entity.Image;
-import com.example.outsourcing.domain.common.exception.*;
+import com.example.outsourcing.domain.common.exception.NotFoundStoreException;
+import com.example.outsourcing.domain.common.exception.StoreLimitExceededException;
+import com.example.outsourcing.domain.common.exception.StoreStatusAlreadySameException;
+import com.example.outsourcing.domain.common.exception.UnauthorizedStoreOwnerException;
 import com.example.outsourcing.domain.common.service.ImageService;
 import com.example.outsourcing.domain.common.service.KaKaoMapApiService;
-import com.example.outsourcing.domain.store.dto.request.*;
-import com.example.outsourcing.domain.store.dto.response.StoreSaveResponseDto;
+import com.example.outsourcing.domain.store.dto.request.StoreNoticeUpdateRequestDto;
+import com.example.outsourcing.domain.store.dto.request.StoreSaveRequestDto;
+import com.example.outsourcing.domain.store.dto.request.StoreStatusUpdateRequestDto;
+import com.example.outsourcing.domain.store.dto.request.StoreUpdateRequestDto;
 import com.example.outsourcing.domain.store.dto.response.StoreNoticeResponseDto;
+import com.example.outsourcing.domain.store.dto.response.StoreSaveResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreStatusResponseDto;
 import com.example.outsourcing.domain.store.dto.response.StoreUpdateResponseDto;
 import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.store.enums.StoreStatus;
 import com.example.outsourcing.domain.store.repository.StoreRepository;
 import com.example.outsourcing.domain.user.entity.User;
-import com.example.outsourcing.domain.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.locationtech.jts.geom.Point;
 import org.springframework.stereotype.Service;
@@ -36,10 +40,6 @@ public class OwnerStoreService {
     private final KaKaoMapApiService kaKaoMapApiService;
 
     private final ImageService imageService;
-
-    private final PasswordEncoder passwordEncoder;
-
-    private final UserService userService;
 
     @Transactional
     public StoreSaveResponseDto saveStore(AuthUser authUser, StoreSaveRequestDto dto, MultipartFile file) {

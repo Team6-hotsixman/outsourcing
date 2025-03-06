@@ -22,6 +22,7 @@ import com.example.outsourcing.domain.store.repository.StoreRepository;
 import com.example.outsourcing.domain.user.entity.User;
 import com.example.outsourcing.domain.user.enums.UserRole;
 import com.example.outsourcing.domain.user.enums.UserStatus;
+import org.geolatte.geom.M;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.locationtech.jts.geom.Coordinate;
@@ -41,9 +42,9 @@ import java.time.LocalTime;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -73,7 +74,6 @@ class OwnerStoreServiceTest {
         GeometryFactory factory = new GeometryFactory();
         Point point = factory.createPoint(new Coordinate(37.5665, 126.9780));
         StoreSaveRequestDto request =  StoreSaveRequestDto.builder()
-                .imageId(1L)
                 .categoryId(1L)
                 .storeName("중국집")
                 .storeStatus(StoreStatus.OPEN)
@@ -83,50 +83,10 @@ class OwnerStoreServiceTest {
                 .openTime(LocalTime.of(12,0,0))
                 .closeTime(LocalTime.of(23,0,0))
                 .build();
-        MultipartFile file = new MultipartFile() {
-            @Override
-            public String getName() {
-                return null;
-            }
-
-            @Override
-            public String getOriginalFilename() {
-                return null;
-            }
-
-            @Override
-            public String getContentType() {
-                return null;
-            }
-
-            @Override
-            public boolean isEmpty() {
-                return false;
-            }
-
-            @Override
-            public long getSize() {
-                return 0;
-            }
-
-            @Override
-            public byte[] getBytes() throws IOException {
-                return new byte[0];
-            }
-
-            @Override
-            public InputStream getInputStream() throws IOException {
-                return null;
-            }
-
-            @Override
-            public void transferTo(File dest) throws IOException, IllegalStateException {
-
-            }
-        };
+        MultipartFile file = mock(MultipartFile.class);
 
         given(categoryService.getCategoryById(anyLong())).willReturn(categoryResponse);
-        given(imageService.getImageById(anyLong())).willReturn(image);
+        given(imageService.uploadFile(any())).willReturn(image);
         given(kaKaoMapApiService.getPoint(anyString())).willReturn(point);
 
         // when
@@ -138,32 +98,83 @@ class OwnerStoreServiceTest {
 
     @Test
     public void 존재하지_않는_카테고리_ID일_경우_예외_발생() {
-        // given
-        Long categoryId = 1L;
-        given(categoryService.getCategoryById(anyLong())).willThrow(new ApplicationException(ErrorCode.NOT_FOUND_CATEGORY));
+            // given
+            AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
+            StoreSaveRequestDto request =  StoreSaveRequestDto.builder()
+                    .categoryId(1L)
+                    .storeName("중국집")
+                    .storeStatus(StoreStatus.OPEN)
+                    .storeNotice("맛집임")
+                    .address("서울시 도봉구")
+                    .minOrderPrice(10000)
+                    .openTime(LocalTime.of(12,0,0))
+                    .closeTime(LocalTime.of(23,0,0))
+                    .build();
+        MultipartFile file = mock(MultipartFile.class);
+
+            given(categoryService.getCategoryById(anyLong())).willThrow(new ApplicationException(ErrorCode.NOT_FOUND_CATEGORY));
 
         // when & then
         ApplicationException exception = assertThrows(ApplicationException.class, () -> {
-            categoryService.getCategoryById(categoryId);
+            ownerStoreService.saveStore(authUser, request, file);
         });
         assertEquals(ErrorCode.NOT_FOUND_CATEGORY, exception.getErrorCode());
     }
 
     @Test
     public void 이미지_저장_실패로_인한_예외_발생() {
+        // given
+        CategoryResponse categoryResponse = new CategoryResponse(1L, "PIZZA");
+        AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
+        StoreSaveRequestDto request =  StoreSaveRequestDto.builder()
+                .categoryId(1L)
+                .storeName("중국집")
+                .storeStatus(StoreStatus.OPEN)
+                .storeNotice("맛집임")
+                .address("서울시 도봉구")
+                .minOrderPrice(10000)
+                .openTime(LocalTime.of(12,0,0))
+                .closeTime(LocalTime.of(23,0,0))
+                .build();
+        MultipartFile file = mock(MultipartFile.class);
 
+        given(categoryService.getCategoryById(anyLong())).willReturn(categoryResponse);
+        given(imageService.uploadFile(any())).willThrow(new RuntimeException("파일 업로드 실패"));
+
+
+        // when & then
+        RuntimeException exception = assertThrows(RuntimeException.class, () -> {
+            ownerStoreService.saveStore(authUser, request, file);
+        });
+        assertEquals("파일 업로드 실패", exception.getMessage());
     }
+
 
     @Test
     public void 주소로_좌표_변환_실패_시_예외_발생 () {
         // given
-        String address = "address";
+        CategoryResponse categoryResponse = new CategoryResponse(1L, "PIZZA");
+        Image image = new Image(1L, "image1","qwer1234");
+        AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
+        StoreSaveRequestDto request =  StoreSaveRequestDto.builder()
+                .categoryId(1L)
+                .storeName("중국집")
+                .storeStatus(StoreStatus.OPEN)
+                .storeNotice("맛집임")
+                .address("서울시 도봉구")
+                .minOrderPrice(10000)
+                .openTime(LocalTime.of(12,0,0))
+                .closeTime(LocalTime.of(23,0,0))
+                .build();
+        MultipartFile file = mock(MultipartFile.class);
 
+        given(categoryService.getCategoryById(anyLong())).willReturn(categoryResponse);
+        given(imageService.uploadFile(any())).willReturn(image);
         given(kaKaoMapApiService.getPoint(anyString())).willThrow(new ApplicationException(ErrorCode.INVALID_ADDRESS));
 
         // when & then
         ApplicationException exception = assertThrows(ApplicationException.class, () -> {
-            kaKaoMapApiService.getPoint(address);
+            ownerStoreService.saveStore(authUser, request, file);
         });
         assertEquals(ErrorCode.INVALID_ADDRESS, exception.getErrorCode());
     }
@@ -177,7 +188,6 @@ class OwnerStoreServiceTest {
         GeometryFactory factory = new GeometryFactory();
         Point point = factory.createPoint(new Coordinate(37.5665, 126.9780));
         StoreSaveRequestDto request = StoreSaveRequestDto.builder()
-                .imageId(1L)
                 .categoryId(1L)
                 .storeName("중국집")
                 .storeStatus(StoreStatus.OPEN)
@@ -187,49 +197,10 @@ class OwnerStoreServiceTest {
                 .openTime(LocalTime.of(12,0,0))
                 .closeTime(LocalTime.of(23,0,0))
                 .build();
-        MultipartFile file = new MultipartFile() {
-            @Override
-            public String getName() {
-                return null;
-            }
+        MultipartFile file = mock(MultipartFile.class);
 
-            @Override
-            public String getOriginalFilename() {
-                return null;
-            }
-
-            @Override
-            public String getContentType() {
-                return null;
-            }
-
-            @Override
-            public boolean isEmpty() {
-                return false;
-            }
-
-            @Override
-            public long getSize() {
-                return 0;
-            }
-
-            @Override
-            public byte[] getBytes() throws IOException {
-                return new byte[0];
-            }
-
-            @Override
-            public InputStream getInputStream() throws IOException {
-                return null;
-            }
-
-            @Override
-            public void transferTo(File dest) throws IOException, IllegalStateException {
-
-            }
-        };
         given(categoryService.getCategoryById(anyLong())).willReturn(categoryResponse);
-        given(imageService.getImageById(anyLong())).willReturn(image);
+        given(imageService.uploadFile(any())).willReturn(image);
         given(kaKaoMapApiService.getPoint(anyString())).willReturn(point);
         given(storeRepository.countStoresByUserId(anyLong())).willReturn(3L);
 
@@ -269,7 +240,6 @@ class OwnerStoreServiceTest {
                 .build();
 
         StoreUpdateRequestDto request = StoreUpdateRequestDto.builder()
-                .imageId(1L)
                 .categoryId(1L)
                 .storeName("중국집")
                 .minOrderPrice(10000)
@@ -277,16 +247,18 @@ class OwnerStoreServiceTest {
                 .closeTime(LocalTime.of(23, 0, 0))
                 .build();
 
+        MultipartFile file = mock(MultipartFile.class);
+
         given(storeRepository.findById(anyLong())).willReturn(Optional.of(store));
-        given(imageService.getImageById(anyLong())).willReturn(image);
+        given(imageService.uploadFile(any())).willReturn(image);
         given(categoryService.getCategoryById(anyLong())).willReturn(categoryResponse);
 
         // when
-        StoreUpdateResponseDto result = ownerStoreService.updateStore(storeId, authUser, request);
+        StoreUpdateResponseDto result = ownerStoreService.updateStore(storeId, authUser, request, file);
 
         // then
         assertNotNull(result);
-        assertEquals(result.getImageId(), 1L);
+        assertEquals(result.getImagePath(), "qwer1234");
         assertEquals(result.getCategoryName(), "PIZZA");
         assertEquals(result.getStoreName(), "중국집");
         assertEquals(result.getMinOrderPrice(), 10000);
@@ -300,7 +272,6 @@ class OwnerStoreServiceTest {
         Long storeId = 1L;
         AuthUser authUser = new AuthUser(1L, "email", UserRole.USER);
         StoreUpdateRequestDto request = StoreUpdateRequestDto.builder()
-                .imageId(1L)
                 .categoryId(1L)
                 .storeName("중국집")
                 .minOrderPrice(10000)
@@ -308,12 +279,13 @@ class OwnerStoreServiceTest {
                 .closeTime(LocalTime.of(23, 0, 0))
                 .build();
 
+        MultipartFile file = mock(MultipartFile.class);
         given(storeRepository.findById(anyLong())).willReturn(Optional.empty());
 
 
         // when & then
         NotFoundStoreException exception = assertThrows(NotFoundStoreException.class, () ->
-            ownerStoreService.updateStore(storeId, authUser, request));
+            ownerStoreService.updateStore(storeId, authUser, request, file));
         assertEquals(ErrorCode.NOT_FOUND_STORE, exception.getErrorCode());
     }
 
@@ -354,20 +326,19 @@ class OwnerStoreServiceTest {
                 .build();
 
         StoreUpdateRequestDto request = StoreUpdateRequestDto.builder()
-                .imageId(1L)
                 .categoryId(1L)
                 .storeName("중국집")
                 .minOrderPrice(10000)
                 .openTime(LocalTime.of(12, 0, 0))
                 .closeTime(LocalTime.of(23, 0, 0))
                 .build();
-
+        MultipartFile file = mock(MultipartFile.class);
         given(storeRepository.findById(anyLong())).willReturn(Optional.of(store));
 
 
         // when & then
         UnauthorizedStoreOwnerException exception = assertThrows(UnauthorizedStoreOwnerException.class, () ->
-                ownerStoreService.updateStore(storeId, authUser, request));
+                ownerStoreService.updateStore(storeId, authUser, request, file));
         assertEquals(ErrorCode.UNAUTHORIZED_STORE_OWNER, exception.getErrorCode());
     }
 
