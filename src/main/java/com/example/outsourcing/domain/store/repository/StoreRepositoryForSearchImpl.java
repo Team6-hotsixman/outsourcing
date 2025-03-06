@@ -2,7 +2,6 @@ package com.example.outsourcing.domain.store.repository;
 
 import com.example.outsourcing.domain.order.enums.OrderStatus;
 import com.example.outsourcing.domain.store.dto.response.StoreResponseDto;
-import com.example.outsourcing.domain.store.dto.response.StoreResponseForNativeQuery;
 import com.example.outsourcing.domain.store.enums.OrderBy;
 import com.example.outsourcing.domain.store.enums.StoreStatus;
 import jakarta.persistence.EntityManager;
@@ -116,7 +115,7 @@ public class StoreRepositoryForSearchImpl implements StoreRepositoryForSearch{
                 + "FROM Store s "
                 + "JOIN FETCH s.category "
                 + "LEFT JOIN Orders o ON o.store = s "
-                + "LEFT JOIN Review r ON r.order = o "
+                + "LEFT JOIN Review r ON r.store = s "
                 + "LEFT JOIN Menu m ON m.store = s "
                 + "WHERE 1 = 1 ";
         base += "AND o.orderStatus = :orderStatus ";
@@ -156,7 +155,7 @@ public class StoreRepositoryForSearchImpl implements StoreRepositoryForSearch{
                 + "JOIN FETCH s.category "
                 + "LEFT JOIN Orders o ON o.store = s "
                 + "      AND o.orderStatus = :orderStatus "
-                + "LEFT JOIN Review r ON r.order = o "
+                + "LEFT JOIN Review r ON r.store = s "
                 + "WHERE 1 = 1 ";
         base += "AND o.orderStatus = :orderStatus ";
         base += "AND s.storeStatus = :storeStatus ";

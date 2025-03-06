@@ -80,7 +80,7 @@ class OwnerStoreServiceTest {
                 .closeTime(LocalTime.of(23,0,0))
                 .build();
 
-        given(categoryService.getCategoryById(anyLong())).willReturn(categoryResponse);
+        given(categoryService.getCategory(anyLong())).willReturn(categoryResponse);
         given(imageService.getImageById(anyLong())).willReturn(image);
         given(kaKaoMapApiService.getPoint(anyString())).willReturn(point);
 
@@ -95,11 +95,11 @@ class OwnerStoreServiceTest {
     public void 존재하지_않는_카테고리_ID일_경우_예외_발생() {
         // given
         Long categoryId = 1L;
-        given(categoryService.getCategoryById(anyLong())).willThrow(new ApplicationException(ErrorCode.NOT_FOUND_CATEGORY));
+        given(categoryService.getCategory(anyLong())).willThrow(new ApplicationException(ErrorCode.NOT_FOUND_CATEGORY));
 
         // when & then
         ApplicationException exception = assertThrows(ApplicationException.class, () -> {
-            categoryService.getCategoryById(categoryId);
+            categoryService.getCategory(categoryId);
         });
         assertEquals(ErrorCode.NOT_FOUND_CATEGORY, exception.getErrorCode());
     }
@@ -143,7 +143,7 @@ class OwnerStoreServiceTest {
                 .closeTime(LocalTime.of(23,0,0))
                 .build();
 
-        given(categoryService.getCategoryById(anyLong())).willReturn(categoryResponse);
+        given(categoryService.getCategory(anyLong())).willReturn(categoryResponse);
         given(imageService.getImageById(anyLong())).willReturn(image);
         given(kaKaoMapApiService.getPoint(anyString())).willReturn(point);
         given(storeRepository.countStoresByUserId(anyLong())).willReturn(3L);
@@ -194,7 +194,7 @@ class OwnerStoreServiceTest {
 
         given(storeRepository.findById(anyLong())).willReturn(Optional.of(store));
         given(imageService.getImageById(anyLong())).willReturn(image);
-        given(categoryService.getCategoryById(anyLong())).willReturn(categoryResponse);
+        given(categoryService.getCategory(anyLong())).willReturn(categoryResponse);
 
         // when
         StoreUpdateResponseDto result = ownerStoreService.updateStore(storeId, authUser, request);

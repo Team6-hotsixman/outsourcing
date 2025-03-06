@@ -27,4 +27,8 @@ public class ReviewImage extends BaseEntity {
         this.image = image;
     }
 
+    public void delete(){
+        this.review.getImages().remove(this);
+    }
+
 }

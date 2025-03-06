@@ -6,7 +6,6 @@ import com.example.outsourcing.domain.category.dto.response.CategoryResponse;
 import com.example.outsourcing.domain.category.service.AdminCategoryService;
 import com.example.outsourcing.domain.common.annotation.Admin;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -18,8 +17,8 @@ public class AdminCategoryController {
     private final AdminCategoryService adminCategoryService;
 
     @PostMapping
-    public ResponseEntity<CategoryResponse> addCategory(@RequestBody CreateCategoryRequest createCategoryRequest) {
-        CategoryResponse categoryResponse = adminCategoryService.addCategory(createCategoryRequest);
+    public ResponseEntity<CategoryResponse> saveCategory(@RequestBody CreateCategoryRequest createCategoryRequest) {
+        CategoryResponse categoryResponse = adminCategoryService.saveCategory(createCategoryRequest);
 
         return ResponseEntity.ok(categoryResponse);
     }
