@@ -30,7 +30,7 @@ public class ImageService {
     private String bucketName;
 
     //S3에 파일 업로드
-    public Long uploadFile(MultipartFile file) {
+    public Image uploadFile(MultipartFile file) {
 
         Image image = new Image();
         image = imageRepository.save(image);
@@ -51,7 +51,7 @@ public class ImageService {
             image.setImagePath(imagePath);
             imageRepository.save(image);
 
-            return image.getId();
+            return image;
         } catch (IOException e) {
             throw new RuntimeException("파일 업로드 실패", e);
         }
