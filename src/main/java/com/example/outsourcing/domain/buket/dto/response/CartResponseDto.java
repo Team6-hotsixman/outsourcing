@@ -1,5 +1,6 @@
 package com.example.outsourcing.domain.buket.dto.response;
 
+import com.example.outsourcing.domain.order.dto.request.OrderItemOptionRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import java.util.List;
 public class CartResponseDto {
     private long menuId;
     private String menuName;
-    private List<Long> options;
+    private List<OrderItemOptionRequestDto> options;
     private int quantity;
 
     public static CartResponseDto fromEntry(Object key, Object value) {
@@ -21,12 +22,17 @@ public class CartResponseDto {
         long menuId = Long.parseLong(parts[0]);
         String menuName = parts[1];
 
-        List<Long> options = List.of();
+        List<OrderItemOptionRequestDto> options = List.of();
         if (parts.length > 2) {
             String optionString = parts[2].replaceAll("[\\[\\]]", "");
             if (!optionString.isEmpty()) {
                 options = List.of(optionString.split(",")).stream()
-                        .map(Long::parseLong)
+                        .map(v -> {
+                            String[] split = v.split("/");
+                            Long optionId = Long.parseLong(split[0]);
+                            int q = Integer.parseInt(split[1]);
+                            return new OrderItemOptionRequestDto(optionId, q);
+                        })
                         .toList();
             }
         }
