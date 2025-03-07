@@ -44,7 +44,7 @@ public interface StoreRepository extends JpaRepository<Store, Long>, StoreReposi
             "               and s.store_status = :storeStatus  " +
             "               and s.store_name like concat(:keyword, '%')   " +
             "               and st_contains(st_buffer(:location, 4000), s.location)  " +
-            "             group by s.id  " +
+            "             group by id, address, category_id, category_name, close_time, created_at , image_id, min_order_price, modified_at, open_time, store_name, store_notice, store_status, user_id , distance, rate " +
             "              " +
             "             union all " +
             "              " +
@@ -75,9 +75,11 @@ public interface StoreRepository extends JpaRepository<Store, Long>, StoreReposi
             "               and s.store_status = :storeStatus  " +
             "               and exists( select 1 from menu where store_id = s.id and menu_name like concat(:keyword, '%')) " +
             "               and st_contains(st_buffer(:location, 4000), s.location)  " +
-            "             group by s.id  " +
+            "             group by id, address, category_id, category_name, close_time, created_at , image_id, min_order_price, modified_at, open_time, store_name, store_notice, store_status, user_id , distance, rate " +
             "     ) total " +
-            "group by total.id " +
+            "group by total.id, total.address, total.category_id, total.category_name, total.close_time, " +
+            "         total.created_at, total.image_id, total.min_order_price, total.modified_at, total.open_time, " +
+            "         total.store_name, total.store_notice, total.store_status, total.user_id , total.distance , total.rate " +
             "order by total.distance " +
             "limit :offset, :limit ",
     nativeQuery = true)
@@ -112,7 +114,7 @@ public interface StoreRepository extends JpaRepository<Store, Long>, StoreReposi
             "               and s.store_status = :storeStatus  " +
             "               and s.store_name like concat(:keyword, '%')   " +
             "               and st_contains(st_buffer(:location, 4000), s.location)  " +
-            "             group by s.id  " +
+            "             group by id, address, category_id, category_name, close_time, created_at , image_id, min_order_price, modified_at, open_time, store_name, store_notice, store_status, user_id , distance, rate " +
             "              " +
             "             union all " +
             "              " +
@@ -143,9 +145,11 @@ public interface StoreRepository extends JpaRepository<Store, Long>, StoreReposi
             "               and s.store_status = :storeStatus  " +
             "               and exists( select 1 from menu where store_id = s.id and menu_name like concat(:keyword, '%')) " +
             "               and st_contains(st_buffer(:location, 4000), s.location)  " +
-            "             group by s.id  " +
+            "             group by id, address, category_id, category_name, close_time, created_at , image_id, min_order_price, modified_at, open_time, store_name, store_notice, store_status, user_id , distance, rate " +
             "     ) total " +
-            "group by total.id " +
+            "group by total.id, total.address, total.category_id, total.category_name, total.close_time, " +
+            "         total.created_at, total.image_id, total.min_order_price, total.modified_at, total.open_time, " +
+            "         total.store_name, total.store_notice, total.store_status, total.user_id , total.distance , total.rate " +
             "order by total.rate desc " +
             "limit :offset, :limit ",
             nativeQuery = true)
