@@ -1,8 +1,13 @@
 package com.example.outsourcing.domain.order.controller;
 
+import com.example.outsourcing.domain.buket.dto.response.CartResponseDto;
+import com.example.outsourcing.domain.buket.service.CartService;
 import com.example.outsourcing.domain.common.annotation.Auth;
 import com.example.outsourcing.domain.common.annotation.Owner;
 import com.example.outsourcing.domain.common.dto.AuthUser;
+import com.example.outsourcing.domain.common.exception.ApplicationException;
+import com.example.outsourcing.domain.common.exception.ErrorCode;
+import com.example.outsourcing.domain.order.dto.request.OrderItemRequestDto;
 import com.example.outsourcing.domain.order.dto.request.OrderRequestDto;
 import com.example.outsourcing.domain.order.dto.response.OrderSimpleResponseDto;
 import com.example.outsourcing.domain.order.dto.response.OrderResponseDto;
@@ -22,32 +27,41 @@ import java.util.List;
 public class OrderController {
 
     private final OrderService orderService;
+    private final CartService cartService;
 
     @PostMapping("/orders")
     public ResponseEntity<OrderSimpleResponseDto> placeOrder(
-            HttpServletRequest httpServletRequest,
+            @Auth AuthUser authUser,
             @RequestParam Long storeId,
             @Validated @RequestBody OrderRequestDto requestDto
             ) {
-        Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userId")));
-        return new ResponseEntity<>(orderService.placeOrder(userId, storeId, requestDto), HttpStatus.CREATED);
+
+        if(requestDto.getOrderItems() == null || requestDto.getOrderItems().isEmpty()) {
+            List<CartResponseDto> cart = cartService.getCart(authUser.getId());
+            if(cart == null || cart.isEmpty()) {
+                throw new ApplicationException(ErrorCode.EMPTY_CART);
+            }
+            requestDto.setOrderItems(OrderItemRequestDto.fromCart(cartService.getCart(authUser.getId())));
+        }
+
+        return new ResponseEntity<>(orderService.placeOrder(authUser.getId(), storeId, requestDto), HttpStatus.CREATED);
     }
 
     @GetMapping("/orders")
     public List<OrderResponseDto> getOrders(
+            @Auth AuthUser authUser,
             HttpServletRequest httpServletRequest
     ) {
         Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userId")));
-        return orderService.findAll(userId);
+        return orderService.findAll(authUser.getId());
     }
 
     @GetMapping("/orders/{orderId}")
     public OrderResponseDto getOrder(
-            @PathVariable Long orderId,
-            HttpServletRequest httpServletRequest
+            @Auth AuthUser authUser,
+            @PathVariable Long orderId
     ) {
-        Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userId")));
-        return orderService.findOne(orderId, userId);
+        return orderService.findOne(orderId, authUser.getId());
     }
 
     @Owner
@@ -63,11 +77,10 @@ public class OrderController {
 
     @DeleteMapping("/orders")
     public void cancelOrder(
-            HttpServletRequest httpServletRequest,
+            @Auth AuthUser authUser,
             @RequestParam Long storeId,
             @RequestParam Long orderId
     ) {
-        Long userId = Long.parseLong(String.valueOf(httpServletRequest.getAttribute("userId")));
-        orderService.cancelOrder(userId, orderId, storeId);
+        orderService.cancelOrder(authUser.getId(), orderId, storeId);
     }
 }

@@ -1,5 +1,6 @@
 package com.example.outsourcing.domain.order.dto.request;
 
+import com.example.outsourcing.domain.buket.dto.response.CartResponseDto;
 import com.example.outsourcing.domain.menu.entity.Menu;
 import com.example.outsourcing.domain.order.entity.OrderItem;
 import com.example.outsourcing.domain.order.entity.OrderItemOption;
@@ -26,5 +27,11 @@ public class OrderItemRequestDto {
                 .menu(menu)
                 .options(options)
                 .build();
+    }
+
+    public static List<OrderItemRequestDto> fromCart(List<CartResponseDto> cart){
+        return cart.stream()
+                .map(v -> new OrderItemRequestDto(v.getMenuId(), v.getQuantity(), v.getOptions())
+                ).toList();
     }
 }
