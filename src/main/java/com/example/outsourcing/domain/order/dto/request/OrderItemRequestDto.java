@@ -3,6 +3,7 @@ package com.example.outsourcing.domain.order.dto.request;
 import com.example.outsourcing.domain.buket.dto.response.CartResponseDto;
 import com.example.outsourcing.domain.menu.entity.Menu;
 import com.example.outsourcing.domain.order.entity.OrderItem;
+import com.example.outsourcing.domain.order.entity.OrderItemOption;
 import com.example.outsourcing.domain.order.entity.Orders;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -19,11 +20,12 @@ public class OrderItemRequestDto {
     private int quantity;
     private List<OrderItemOptionRequestDto> options;
 
-    public static OrderItem toEntity(int quantity, Orders order, Menu menu) {
+    public static OrderItem toEntity(int quantity, Orders order, Menu menu, List<OrderItemOption> options) {
         return OrderItem.builder()
                 .quantity(quantity)
                 .order(order)
                 .menu(menu)
+                .options(options)
                 .build();
     }
 
