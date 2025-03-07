@@ -18,7 +18,6 @@ import java.time.LocalDateTime;
 @Getter
 @Entity
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-
 public class User extends BaseEntity {
 
     @Id
@@ -36,6 +35,8 @@ public class User extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     private UserRole userRole;
+
+    private Long kakaoId;
 
     private LocalDateTime createdAt;
 

@@ -10,9 +10,11 @@ import com.example.outsourcing.domain.user.entity.User;
 import com.example.outsourcing.domain.user.enums.UserStatus;
 import com.example.outsourcing.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserService {
@@ -30,6 +32,7 @@ public class UserService {
         return new UserResponseDto(user);
     }
 
+    @Transactional
     public UserResponseDto passwordUpdate(Long userId, UserUpdateRequestDto requestDto) {
         User user = userRepository.findByIdOrElseThrow(userId);
 
@@ -46,6 +49,7 @@ public class UserService {
         }
 
         user.passwordUpdate(passwordEncoder.encode(requestDto.getNewPassword()));
+        log.info(passwordEncoder.encode(requestDto.getNewPassword()));
 
         return new UserResponseDto(user);
     }
