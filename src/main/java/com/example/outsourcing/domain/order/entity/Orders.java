@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -35,6 +37,9 @@ public class Orders {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
+    @OneToMany(mappedBy = "order", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<OrderItem> orderItems = new ArrayList<>();
+
     @Builder
     public Orders(
             Integer totalPriceAmount,
@@ -42,7 +47,8 @@ public class Orders {
             LocalDateTime orderAt,
             OrderStatus orderStatus,
             Store store,
-            User user
+            User user,
+            List<OrderItem> orderItems
     ) {
         this.totalPriceAmount = totalPriceAmount;
         this.usedPoint = usedPoint;
@@ -50,9 +56,14 @@ public class Orders {
         this.orderStatus = orderStatus;
         this.store = store;
         this.user = user;
+        this.orderItems = orderItems;
     }
 
     public void updateOrderStatus(OrderStatus orderStatus) {
         this.orderStatus = orderStatus;
+    }
+
+    public void updateOrderItems(List<OrderItem> orderItems) {
+        this.orderItems = orderItems;
     }
 }

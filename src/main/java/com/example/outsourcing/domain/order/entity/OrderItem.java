@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Getter
 @NoArgsConstructor
@@ -23,10 +26,14 @@ public class OrderItem {
     @JoinColumn(name = "menu_id", nullable = false)
     private Menu menu;
 
+    @OneToMany(mappedBy = "orderItem", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<OrderItemOption> options = new ArrayList<>();
+
     @Builder
-    public OrderItem(int quantity, Orders order, Menu menu) {
+    public OrderItem(int quantity, Orders order, Menu menu, List<OrderItemOption> options) {
         this.quantity = quantity;
         this.order = order;
         this.menu = menu;
+        this.options = options;
     }
 }

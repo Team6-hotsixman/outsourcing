@@ -39,7 +39,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -144,16 +146,20 @@ public class OrderService {
                 LocalDateTime.now(),
                 OrderStatus.NEW,
                 store,
-                user
+                user,
+                null
         );
         orderRepository.save(order);
 
         //주문 아이템 생성 및 저장
+        List<OrderItem> orderItems = new ArrayList<>();
+        List<OrderItemOption> options = new ArrayList<>();
         for (OrderItemRequestDto itemRequestDto : requestDto.getOrderItems()) {
             Menu menu = menuRepository.findById(itemRequestDto.getMenuId()).orElseThrow(
                     () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU)
             );
-            OrderItem orderItem = OrderItemRequestDto.toEntity(itemRequestDto.getQuantity(), order, menu);
+            OrderItem orderItem = OrderItemRequestDto.toEntity(itemRequestDto.getQuantity(), order, menu, options);
+            orderItems.add(orderItem);
             orderItemRepository.save(orderItem);
 
             //주문 아이템 옵션 생성 및 저장
@@ -162,10 +168,13 @@ public class OrderService {
                         () -> new ApplicationException(ErrorCode.NOT_FOUND_MENU_OPTION)
                 );
                 OrderItemOption orderItemOption = OrderItemOptionRequestDto.toEntity(optionRequestDto.getQuantity(), orderItem, menuOption);
+                options.add(orderItemOption);
                 orderItemOptionRepository.save(orderItemOption);
             }
         }
+        // 값이 주입된 List<OrderItem> orderItems를 order 필드에 업데이트
 
+        order.updateOrderItems(orderItems);
         return OrderSimpleResponseDto.of(order);
     }
 
