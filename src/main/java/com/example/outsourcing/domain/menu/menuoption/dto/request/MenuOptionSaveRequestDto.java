@@ -24,9 +24,6 @@ public class MenuOptionSaveRequestDto {
     private final String description;
 
     @NotNull
-    private final Long imageId;
-
-    @NotNull
     private final Long menuId;
 
     public static MenuOption toEntity(MenuOptionSaveRequestDto requestDto, Menu menu, Image image) {
