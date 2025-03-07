@@ -13,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -29,13 +31,15 @@ public class StatisticsService {
     public List<StatisticsPriceResponseDto> getTotalPrice(String date) {
         if (date.length() == 7) {
             YearMonth yearMonth = YearMonth.parse(date, DateTimeFormatter.ofPattern("yyyy-MM"));
-            LocalDate startDate = yearMonth.atDay(1);
-            LocalDate endDate = yearMonth.atEndOfMonth();
-            return orderService.getTotalPriceByStoreAndMonth(startDate, endDate);
+            LocalDateTime startDateTime = yearMonth.atDay(1).atStartOfDay();
+            LocalDateTime endDateTime = yearMonth.atEndOfMonth().atTime(LocalTime.MAX);
+            return orderService.getTotalPriceByStore(startDateTime, endDateTime);
         }
         if (date.length() == 10) {
             LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
-            return orderService.getTotalPriceByStoreAndDate(localDate);
+            LocalDateTime startDateTime = localDate.atStartOfDay();
+            LocalDateTime endDateTime = localDate.atTime(LocalTime.MAX);
+            return orderService.getTotalPriceByStore(startDateTime, endDateTime);
         }
 
         throw new ApplicationException(ErrorCode.INVALID_DATE_FORMAT);
@@ -45,17 +49,20 @@ public class StatisticsService {
     public List<StatisticsCountResponseDto> getCountOrders(String date) {
         if (date.length() == 7) {
             YearMonth yearMonth = YearMonth.parse(date, DateTimeFormatter.ofPattern("yyyy-MM"));
-            LocalDate startDate = yearMonth.atDay(1);
-            LocalDate endDate = yearMonth.atEndOfMonth();
-            return orderService.getCountOrdersByStoreAndMonth(startDate, endDate);
+            LocalDateTime startDateTime = yearMonth.atDay(1).atStartOfDay();
+            LocalDateTime endDateTime = yearMonth.atEndOfMonth().atTime(LocalTime.MAX);
+            return orderService.getCountOrdersByStore(startDateTime, endDateTime);
         }
         if (date.length() == 10) {
             LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
-            return orderService.getCountOrdersByStoreAndDate(localDate);
+            LocalDateTime startDateTime = localDate.atStartOfDay();
+            LocalDateTime endDateTime = localDate.atTime(LocalTime.MAX);
+            return orderService.getCountOrdersByStore(startDateTime, endDateTime);
         }
 
         throw new ApplicationException(ErrorCode.INVALID_DATE_FORMAT);
     }
+
 
     @Transactional(readOnly = true)
     public StatisticsCountResponseDto getCountOrdersByStore(String date, Long storeId, AuthUser authUser) {
@@ -65,13 +72,15 @@ public class StatisticsService {
         }
         if (date.length() == 7) {
             YearMonth yearMonth = YearMonth.parse(date, DateTimeFormatter.ofPattern("yyyy-MM"));
-            LocalDate startDate = yearMonth.atDay(1);
-            LocalDate endDate = yearMonth.atEndOfMonth();
-            return orderService.getCountOrdersByMonth(storeId, startDate, endDate);
+            LocalDateTime startDateTime = yearMonth.atDay(1).atStartOfDay();
+            LocalDateTime endDateTime = yearMonth.atEndOfMonth().atTime(LocalTime.MAX);
+            return orderService.getCountOrders(storeId, startDateTime, endDateTime);
         }
         if (date.length() == 10) {
             LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
-            return orderService.getCountOrdersByDay(storeId, localDate);
+            LocalDateTime startDateTime = localDate.atStartOfDay();
+            LocalDateTime endDateTime = localDate.atTime(LocalTime.MAX);
+            return orderService.getCountOrders(storeId, startDateTime, endDateTime);
         }
 
         throw new ApplicationException(ErrorCode.INVALID_DATE_FORMAT);
@@ -86,13 +95,15 @@ public class StatisticsService {
 
         if (date.length() == 7) {
             YearMonth yearMonth = YearMonth.parse(date, DateTimeFormatter.ofPattern("yyyy-MM"));
-            LocalDate startDate = yearMonth.atDay(1);
-            LocalDate endDate = yearMonth.atEndOfMonth();
-            return orderService.getTotalRevenueByMonth(storeId, startDate, endDate);
+            LocalDateTime startDateTime = yearMonth.atDay(1).atStartOfDay();
+            LocalDateTime endDateTime = yearMonth.atEndOfMonth().atTime(LocalTime.MAX);
+            return orderService.getTotalRevenue(storeId, startDateTime, endDateTime);
         }
         if (date.length() == 10) {
             LocalDate localDate = LocalDate.parse(date, DateTimeFormatter.ISO_DATE);
-            return orderService.getTotalRevenueByDay(storeId, localDate);
+            LocalDateTime startDateTime = localDate.atStartOfDay();
+            LocalDateTime endDateTime = localDate.atTime(LocalTime.MAX);
+            return orderService.getTotalRevenue(storeId, startDateTime, endDateTime);
         }
 
         throw new ApplicationException(ErrorCode.INVALID_DATE_FORMAT);
