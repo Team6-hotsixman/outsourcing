@@ -1,5 +1,7 @@
 package com.example.outsourcing.domain.favorite.controller;
 
+import com.example.outsourcing.domain.common.annotation.Auth;
+import com.example.outsourcing.domain.common.dto.AuthUser;
 import com.example.outsourcing.domain.favorite.service.FavoriteService;
 import com.example.outsourcing.domain.store.dto.response.StoreListResponseDto;
 import com.example.outsourcing.domain.user.entity.User;
@@ -10,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@RestControllerAdvice
+@RestController
 @RequiredArgsConstructor
 @RequestMapping("/stores")
 public class FavoriteController {
@@ -18,24 +20,16 @@ public class FavoriteController {
 
     // 즐겨찾기 기능 (토글형)
     @PostMapping("/{storeId}/favorits")
-    public ResponseEntity<Void> toggleFavorites(@PathVariable Long storeId) {
-        User authUser = User.builder()
-                .email("qwer@1234")
-                .password("password")
-                .userRole(UserRole.OWNER)
-                .build();
-        favoriteService.toggleFavorite(storeId, authUser);
+    public ResponseEntity<Void> toggleFavorites(@PathVariable Long storeId, @Auth AuthUser authUser) {
+        User user = User.fromAuthUser(authUser);
+        favoriteService.toggleFavorite(storeId, user);
         return ResponseEntity.ok().build();
     }
 
     // 즐겨찾기한 가게 리스트 반환
     @GetMapping("/favorits")
-    public ResponseEntity<List<StoreListResponseDto>> getFavorites() {
-        User authUser = User.builder()
-                .email("qwer@1234")
-                .password("password")
-                .userRole(UserRole.OWNER)
-                .build();
-        return ResponseEntity.ok(favoriteService.getFavorites(authUser));
+    public ResponseEntity<List<StoreListResponseDto>> getFavorites(@Auth AuthUser authUser) {
+        User user = User.fromAuthUser(authUser);
+        return ResponseEntity.ok(favoriteService.getFavorites(user));
     }
 }

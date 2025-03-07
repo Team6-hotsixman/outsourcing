@@ -11,10 +11,8 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 public interface OrderRepository extends JpaRepository<Orders, Long> {
-
     List<Orders> findAllByUserId(Long id);
 
-    // 관리자 통계 시작
     @Query("SELECT new com.example.outsourcing.domain.statistics.dto.response.StatisticsPriceResponseDto(o.store.storeName, SUM(o.totalPriceAmount)) " +
             "FROM Orders o " +
             "WHERE o.orderAt BETWEEN :startDate AND :endDate " +
@@ -32,11 +30,8 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
     List<StatisticsCountResponseDto> getCountOrdersByStore(
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate);
-    // 관리자 통계 끝
 
-    // 가게 통계 시작
-
-    @Query("SELECT new com.example.outsourcing.domain.statistics.dto.response.StatisticsCountResponseDto(o.store.storeName, sum(o.totalPriceAmount)) " +
+    @Query("SELECT new com.example.outsourcing.domain.statistics.dto.response.StatisticsCountResponseDto(o.store.storeName, count(o)) " +
             "FROM Orders o " +
             "WHERE o.orderAt BETWEEN :startDate AND :endDate " +
             "AND o.store.id = :storeId " +
@@ -58,8 +53,4 @@ public interface OrderRepository extends JpaRepository<Orders, Long> {
             @Param("startDate") LocalDateTime startDate,
             @Param("endDate") LocalDateTime endDate
     );
-
-
-    // 가게 통계 끝
-
 }
