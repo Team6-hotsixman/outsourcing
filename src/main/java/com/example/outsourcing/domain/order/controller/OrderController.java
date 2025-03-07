@@ -5,6 +5,8 @@ import com.example.outsourcing.domain.buket.service.CartService;
 import com.example.outsourcing.domain.common.annotation.Auth;
 import com.example.outsourcing.domain.common.annotation.Owner;
 import com.example.outsourcing.domain.common.dto.AuthUser;
+import com.example.outsourcing.domain.common.exception.ApplicationException;
+import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.order.dto.request.OrderItemRequestDto;
 import com.example.outsourcing.domain.order.dto.request.OrderRequestDto;
 import com.example.outsourcing.domain.order.dto.response.OrderSimpleResponseDto;
@@ -33,9 +35,15 @@ public class OrderController {
             @RequestParam Long storeId,
             @Validated @RequestBody OrderRequestDto requestDto
             ) {
+
         if(requestDto.getOrderItems() == null || requestDto.getOrderItems().isEmpty()) {
+            List<CartResponseDto> cart = cartService.getCart(authUser.getId());
+            if(cart == null || cart.isEmpty()) {
+                throw new ApplicationException(ErrorCode.EMPTY_CART);
+            }
             requestDto.setOrderItems(OrderItemRequestDto.fromCart(cartService.getCart(authUser.getId())));
         }
+
         return new ResponseEntity<>(orderService.placeOrder(authUser.getId(), storeId, requestDto), HttpStatus.CREATED);
     }
 
