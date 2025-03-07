@@ -1,5 +1,7 @@
 package com.example.outsourcing.domain.buket.dto.request;
 
+import com.example.outsourcing.domain.order.dto.request.OrderItemOptionRequestDto;
+import com.example.outsourcing.domain.order.dto.request.OrderItemRequestDto;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
@@ -10,6 +12,6 @@ import java.util.List;
 public class MenuRequest {
     private long menuId;
     private String menuName;
-    private List<Long> options;
+    private List<OrderItemOptionRequestDto> options;
     private int quantity;
 }

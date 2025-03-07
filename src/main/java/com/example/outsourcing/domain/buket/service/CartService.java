@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -53,9 +54,10 @@ public class CartService {
         StringBuilder key = new StringBuilder(String.valueOf(addMenuRequest.getMenuId()));
         key.append(":"+addMenuRequest.getMenuName());
         if (addMenuRequest.getOptions() != null && !addMenuRequest.getOptions().isEmpty()) {
-            key.append(":[").append(String.join(",", addMenuRequest.getOptions().stream()
-                    .map(String::valueOf)
-                    .toList()))
+            key.append(":[")
+                    .append(addMenuRequest.getOptions()
+                            .stream().map(v -> v.getMenuOptionId() + "/" + v.getQuantity())
+                            .collect(Collectors.joining(",")))
                     .append("]");
         }
         return key.toString();
