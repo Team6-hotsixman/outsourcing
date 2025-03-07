@@ -5,6 +5,7 @@ import com.example.outsourcing.domain.common.exception.ApplicationException;
 import com.example.outsourcing.domain.common.exception.ErrorCode;
 import com.example.outsourcing.domain.common.exception.UnauthorizedUserException;
 import com.example.outsourcing.domain.common.repository.ImageRepository;
+import com.example.outsourcing.domain.common.service.ImageService;
 import com.example.outsourcing.domain.menu.entity.Menu;
 import com.example.outsourcing.domain.menu.menuoption.dto.request.MenuOptionSaveRequestDto;
 import com.example.outsourcing.domain.menu.menuoption.dto.request.MenuOptionUpdateRequestDto;
@@ -16,6 +17,7 @@ import com.example.outsourcing.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -25,15 +27,14 @@ public class MenuOptionService {
 
     private final MenuOptionRepository menuOptionRepository;
     private final MenuRepository menuRepository;
-    private final ImageRepository imageRepository;
+    private final ImageService imageService;
 
     @Transactional
-    public MenuOptionResponseDto saveMenuOption(MenuOptionSaveRequestDto requestDto) {
+    public MenuOptionResponseDto saveMenuOption(MenuOptionSaveRequestDto requestDto, MultipartFile file) {
         Menu menu = menuRepository.findById(requestDto.getMenuId())
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_MENU));
 
-        Image image = imageRepository.findById(requestDto.getImageId())
-                .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_IMAGE));
+        Image image = imageService.uploadFile(file);
 
         MenuOption menuOption = MenuOptionSaveRequestDto.toEntity(requestDto, menu, image);
 
@@ -55,12 +56,11 @@ public class MenuOptionService {
     }
 
     @Transactional
-    public MenuOptionResponseDto updateMenuOption(Long optionId, MenuOptionUpdateRequestDto requestDto) {
+    public MenuOptionResponseDto updateMenuOption(Long optionId, MenuOptionUpdateRequestDto requestDto, MultipartFile file) {
         MenuOption menuOption = menuOptionRepository.findById(optionId)
                 .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_MENU_OPTION));
 
-        Image image = imageRepository.findById(requestDto.getImageId())
-                .orElseThrow(() -> new ApplicationException(ErrorCode.NOT_FOUND_IMAGE));
+        Image image = imageService.uploadFile(file);
 
         menuOption.updateMenuOption(requestDto, image);
 

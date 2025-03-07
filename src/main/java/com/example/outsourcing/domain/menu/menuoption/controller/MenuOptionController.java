@@ -1,14 +1,17 @@
 package com.example.outsourcing.domain.menu.menuoption.controller;
 
 import com.example.outsourcing.domain.common.annotation.Owner;
+import com.example.outsourcing.domain.menu.dto.request.MenuSaveRequestDto;
 import com.example.outsourcing.domain.menu.menuoption.dto.request.MenuOptionSaveRequestDto;
 import com.example.outsourcing.domain.menu.menuoption.dto.request.MenuOptionUpdateRequestDto;
 import com.example.outsourcing.domain.menu.menuoption.dto.response.MenuOptionResponseDto;
 import com.example.outsourcing.domain.menu.menuoption.service.MenuOptionService;
 import com.example.outsourcing.domain.user.entity.User;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,8 +24,9 @@ public class MenuOptionController {
     @Owner
     @PostMapping("/options")
     public ResponseEntity<MenuOptionResponseDto> saveMenuOption(
-            @RequestBody MenuOptionSaveRequestDto requestDto) {
-        return ResponseEntity.ok(menuOptionService.saveMenuOption(requestDto));
+            @RequestPart(value = "json") @Valid MenuOptionSaveRequestDto requestDto,
+            @RequestPart(value = "file") MultipartFile file) {
+        return ResponseEntity.ok(menuOptionService.saveMenuOption(requestDto, file));
     }
 
     @GetMapping("/options")
@@ -34,8 +38,9 @@ public class MenuOptionController {
     @PatchMapping("/options/{optionId}")
     public ResponseEntity<MenuOptionResponseDto> updateMenuOption(
             @PathVariable Long optionId,
-            @RequestBody MenuOptionUpdateRequestDto requestDto) {
-        return ResponseEntity.ok(menuOptionService.updateMenuOption(optionId, requestDto));
+            @RequestPart(value = "json") @Valid MenuOptionUpdateRequestDto requestDto,
+            @RequestPart(value = "file") MultipartFile file) {
+        return ResponseEntity.ok(menuOptionService.updateMenuOption(optionId, requestDto, file));
     }
 
     @Owner
