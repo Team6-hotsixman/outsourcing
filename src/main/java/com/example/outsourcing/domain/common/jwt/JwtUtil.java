@@ -56,7 +56,8 @@ public class JwtUtil {
 
         log.info("userRole : '{}'", userRole); // null이 아닌 경우만 찍힘
 
-        return builder.signWith(key, signatureAlgorithm).compact();
+        return "Bearer " + builder.signWith(key, signatureAlgorithm).compact();
+
     }
 
 
