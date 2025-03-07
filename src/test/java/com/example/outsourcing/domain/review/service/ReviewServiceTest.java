@@ -14,7 +14,9 @@ import com.example.outsourcing.domain.review.dto.response.ReviewResponse;
 import com.example.outsourcing.domain.review.entity.Review;
 import com.example.outsourcing.domain.review.entity.ReviewImage;
 import com.example.outsourcing.domain.review.repository.ReviewRepository;
+import com.example.outsourcing.domain.store.entity.Store;
 import com.example.outsourcing.domain.user.entity.User;
+import com.example.outsourcing.domain.user.enums.UserRole;
 import com.example.outsourcing.domain.user.repository.UserRepository;
 import jakarta.persistence.SqlResultSetMapping;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,6 +57,7 @@ class ReviewServiceTest {
     private User user;
     private Orders order;
     private Review review;
+    private User owner;
 
     @BeforeEach
     void setUp() {
@@ -63,12 +66,25 @@ class ReviewServiceTest {
                 .password("password")
                 .name("user")
                 .point(100)
-                .userRole(null)
+                .userRole(UserRole.USER)
                 .userStatus(null)
                 .createdAt(LocalDateTime.now())
                 .modifiedAt(LocalDateTime.now())
                 .build();
         ReflectionTestUtils.setField(user, "id", 1L);
+
+        owner = User.builder()
+                .email("a@a.com")
+                .password("password")
+                .name("owner")
+                .point(100)
+                .userRole(UserRole.USER)
+                .userStatus(null)
+                .createdAt(LocalDateTime.now())
+                .modifiedAt(LocalDateTime.now())
+                .build();
+        ReflectionTestUtils.setField(owner, "id", 99L);
+
 
         order = Orders.builder()
                 .orderStatus(OrderStatus.COMPLETED)
@@ -76,6 +92,7 @@ class ReviewServiceTest {
                 .user(user)
                 .build();
         ReflectionTestUtils.setField(order, "id", 1L);
+
         review = Review.builder()
                 .order(order)
                 .user(user)
@@ -100,6 +117,36 @@ class ReviewServiceTest {
 
         given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
         given(orderRepository.findById(anyLong())).willReturn(Optional.of(order));
+        given(reviewRepository.existsByUserIdAndOrderId(anyLong(), anyLong())).willReturn(false);
+        given(imageService.uploadFile(any())).willReturn(new Image(1L, "test.jpg", "url"));
+        given(reviewRepository.save(any(Review.class))).willReturn(review);
+
+        // when
+        ReviewResponse response = reviewService.saveReview(orderId, authUser, request, images);
+
+        // then
+        assertNotNull(response);
+        assertEquals(request.getContent(), response.getContents());
+        assertEquals(request.getRate(), response.getRate());
+        verify(reviewRepository, times(1)).save(any(Review.class));
+    }
+
+    @Test
+    void saveReview_리뷰저장성공_가게사장도리뷰를달수있다() {
+        // given
+        long orderId = 1L;
+        AuthUser authUser = new AuthUser(user.getId(), user.getEmail(), user.getUserRole());
+        ReviewCreateRequest request = new ReviewCreateRequest(review.getContent(), review.getRate());
+        List<MultipartFile> images = List.of(mock(MultipartFile.class));
+
+        //주문데이터 세팅
+        Store store = mock(Store.class);
+        ReflectionTestUtils.setField(order, "store", store);
+        given(store.getUser()).willReturn(owner);
+
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(owner));
+        given(orderRepository.findById(anyLong())).willReturn(Optional.of(order));
+        given(reviewRepository.existsByUserIdAndOrderId(anyLong(), anyLong())).willReturn(false);
         given(imageService.uploadFile(any())).willReturn(new Image(1L, "test.jpg", "url"));
         given(reviewRepository.save(any(Review.class))).willReturn(review);
 
@@ -150,7 +197,57 @@ class ReviewServiceTest {
         ApplicationException exception = assertThrows(ApplicationException.class,
                 () -> reviewService.saveReview(orderId, authUser, request, images));
 
-        assertEquals(ErrorCode.METHOD_ARGUMENT_NOT_VALID, exception.getErrorCode());
+        assertEquals(ErrorCode.REVIEW_ONLY_FOR_COMPLETED_ORDER, exception.getErrorCode());
+    }
+
+    @Test
+    void saveReview_리뷰저장실패_주문당사자가아닐때() {
+        // given
+        long orderId = 1L;
+        long anotherUserId = 34234L;
+        User anotherUser = mock(User.class);
+        ReflectionTestUtils.setField(order, "user", anotherUser);
+
+        //주문데이터 세팅
+        Store store = mock(Store.class);
+        ReflectionTestUtils.setField(order, "store", store);
+        given(store.getUser()).willReturn(owner);
+
+        AuthUser authUser = new AuthUser(user.getId(), user.getEmail(), user.getUserRole());
+        ReviewCreateRequest request = new ReviewCreateRequest(review.getContent(), review.getRate());
+        List<MultipartFile> images = List.of(mock(MultipartFile.class));
+
+        given(anotherUser.getId()).willReturn(anotherUserId);
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+        given(orderRepository.findById(anyLong())).willReturn(Optional.of(order));
+
+        // when & then
+        ApplicationException applicationException = assertThrows(ApplicationException.class,
+                () -> reviewService.saveReview(orderId, authUser, request, images));
+        assertEquals(ErrorCode.Unauthorized_User, applicationException.getErrorCode());
+    }
+
+    @Test
+    void saveReview_리뷰저장실패_사용자가여러개의리뷰를달때() {
+        // given
+        long orderId = 1L;
+
+        //주문데이터 세팅
+        Store store = mock(Store.class);
+
+        AuthUser authUser = new AuthUser(user.getId(), user.getEmail(), user.getUserRole());
+        ReviewCreateRequest request = new ReviewCreateRequest(review.getContent(), review.getRate());
+        List<MultipartFile> images = List.of(mock(MultipartFile.class));
+
+        given(userRepository.findById(anyLong())).willReturn(Optional.of(user));
+        given(orderRepository.findById(anyLong())).willReturn(Optional.of(order));
+        given(reviewRepository.existsByUserIdAndOrderId(anyLong(), anyLong())).willReturn(true);
+
+
+        // when & then
+        ApplicationException applicationException = assertThrows(ApplicationException.class,
+                () -> reviewService.saveReview(orderId, authUser, request, images));
+        assertEquals(ErrorCode.DUPLICATE_REVIEW, applicationException.getErrorCode());
     }
 
     @Test
