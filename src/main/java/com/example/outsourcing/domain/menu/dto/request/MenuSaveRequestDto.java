@@ -28,16 +28,13 @@ public class MenuSaveRequestDto {
     @NotNull
     private final Long storeId;
 
-    @NotNull
-    private final Long imageId;
 
-    public MenuSaveRequestDto(String menuName, Integer price, String description, Long categoryId, Long storeId, Long imageId) {
+    public MenuSaveRequestDto(String menuName, Integer price, String description, Long categoryId, Long storeId) {
         this.menuName = menuName;
         this.price = price;
         this.description = description;
         this.categoryId = categoryId;
         this.storeId = storeId;
-        this.imageId = imageId;
     }
 
     public static Menu toEntity(MenuSaveRequestDto requestDto, Store store, Category category, Image image) {

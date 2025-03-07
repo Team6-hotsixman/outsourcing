@@ -7,6 +7,7 @@ import com.example.outsourcing.domain.store.service.StoreService;
 import com.example.outsourcing.domain.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -18,6 +19,7 @@ public class FavoriteService {
 
     private final StoreService storeService;
 
+    @Transactional
     public void toggleFavorite(Long storeId, User authUser) {
         Store store = storeService.getStore(storeId);
         favoriteRepository.toggleFavorite(store, authUser);
